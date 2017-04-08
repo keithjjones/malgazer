@@ -86,6 +86,8 @@ class FileObject(object):
             length = self.file_size
 
         data = self.data[offset:length+offset]
+        self.running_entropy_offset = offset
+        self.running_entropy_length = length
 
         self.running_entropy_window_size = window_size
         self.running_entropy_data = runent.calculate(data)
