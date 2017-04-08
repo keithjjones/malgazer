@@ -70,20 +70,20 @@ class FileObject(object):
         """
         runent = entropy.RunningEntropy(window=window_size, normalize=normalize)
 
-        if offset+1 > self.file_size - window_size:
+        if offset > self.file_size - window_size or offset < 0:
             raise IndexError("The offset {0} is not a valid "
                              "value for file length {1} "
                              "and window size {2}!"
                              .format(offset, self.file_size, window_size))
 
         if length is not None:
-            if length + offset - 1 > self.file_size:
+            if length + offset > self.file_size:
                 raise IndexError("The length {0} is not a valid "
                                  "value for file length {1} "
                                  "and offset {2}!"
                                  .format(length, self.file_size, offset))
         else:
-            length = self.file_size
+            length = self.file_size - offset
 
         data = self.data[offset:length+offset]
         self.running_entropy_offset = offset
