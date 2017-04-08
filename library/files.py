@@ -1,6 +1,8 @@
 # Files module
 import os
 import magic
+import re
+import pefile
 from . import entropy
 
 
@@ -45,7 +47,9 @@ class FileObject(object):
         
         :return:  Nothing. 
         """
-        pass
+        # Detect Windows PE Files...
+        if re.match("PE.*MS Windows.*", self.filetype):
+            self.pefile = pefile.PE(self.filename)
 
     def running_entropy(self, window_size=256, normalize=True):
         """
