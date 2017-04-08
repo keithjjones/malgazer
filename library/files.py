@@ -24,6 +24,7 @@ class FileObject(object):
         self.data = list()
         self.filetype = magic.from_file(self.filename)
         self._read_file()
+        self._parse_file_type()
 
     def _read_file(self):
         """
@@ -37,6 +38,14 @@ class FileObject(object):
                 self.data.append(byte)
                 byte = f.read(1)
         self.file_size = len(self.data)
+
+    def _parse_file_type(self):
+        """
+        Parses this file into its appropriate type.
+        
+        :return:  Nothing. 
+        """
+        pass
 
     def running_entropy(self, window_size=256, normalize=True):
         """
