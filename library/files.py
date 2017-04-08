@@ -51,6 +51,19 @@ class FileObject(object):
         if re.match("PE.*MS Windows.*", self.filetype):
             self.pefile = pefile.PE(self.filename)
 
+    def file_type_entropy(self, window_size=256, normalize=True):
+        """
+        Calculates the running entropy of the file with respect to the file
+        type.  For example, Windows PE files will be calculated on each section.
+        
+        :param window_size:  The running window size in bytes. 
+        :param normalize:   True if the output sould be normalized between
+            0 and 1.
+        :return: A dict of running windows entropy lists as appropriate for
+            the file type.
+        """
+        pass
+    
     def running_entropy(self, window_size=256, normalize=True,
                         offset=0, length=None):
         """
