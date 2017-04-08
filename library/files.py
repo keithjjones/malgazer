@@ -51,19 +51,44 @@ class FileObject(object):
         if re.match("PE.*MS Windows.*", self.filetype):
             self.pefile = pefile.PE(self.filename)
 
-    def running_entropy(self, window_size=256, normalize=True):
+    def running_entropy(self, window_size=256, normalize=True,
+                        offset=0, length=None):
         """
         Calculates the running entropy of the whole file object using a
-        window size.
+        window size.  Optionally, you can specify an offset and length
+        within the file for the calculations.
 
         :param window_size:  The running window size in bytes.
         :param normalize:  True if the output should be normalized
             between 0 and 1.
+        :param offset:  Byte offset to start calculations within the file.
+            Note, use a valid value or there can be an exception!
+        :param length:  Length, in bytes, of the data area to compute.
+            Set to None to ignore the length.  Note, use a valid value or
+            there can be an exception!
         :return: A list of running entropy values for the given window size.
         """
-        re = entropy.RunningEntropy(window=window_size, normalize=normalize)
+        runent = entropy.RunningEntropy(window=window_size, normalize=normalize)
+
+        if offset+1 > self.file_size - window_size:
+            raise IndexError("The offset {0} is not a valid "
+                             "value for file length {1} "
+                             "and window size {2}!"
+                             .format(offset, self.file_size, window_size))
+
+        if length is not None:
+            if length + offset - 1 > self.file_size:
+                raise IndexError("The length {0} is not a valid "
+                                 "value for file length {1} "
+                                 "and offset {2}!"
+                                 .format(length, self.file_size, offset))
+        else:
+            length = self.file_size
+
+        data = self.data[offset:length+offset]
+
         self.running_entropy_window_size = window_size
-        self.running_entropy_data = re.calculate(self.data)
+        self.running_entropy_data = runent.calculate(data)
         return self.running_entropy_data
 
     def entropy(self, normalize=True):
@@ -74,6 +99,6 @@ class FileObject(object):
             between 0 and 1.
         :return: An entropy value of the whole file.
         """
-        re = entropy.RunningEntropy(window=len(self.data), normalize=normalize)
-        self.entropy = re.calculate(self.data)[0]
+        runent = entropy.RunningEntropy(window=len(self.data), normalize=normalize)
+        self.entropy = runent.calculate(self.data)[0]
         return self.entropy
