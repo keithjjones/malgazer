@@ -41,9 +41,6 @@ def main():
                              "entropy plot (html).",
                         default="malgzer_running_entropy.html",
                         required=False)
-    # parser.add_argument("-p", "--punctuation", action='store_true',
-    #                     help="Counts punctuation as valid cipher characters instead of ignoring them."
-    #                          "", required=False)
 
     args = parser.parse_args()
 
