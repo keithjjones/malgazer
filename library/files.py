@@ -20,7 +20,7 @@ class FileObject(object):
         self.running_entropy_data = None
         self.running_entropy_window_size = 0
         self.file_size = 0
-        self.parsedfile = dict()
+        self.parsedfile = None
 
         # Fill out other data here...
         self.filename = filename
@@ -63,19 +63,23 @@ class FileObject(object):
         :param normalize:   True if the output sould be normalized between
             0 and 1.
         :return: A dict of running window entropy lists as appropriate for
-            the file type.
+            the file type.  None if the file was not parsed successfully.
         """
+        if self.parsedfile is None:
+            return None
+
         # Windows PE Files...
         if self.parsedfile['type'] == 'pefile':
-            self.parsedfile['running_entropy'] = dict()
+            self.parsedfile['running_entropy_sections'] = dict()
             for section in self.parsedfile['file'].sections:
                 section_name = section.Name.decode('UTF-8').rstrip('\x00')
                 offset = section.PointerToRawData
-                length = section.SizeOfRawData
-                self.parsedfile['running_entropy'][section_name] = \
+                length = section.Misc_VirtualSize
+                # TODO: Above may be section.SizeOfRawData - test this.
+                self.parsedfile['running_entropy_sections'][section_name] = \
                     self.running_entropy(window_size, normalize,
                                          offset=offset, length=length)
-            return self.parsedfile['running_entropy']
+            return self.parsedfile['running_entropy_sections']
 
     def running_entropy(self, window_size=256, normalize=True,
                         offset=0, length=None):
