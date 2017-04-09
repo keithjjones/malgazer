@@ -62,24 +62,34 @@ class FileObject(object):
         :param window_size:  The running window size in bytes. 
         :param normalize:   True if the output sould be normalized between
             0 and 1.
-        :return: A dict of running window entropy lists as appropriate for
-            the file type.  None if the file was not parsed successfully.
+        :return: A dict with running window entropy and other metadata 
+            as appropriate for the file type.  
+            Returns None if the file was not parsed successfully.
         """
+        # Return right away if the data was not parsed...
         if self.parsedfile is None:
             return None
 
         # Windows PE Files...
         if self.parsedfile['type'] == 'pefile':
-            self.parsedfile['running_entropy_sections'] = dict()
+            self.parsedfile['running_entropy'] = dict()
+            self.parsedfile['running_entropy']['sections'] = list()
             for section in self.parsedfile['file'].sections:
                 section_name = section.Name.decode('UTF-8').rstrip('\x00')
                 offset = section.PointerToRawData
                 length = section.Misc_VirtualSize
                 # TODO: Above may be section.SizeOfRawData - test this.
-                self.parsedfile['running_entropy_sections'][section_name] = \
-                    self.running_entropy(window_size, normalize,
-                                         offset=offset, length=length)
-            return self.parsedfile['running_entropy_sections']
+                # More info:
+                # https://msdn.microsoft.com/en-us/library/ms809762.aspx
+                self.parsedfile['running_entropy']['sections'].append({
+                    'name': section_name, 'offset': offset, 'length': length,
+                    'entropy_window_length': window_size,
+                    'normalize': normalize,
+                    'running_entropy': self.running_entropy(window_size,
+                                                            normalize,
+                                                            offset=offset,
+                                                            length=length)})
+            return self.parsedfile['running_entropy']
 
     def running_entropy(self, window_size=256, normalize=True,
                         offset=0, length=None):
