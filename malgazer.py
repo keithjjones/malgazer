@@ -1,18 +1,9 @@
 # Script to calculate the entropy of a complete file.
 import argparse
 from library.files import FileObject
+from library.plots import ScatterPlot
 import numpy
 import time
-
-try:
-    from plotly import __version__
-    from plotly.offline import (download_plotlyjs, plot)
-    from plotly.graph_objs import (Bar, Scatter, Figure,
-    Pie, Layout, Line, Annotations, Annotation)
-    from plotly import tools
-    from plotly.tools import FigureFactory as FF
-except ImportError as e:
-    raise e
 
 
 def main():
@@ -30,7 +21,8 @@ def main():
                         help="Window size, in bytes, for running entropy."
                              "", type=int, required=False)
     parser.add_argument("-pre", "--plotrunningentropy", action='store_true',
-                        help="Plot the running entropy values."
+                        help="Plot the running entropy values.  Only valid "
+                             "if -w is used!"
                              "", required=False)
     parser.add_argument("-preskip", "--plotrunningentropyskip",
                         help="Skip this number of bytes in running entropy "
@@ -58,7 +50,7 @@ def main():
     print("\tFile Type: {0}".format(f.filetype))
     print("\tFile Entropy: {0:.6f}".format(f.entropy(normalize)))
     print("\tFile Entropy Calculation Time: {0:.6f} seconds"
-          .format(round(time.time()-start_time, 6)))
+          .format(round(time.time() - start_time, 6)))
     if args.window:
         running_start_time = time.time()
         print("Running Window Entropy:")
@@ -73,7 +65,7 @@ def main():
         if args.plotrunningentropy:
             plot_running_start_time = time.time()
             print("Plotting Running Window Entropy...")
-            if args.plotrunningentropyskip:
+            if args.plotrunningentropyskip > 1:
                 print("\tSkipping every {0} entropy values in plot..."
                       .format(args.plotrunningentropyskip))
             # Setup the x axis as location information
@@ -84,40 +76,31 @@ def main():
                  for i in range(0, len(running_entropy))
                  if i % int(args.plotrunningentropyskip) == 0]
 
-            # Start with empty output
-            output = []
-            title = "Running Window Entropy"
-
-            # Add current scatter plot
-            output.append(Scatter(name="Running Entropy Window Size {0} Bytes"
-                                  .format(args.window),
-                                  x=x,
-                                  y=y,
-                                  hoverinfo="x+y"
-                                  ))
-
-            # Setup the plot...
-            xaxis_title = "Byte Location"
+            title = ("Malgazer - Running Entropy Window Size {0} Bytes"
+                     .format(args.window))
+            xtitle = "Byte Location"
+            ytitle = "Entropy Value"
+            datatitle = args.MalwareFile
             if args.plotrunningentropyskip > 1:
-                xaxis_title += (" (skip value = {0} bytes)"
-                                .format(int(args.plotrunningentropyskip)))
-            plotlayout = Layout(showlegend=True, title=title,
-                                xaxis=dict(title=xaxis_title),
-                                yaxis=dict(title="Entropy"))
-            plotfigure = Figure(data=output, layout=plotlayout)
-
-            # Plot without the plotly annoying link...
-            plot(plotfigure, show_link=False,
-                 filename=args.plotrunningentropyfilename,
-                 auto_open=True)
+                xtitle += (" (skip value = {0} bytes)"
+                           .format(int(args.plotrunningentropyskip)))
+            myplot = ScatterPlot(x=x, datatitle=datatitle, xtitle=xtitle,
+                                 y=y, ytitle=ytitle,
+                                 plottitle=title)
+            html = myplot.plot_div()
+            with open('malgazer.html', 'w') as f:
+                f.write("<HTML><TITLE>{0}</TITLE><BODY>".format(title))
+                f.write(html)
+                f.write("</BODY></HTML>")
             print("\tPlot Running Window Entropy Time: {0:.6f} seconds"
-                  .format(round(time.time()-plot_running_start_time, 6)))
+                  .format(round(time.time() - plot_running_start_time, 6)))
 
     # Print the running time
     print()
     print("Total running time: {0:.6f} seconds"
-          .format(round(time.time()-start_time, 6)))
+          .format(round(time.time() - start_time, 6)))
     print()
+
 
 if __name__ == "__main__":
     main()
