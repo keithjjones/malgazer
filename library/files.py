@@ -20,6 +20,7 @@ class FileObject(object):
         self.running_entropy_data = None
         self.running_entropy_window_size = 0
         self.file_size = 0
+        self.parsedfile = dict()
 
         # Fill out other data here...
         self.filename = filename
@@ -49,25 +50,37 @@ class FileObject(object):
         """
         # Detect Windows PE Files...
         if re.match("PE.*MS Windows.*", self.filetype):
-            self.pefile = pefile.PE(self.filename)
+            self.parsedfile = {"type": "pefile",
+                               "file": pefile.PE(self.filename)}
 
-    def file_type_entropy(self, window_size=256, normalize=True):
+    def parsed_file_running_entropy(self, window_size=256, normalize=True):
         """
         Calculates the running entropy of the file with respect to the file
-        type.  For example, Windows PE files will be calculated on each section.
+        type.  For example, Windows PE files entropy will be 
+        calculated on each section.
         
         :param window_size:  The running window size in bytes. 
         :param normalize:   True if the output sould be normalized between
             0 and 1.
-        :return: A dict of running windows entropy lists as appropriate for
+        :return: A dict of running window entropy lists as appropriate for
             the file type.
         """
-        pass
-    
+        # Windows PE Files...
+        if self.parsedfile['type'] == 'pefile':
+            self.parsedfile['running_entropy'] = dict()
+            for section in self.parsedfile['file'].sections:
+                section_name = section.Name.decode('UTF-8').rstrip('\x00')
+                offset = section.PointerToRawData
+                length = section.SizeOfRawData
+                self.parsedfile['running_entropy'][section_name] = \
+                    self.running_entropy(window_size, normalize,
+                                         offset=offset, length=length)
+            return self.parsedfile['running_entropy']
+
     def running_entropy(self, window_size=256, normalize=True,
                         offset=0, length=None):
         """
-        Calculates the running entropy of the whole file object using a
+        Calculates the running entropy of the whole generic file object using a
         window size.  Optionally, you can specify an offset and length
         within the file for the calculations.
 
