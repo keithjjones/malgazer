@@ -54,7 +54,7 @@ def main():
     print("\tFile Entropy: {0:.6f}".format(f.entropy(normalize)))
     print("\tFile Entropy Calculation Time: {0:.6f} seconds"
           .format(round(time.time() - start_time, 6)))
-    if f.parsedfile['type'] is not None:
+    if f.parsedfile is not None and f.parsedfile['type'] == 'pefile':
         parsed_time = time.time()
         print("Parsed File As Type: {0}".format(f.parsedfile['type']))
         parsed_entropy = f.parsed_file_entropy(normalize)
@@ -77,6 +77,23 @@ def main():
         print("\tRunning Entropy Max: {0:.6f}".format(n.max()))
         print("\tRunning Entropy Calculation Time: {0:.6f} seconds"
               .format(round(time.time() - running_start_time, 6)))
+
+        if f.parsedfile is not None and f.parsedfile['type'] == 'pefile':
+            running_start_time = time.time()
+            print("Parsed File Running Window Entropy:")
+            print("\tRunning Entropy Window Size (bytes): {0}".format(
+                args.window))
+            parsed_running_start_time = time.time()
+            parsed_running_entropy = \
+                f.parsed_file_running_entropy(int(args.window), normalize)
+            for section in parsed_running_entropy['sections']:
+                n = numpy.array(section['running_entropy'])
+                print("\tSection Name: {0}".format(section['name']))
+                print("\t\tRunning Entropy Mean: {0:.6f}".format(n.mean()))
+                print("\t\tRunning Entropy Min: {0:.6f}".format(n.min()))
+                print("\t\tRunning Entropy Max: {0:.6f}".format(n.max()))
+            print("\tRunning Entropy Calculation Time: {0:.6f} seconds"
+                  .format(round(time.time() - running_start_time, 6)))
 
         if args.plotrunningentropy:
             plot_running_start_time = time.time()
