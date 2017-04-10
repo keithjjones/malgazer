@@ -20,6 +20,9 @@ def main():
     parser.add_argument("-w", "--window",
                         help="Window size, in bytes, for running entropy."
                              "", type=int, required=False)
+    parser.add_argument("-p", "--parsefile", action='store_true',
+                        help="Show parsed file info (such as PE structs)."
+                             "", required=False)
     parser.add_argument("-pre", "--plotrunningentropy", action='store_true',
                         help="Plot the running entropy values.  Only valid "
                              "if -w is used!"
@@ -51,6 +54,18 @@ def main():
     print("\tFile Entropy: {0:.6f}".format(f.entropy(normalize)))
     print("\tFile Entropy Calculation Time: {0:.6f} seconds"
           .format(round(time.time() - start_time, 6)))
+    if f.parsedfile['type'] is not None:
+        parsed_time = time.time()
+        print("Parsed File As Type: {0}".format(f.parsedfile['type']))
+        parsed_entropy = f.parsed_file_entropy(normalize)
+        print("\tSection Entropy:")
+        for section in parsed_entropy['sections']:
+            print("\t\tName: {0}".format(section['name']))
+            print("\t\t\tRaw Offset: {0}".format(hex(section['offset'])))
+            print("\t\t\tSize: {0}".format(hex(section['length'])))
+            print("\t\t\tEntropy: {0}".format(section['entropy']))
+        print("\tParsed File Entropy Calculation Time: {0:6f} seconds"
+              .format(round(time.time() - parsed_time, 6)))
     if args.window:
         running_start_time = time.time()
         print("Running Window Entropy:")
@@ -62,6 +77,7 @@ def main():
         print("\tRunning Entropy Max: {0:.6f}".format(n.max()))
         print("\tRunning Entropy Calculation Time: {0:.6f} seconds"
               .format(round(time.time() - running_start_time, 6)))
+
         if args.plotrunningentropy:
             plot_running_start_time = time.time()
             print("Plotting Running Window Entropy...")
@@ -88,10 +104,10 @@ def main():
                                  y=y, ytitle=ytitle,
                                  plottitle=title)
             html = myplot.plot_div()
-            with open('malgazer.html', 'w') as f:
-                f.write("<HTML><TITLE>{0}</TITLE><BODY>".format(title))
-                f.write(html)
-                f.write("</BODY></HTML>")
+            with open('malgazer.html', 'w') as m:
+                m.write("<HTML><TITLE>{0}</TITLE><BODY>".format(title))
+                m.write(html)
+                m.write("</BODY></HTML>")
             print("\tPlot Running Window Entropy Time: {0:.6f} seconds"
                   .format(round(time.time() - plot_running_start_time, 6)))
 

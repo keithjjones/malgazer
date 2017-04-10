@@ -60,7 +60,7 @@ class FileObject(object):
         calculated on each section.
         
         :param window_size:  The running window size in bytes. 
-        :param normalize:   True if the output sould be normalized between
+        :param normalize:   True if the output should be normalized between
             0 and 1.
         :return: A dict with running window entropy and other metadata 
             as appropriate for the file type.  
@@ -90,6 +90,45 @@ class FileObject(object):
                                                             offset=offset,
                                                             length=length)})
             return self.parsedfile['running_entropy']
+
+    def parsed_file_entropy(self, normalize=True):
+        """
+        Calculates the entropy values and other metadata as appropriate 
+        for the file type.
+        :param normalize: True if the output should be normalized between 
+            0 and 1.
+        :return:  A dict with entropy and other metadata as appropriate for the
+            file type.
+            Returns None if the file was not parsed successfully.
+        """
+        # Return right away if the data was not parsed...
+        if self.parsedfile is None:
+            return None
+
+        # Windows PE Files...
+        if self.parsedfile['type'] == 'pefile':
+            self.parsedfile['entropy'] = dict()
+            self.parsedfile['entropy']['sections'] = list()
+            for section in self.parsedfile['file'].sections:
+                section_name = section.Name.decode('UTF-8').rstrip('\x00')
+                offset = section.PointerToRawData
+                length = section.Misc_VirtualSize
+                # TODO: Above may be section.SizeOfRawData - test this.
+                # More info:
+                # https://msdn.microsoft.com/en-us/library/ms809762.aspx
+                entval = self.running_entropy(length,
+                                              normalize,
+                                              offset=offset,
+                                              length=length)
+                if len(entval) > 1:
+                    raise Exception("This should happen.  Check this code.")
+                entval = entval[0]
+
+                self.parsedfile['entropy']['sections'].append({
+                    'name': section_name, 'offset': offset, 'length': length,
+                    'normalize': normalize,
+                    'entropy': entval})
+            return self.parsedfile['entropy']
 
     def running_entropy(self, window_size=256, normalize=True,
                         offset=0, length=None):
@@ -125,7 +164,7 @@ class FileObject(object):
         else:
             length = self.file_size - offset
 
-        data = self.data[offset:length+offset]
+        data = self.data[offset:length + offset]
         self.running_entropy_offset = offset
         self.running_entropy_length = length
 
@@ -141,6 +180,7 @@ class FileObject(object):
             between 0 and 1.
         :return: An entropy value of the whole file.
         """
-        runent = entropy.RunningEntropy(window=len(self.data), normalize=normalize)
+        runent = entropy.RunningEntropy(window=len(self.data),
+                                        normalize=normalize)
         self.entropy = runent.calculate(self.data)[0]
         return self.entropy
