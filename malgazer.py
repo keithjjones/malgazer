@@ -63,7 +63,7 @@ def main():
             print("\t\tName: {0}".format(section['name']))
             print("\t\t\tRaw Offset: {0}".format(hex(section['offset'])))
             print("\t\t\tSize: {0}".format(hex(section['length'])))
-            print("\t\t\tEntropy: {0}".format(section['entropy']))
+            print("\t\t\tEntropy: {0:.6f}".format(section['entropy']))
         print("\tParsed File Entropy Calculation Time: {0:6f} seconds"
               .format(round(time.time() - parsed_time, 6)))
     if args.window:
