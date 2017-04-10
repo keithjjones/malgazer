@@ -20,9 +20,6 @@ def main():
     parser.add_argument("-w", "--window",
                         help="Window size, in bytes, for running entropy."
                              "", type=int, required=False)
-    parser.add_argument("-p", "--parsefile", action='store_true',
-                        help="Show parsed file info (such as PE structs)."
-                             "", required=False)
     parser.add_argument("-pre", "--plotrunningentropy", action='store_true',
                         help="Plot the running entropy values.  Only valid "
                              "if -w is used!"
