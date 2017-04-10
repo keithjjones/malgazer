@@ -45,6 +45,7 @@ def main():
         normalize = True
 
     f = FileObject(args.MalwareFile)
+    # Generic Data...
     print("")
     print("**** Summary ****")
     print("Whole file calculations:")
@@ -54,6 +55,8 @@ def main():
     print("\tFile Entropy: {0:.6f}".format(f.entropy(normalize)))
     print("\tFile Entropy Calculation Time: {0:.6f} seconds"
           .format(round(time.time() - start_time, 6)))
+
+    # Windows PE Sections...
     if f.parsedfile is not None and f.parsedfile['type'] == 'pefile':
         parsed_time = time.time()
         print("Parsed File As Type: {0}".format(f.parsedfile['type']))
@@ -67,6 +70,7 @@ def main():
         print("\tParsed File Entropy Calculation Time: {0:6f} seconds"
               .format(round(time.time() - parsed_time, 6)))
     if args.window:
+        # Generic data...
         running_start_time = time.time()
         print("Running Window Entropy:")
         print("\tRunning Entropy Window Size (bytes): {0}".format(args.window))
@@ -78,6 +82,7 @@ def main():
         print("\tRunning Entropy Calculation Time: {0:.6f} seconds"
               .format(round(time.time() - running_start_time, 6)))
 
+        # Windows PE sections...
         if f.parsedfile is not None and f.parsedfile['type'] == 'pefile':
             running_start_time = time.time()
             print("Parsed File Running Window Entropy:")
@@ -95,7 +100,12 @@ def main():
             print("\tRunning Entropy Calculation Time: {0:.6f} seconds"
                   .format(round(time.time() - running_start_time, 6)))
 
+        # Plots...
         if args.plotrunningentropy:
+            # This will be our HTML output
+            html = list()
+
+            # Plot generic data...
             plot_running_start_time = time.time()
             print("Plotting Running Window Entropy...")
             if args.plotrunningentropyskip > 1:
@@ -120,10 +130,37 @@ def main():
             myplot = ScatterPlot(x=x, datatitle=datatitle, xtitle=xtitle,
                                  y=y, ytitle=ytitle,
                                  plottitle=title)
-            html = myplot.plot_div()
+            html.append(myplot.plot_div())
+
+            # Plot Windows PE sections...
+            if f.parsedfile is not None and f.parsedfile['type'] == 'pefile':
+                for section in parsed_running_entropy['sections']:
+                    # Setup the x axis as location information
+                    x = [i for i in range(0, len(section['running_entropy']))
+                         if i % int(args.plotrunningentropyskip) == 0]
+                    # Setup the y axis values
+                    y = [round(section['running_entropy'][i], 6)
+                         for i in range(0, len(section['running_entropy']))
+                         if i % int(args.plotrunningentropyskip) == 0]
+
+                    title = ("Malgazer - Running Entropy Window Size {0} Bytes"
+                             .format(args.window))
+                    xtitle = "Byte Location"
+                    ytitle = "Entropy Value"
+                    datatitle = section['name']
+                    if args.plotrunningentropyskip > 1:
+                        xtitle += (" (skip value = {0} bytes)"
+                                   .format(int(args.plotrunningentropyskip)))
+                    myplot = ScatterPlot(x=x, datatitle=datatitle,
+                                         xtitle=xtitle,
+                                         y=y, ytitle=ytitle,
+                                         plottitle=title)
+                    html.append(myplot.plot_div())
+
             with open('malgazer.html', 'w') as m:
-                m.write("<HTML><TITLE>{0}</TITLE><BODY>".format(title))
-                m.write(html)
+                m.write("<HTML><TITLE>Malgazer</TITLE><BODY>")
+                for h in html:
+                    m.write(h)
                 m.write("</BODY></HTML>")
             print("\tPlot Running Window Entropy Time: {0:.6f} seconds"
                   .format(round(time.time() - plot_running_start_time, 6)))

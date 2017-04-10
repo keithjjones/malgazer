@@ -182,5 +182,9 @@ class FileObject(object):
         """
         runent = entropy.RunningEntropy(window=len(self.data),
                                         normalize=normalize)
-        self.entropy = runent.calculate(self.data)[0]
+        runentvals = runent.calculate(self.data)
+        if len(runentvals) > 1:
+            raise Exception("This should happen.  Check this code.")
+
+        self.entropy = runentvals[0]
         return self.entropy
