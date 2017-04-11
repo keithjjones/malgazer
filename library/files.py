@@ -77,8 +77,8 @@ class FileObject(object):
             for section in self.parsedfile['file'].sections:
                 section_name = section.Name.decode('UTF-8').rstrip('\x00')
                 offset = section.PointerToRawData
-                length = section.Misc_VirtualSize
-                # TODO: Above may be section.SizeOfRawData - test this.
+                length = section.SizeOfRawData
+                # TODO: Above may be section.Misc_VirtualSize - test this.
                 # More info:
                 # https://msdn.microsoft.com/en-us/library/ms809762.aspx
                 self.parsedfile['running_entropy']['sections'].append({
@@ -112,8 +112,8 @@ class FileObject(object):
             for section in self.parsedfile['file'].sections:
                 section_name = section.Name.decode('UTF-8').rstrip('\x00')
                 offset = section.PointerToRawData
-                length = section.Misc_VirtualSize
-                # TODO: Above may be section.SizeOfRawData - test this.
+                length = section.SizeOfRawData
+                # TODO: Above may be section.Misc_VirtualSize - test this.
                 # More info:
                 # https://msdn.microsoft.com/en-us/library/ms809762.aspx
                 entval = self.running_entropy(length,
