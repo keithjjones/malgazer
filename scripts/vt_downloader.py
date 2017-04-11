@@ -44,7 +44,7 @@ def main():
                 os.mkdir(subdir)
 
             print("Downloading {0}".format(notification['sha256']))
-            api.get_file(notification['sha256'], subdir)
+            response = api.get_file(notification['sha256'], subdir)
             print("\tDownloaded {0}".format(notification['sha256']))
             expected_hash = notification['sha256'].upper()
             dl_hash = sha256_file(filename).upper()
@@ -54,6 +54,7 @@ def main():
                 print("\tExpected SHA256: {0}".format(expected_hash))
                 print("\tCalculated SHA256: {0}".format(dl_hash))
                 print("\tWill not delete this sample from the feed.")
+                print("\tHave you exceeded your quota?")
             else:
                 samplestodelete.append(notification['id'])
 
