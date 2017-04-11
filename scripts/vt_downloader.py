@@ -26,6 +26,7 @@ def main():
     nextpage = None
 
     while True:
+        samplestodelete = []
         nextpage, results = api.get_intel_notifications_feed(nextpage)
         results = results.json()
         print("Downloading {0} Samples..."
@@ -35,27 +36,30 @@ def main():
             downloads += 1
             subdir = os.path.join(args.OutputDirectory,
                                   notification['ruleset_name'])
+            filename = os.path.join(subdir, notification['sha256'])
+
             try:
                 os.stat(subdir)
             except:
                 os.mkdir(subdir)
 
-            try:
-                print(sha256_file(os.path.join(subdir, notification['sha256'])).upper())
-            except:
-                pass
-
             print("Downloading {0}".format(notification['sha256']))
+            api.get_file(notification['sha256'], subdir)
+            print("\tDownloaded {0}".format(notification['sha256']))
+            expected_hash = notification['sha256'].upper()
+            dl_hash = sha256_file(filename).upper()
 
-            if (os.path.isfile(os.path.join(subdir, notification['sha256']))
-                and notification['sha256'].upper() ==
-                    sha256_file(
-                        os.path.join(subdir, notification['sha256'])).upper()):
-                print("\tFile {0} Already Downlaoded!"
-                      .format(notification['sha256']))
+            if expected_hash != dl_hash:
+                print("**** DOWNLOAD ERROR!  SHA256 Does not match!")
+                print("\tExpected SHA256: {0}".format(expected_hash))
+                print("\tCalculated SHA256: {0}".format(dl_hash))
+                print("\tWill not delete this sample from the feed.")
             else:
-                api.get_file(notification['sha256'], subdir)
-                print("\tDownloaded {0}".format(notification['sha256']))
+                samplestodelete.append(notification['id'])
+
+        if len(samplestodelete) > 0:
+            api.delete_intel_notifications(samplestodelete)
+            print("Deleted {0} Samples From Feed".format(len(samplestodelete)))
 
         if nextpage is None:
             break
@@ -66,7 +70,8 @@ def main():
 def sha256_file(filename):
     hasher = sha256()
     with open(filename,'rb') as f:
-        hasher.update(f.read())
+        buf = f.read()
+        hasher.update(buf)
     return hasher.hexdigest()
 
 if __name__ == "__main__":
