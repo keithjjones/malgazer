@@ -193,5 +193,5 @@ class FileObject(object):
         if len(runentvals) > 1:
             raise Exception("This should happen.  Check this code.")
 
-        self.entropy = runentvals[0]
-        return self.entropy
+        self.file_entropy = runentvals[0]
+        return self.file_entropy
