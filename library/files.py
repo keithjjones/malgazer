@@ -3,6 +3,7 @@ import os
 import magic
 import re
 import pefile
+import hashlib
 from . import entropy
 
 
@@ -36,11 +37,14 @@ class FileObject(object):
         :return:  Nothing.
         """
         with open(self.filename, 'rb') as f:
+            hash_md5 = hashlib.md5()
             byte = f.read(1)
             while byte != b"":
+                hash_md5.update(byte)
                 self.data.append(byte)
                 byte = f.read(1)
         self.file_size = len(self.data)
+        self.md5 = hash_md5.hexdigest()
 
     def _parse_file_type(self):
         """
