@@ -10,6 +10,7 @@ def main():
     # Capture the running time
     start_time = time.time()
 
+    # Argument parsing
     parser = argparse.ArgumentParser(
         description='Calculates the entropy of a file.')
     parser.add_argument('MalwareFile',
