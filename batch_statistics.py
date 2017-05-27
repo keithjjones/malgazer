@@ -50,7 +50,8 @@ def main():
             m = FileObject(malwarepath)
             print("\tCalculating {0}".format(m.filename))
             fileentropy = m.entropy(normalize)
-            dbfile = m.filename + ".db"
+            dbfile = os.path.join(root + "_db", f)
+            dbfile = dbfile + ".db"
             sql = "INSERT INTO metadata (filepath, filesize, filetype, fileentropy, MD5, SHA256, DBFile) VALUES (:filepath, :filesize, :filetype, :fileentropy, :md5, :sha256, :dbfile);"
             params = {'filepath': m.filename, 'filesize':m.file_size,
                     'filetype':m.filetype, 'fileentropy': fileentropy,
