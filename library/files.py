@@ -38,13 +38,16 @@ class FileObject(object):
         """
         with open(self.filename, 'rb') as f:
             hash_md5 = hashlib.md5()
+            hash_sha256 = hashlib.sha256()
             byte = f.read(1)
             while byte != b"":
                 hash_md5.update(byte)
+                hash_sha256.update(byte)
                 self.data.append(byte)
                 byte = f.read(1)
         self.file_size = len(self.data)
         self.md5 = hash_md5.hexdigest()
+        self.sha256 = hash_sha256.hexdigest()
 
     def _parse_file_type(self):
         """
