@@ -37,6 +37,7 @@ def main():
 
     args = parser.parse_args()
 
+    # Normalize setup...
     if args.nonormalize:
         normalize = False
     else:
