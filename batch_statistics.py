@@ -112,15 +112,17 @@ def main():
                 malware_conn.commit()
                 malware_cursor.execute('CREATE TABLE windows(' +
                                        'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
-                                       'windowsize INT NOT NULL'
+                                       'windowsize INT NOT NULL,'
+                                       'normalized INT NOT NULL'
                                        ');')
                 malware_conn.commit()
 
                 for w in windows:
                     print("\t\tCalculating window size {0}".format(w))
                     # Add the window size to the database...
-                    sql = "INSERT INTO windows (windowsize) VALUES (:windowsize)"
-                    params = {'windowsize': w}
+                    sql = "INSERT INTO windows (windowsize, normalized) " + \
+                          "VALUES (:windowsize, :normalized)"
+                    params = {'windowsize': w, 'normalized': normalize}
                     malware_cursor.execute(sql, params)
                     malware_conn.commit()
 
