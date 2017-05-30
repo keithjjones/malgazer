@@ -50,7 +50,7 @@ def main():
     main_conn = sqlite3.connect(args.SQLFile)
     main_cursor = main_conn.cursor()
 
-    main_cursor.execute('CREATE TABLE metadata(' +
+    main_cursor.execute('CREATE TABLE IF NOT EXISTS metadata(' +
                         'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
                         'filepath TEXT NOT NULL,'
                         'filesize INT NOT NULL,'
@@ -97,20 +97,20 @@ def main():
             # Calculate the window entropy for malware samples...
             if windows is not None:
                 # Prepare and execute SQL for sample DB...
-                try:
-                    os.remove(dbfile)
-                except:
-                    pass
+                # try:
+                #     os.remove(dbfile)
+                # except:
+                #     pass
                 malware_conn = sqlite3.connect(dbfile)
                 malware_cursor = malware_conn.cursor()
-                malware_cursor.execute('CREATE TABLE windowentropy(' +
+                malware_cursor.execute('CREATE TABLE IF NOT EXISTS windowentropy(' +
                                        'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
                                        'windowsize INT NOT NULL,'
                                        'offset INT NOT NULL,'
                                        'entropy REAL NOT NULL'
                                        ');')
                 malware_conn.commit()
-                malware_cursor.execute('CREATE TABLE windows(' +
+                malware_cursor.execute('CREATE TABLE IF NOT EXISTS windows(' +
                                        'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
                                        'windowsize INT NOT NULL,'
                                        'normalized INT NOT NULL'
@@ -118,28 +118,44 @@ def main():
                 malware_conn.commit()
 
                 for w in windows:
-                    print("\t\tCalculating window size {0}".format(w))
-                    # Add the window size to the database...
-                    sql = "INSERT INTO windows (windowsize, normalized) " + \
-                          "VALUES (:windowsize, :normalized)"
-                    params = {'windowsize': w, 'normalized': normalize}
-                    malware_cursor.execute(sql, params)
-                    malware_conn.commit()
+                    if w < m.file_size:
+                        print("\t\tCalculating window size {0}".format(w))
 
-                    # Calculate running entropy...
-                    running_entropy = m.running_entropy(w, normalize)
-
-                    # Add running entropy to the database...
-                    malware_offset = 0
-                    for r in running_entropy:
-                        sql = "INSERT INTO windowentropy " + \
-                              "(windowsize, offset, entropy) " + \
-                              "VALUES (:windowsize, :offset, :entropy);"
-                        params = {'windowsize': w, 'offset': malware_offset,
-                                  'entropy': r}
+                        # See if this data is already in the database...
+                        sql = "SELECT COUNT(*) FROM windows WHERE windowsize=:windowsize"
+                        params = {'windowsize': w}
                         malware_cursor.execute(sql, params)
-                        malware_conn.commit()
-                        malware_offset += 1
+                        results = malware_cursor.fetchone()
+
+                        if results[0] == 0:
+                            # Calculate running entropy...
+                            running_entropy = m.running_entropy(w, normalize)
+
+                            # Delete any old runs...
+                            sql = "DELETE FROM windowentropy WHERE windowsize=:windowsize"
+                            params = {'windowsize': w}
+                            malware_cursor.execute(sql, params)
+                            malware_conn.commit()
+
+                            # Add running entropy to the database...
+                            malware_offset = 0
+                            for r in running_entropy:
+                                sql = "INSERT INTO windowentropy " + \
+                                      "(windowsize, offset, entropy) " + \
+                                      "VALUES (:windowsize, :offset, :entropy);"
+                                params = {'windowsize': w, 'offset': malware_offset,
+                                          'entropy': r}
+                                malware_cursor.execute(sql, params)
+                                malware_offset += 1
+
+                            # Add the window size to the database signifying it is done...
+                            sql = "INSERT INTO windows (windowsize, normalized) " + \
+                                  "VALUES (:windowsize, :normalized)"
+                            params = {'windowsize': w, 'normalized': normalize}
+                            malware_cursor.execute(sql, params)
+                            malware_conn.commit()
+                        else:
+                            print("\t\t\tAlready calculated...")
 
                 malware_conn.commit()
                 malware_conn.close()
