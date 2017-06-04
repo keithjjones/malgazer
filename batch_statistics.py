@@ -73,7 +73,7 @@ def main():
                 continue
 
             if m.parsedfile is not None and m.parsedfile['type'] == 'pefile':
-                print("\tCalculating {0}".format(m.filename))
+                print("\tCalculating: {0} Type: {1}".format(m.filename, m.filetype))
 
                 # Calculate the entropy of the file...
                 fileentropy = m.entropy(normalize)
