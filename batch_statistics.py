@@ -42,10 +42,10 @@ def main():
         windows = [int(x) for x in windows]
 
     print("Storing data in SQLite file {0}".format(args.SQLFile))
-    try:
-        os.remove(args.SQLFile)
-    except:
-        pass
+    # try:
+    #     os.remove(args.SQLFile)
+    # except:
+    #     pass
 
     main_conn = sqlite3.connect(args.SQLFile)
     main_cursor = main_conn.cursor()
@@ -75,9 +75,6 @@ def main():
             if m.parsedfile is not None and m.parsedfile['type'] == 'pefile':
                 print("\tCalculating: {0} Type: {1}".format(m.filename, m.filetype))
 
-                # Calculate the entropy of the file...
-                fileentropy = m.entropy(normalize)
-
                 # Create the DB file name by first creating the directory...
                 dbfile = os.path.join(root + "_db", f)
                 dbfile = dbfile + ".db"
@@ -88,16 +85,25 @@ def main():
                 except:
                     os.mkdir(root + "_db")
 
-                # Prepare and execute SQL for main DB...
-                sql = "INSERT INTO metadata (filepath, filesize, filetype, " + \
-                      "fileentropy, MD5, SHA256, DBFile) VALUES " + \
-                      "(:filepath, :filesize, :filetype, :fileentropy, " + \
-                      ":md5, :sha256, :dbfile);"
-                params = {'filepath': m.filename, 'filesize': m.file_size,
-                          'filetype': m.filetype, 'fileentropy': fileentropy,
-                          'md5': m.md5, 'sha256': m.sha256, 'dbfile': dbfile}
+                sql = "SELECT COUNT(*) FROM metadata where md5 = :md5;"
+                params = {'md5': m.md5}
                 main_cursor.execute(sql, params)
-                main_conn.commit()
+                results = main_cursor.fetchone()
+
+                if results[0] <= 0:
+                    # Calculate the entropy of the file...
+                    fileentropy = m.entropy(normalize)
+
+                    # Prepare and execute SQL for main DB...
+                    sql = "INSERT INTO metadata (filepath, filesize, filetype, " + \
+                          "fileentropy, MD5, SHA256, DBFile) VALUES " + \
+                          "(:filepath, :filesize, :filetype, :fileentropy, " + \
+                          ":md5, :sha256, :dbfile);"
+                    params = {'filepath': m.filename, 'filesize': m.file_size,
+                              'filetype': m.filetype, 'fileentropy': fileentropy,
+                              'md5': m.md5, 'sha256': m.sha256, 'dbfile': dbfile}
+                    main_cursor.execute(sql, params)
+                    main_conn.commit()
 
                 # Calculate the window entropy for malware samples...
                 if windows is not None:
