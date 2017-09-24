@@ -25,9 +25,11 @@ class AnomalyDetector(object):
         if ref_size is None:
             return self._ref_size
         if ref_size >= self.pattern_size():
-            raise ValueError("Reference window size {0} needs to be smaller than pattern window size!".format(ref_size))
+            raise ValueError("Reference window size {0} needs to be smaller "
+                             "than pattern window size!".format(ref_size))
         if ref_size < 1:
-            raise ValueError("Reference window size {0} needs to be a positive number!".format(ref_size))
+            raise ValueError("Reference window size {0} needs to be a "
+                             "positive number!".format(ref_size))
         self._ref_size = ref_size
         return self._ref_size
 
@@ -35,9 +37,13 @@ class AnomalyDetector(object):
         if pattern_size is None:
             return self._pattern_size
         if pattern_size < 1:
-            raise ValueError("Pattern window size {0} needs to be a positive number!".format(pattern_size))
+            raise ValueError("Pattern window size {0} needs to be a "
+                             "positive number!".format(pattern_size))
+
         if pattern_size >= len(self.data):
-            raise ValueError("Pattern window size {0} needs to be less than the data size!".format(pattern_size))
+            raise ValueError("Pattern window size {0} needs to be less "
+                             "than the data size of {1}!".format(pattern_size,
+                                                                 len(self.data)))
         self._pattern_size = pattern_size
         return self._pattern_size
 
