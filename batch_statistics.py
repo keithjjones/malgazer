@@ -1,7 +1,6 @@
 import argparse
 from library.files import FileObject
 from library.plots import ScatterPlot
-import numpy
 import time
 import os
 import sqlite3
