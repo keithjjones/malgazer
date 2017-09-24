@@ -78,11 +78,9 @@ class AnomalyDetector(object):
 
             diff = 0
             # Calculate the sliding window differences...
-            print(self.pattern_size() - self.reference_size() + 1)
             for j in range(0, self.pattern_size() - self.reference_size() + 1):
                 # Calculate the differences...
                 for k in range(0, self.reference_size()):
-                    print("{0} {1} size pattern {2} size ref {3}".format(j, k, len(pattern_window), len(reference_window)))
                     diff += abs(pattern_window[j+k] - reference_window[k])
 
             self.anomaly_diffs.append((i, diff))
