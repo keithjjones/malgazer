@@ -13,8 +13,33 @@ class AnomalyDetector(object):
         :param pattern_size: The size of the pattern window for detection
         """
         self.data = data
-        self.ref_size = ref_size
-        self.pattern_size = pattern_size
+        self.pattern_size(pattern_size)
+        self.reference_size(ref_size)
+
+    def reference_size(self, ref_size=None):
+        """
+        Gets/Changes the reference window size.
+        :param ref_size:
+        :return:
+        """
+        if ref_size is None:
+            return self._ref_size
+        if ref_size >= self.pattern_size():
+            raise ValueError("Reference window size {0} needs to be smaller than pattern window size!".format(ref_size))
+        if ref_size < 1:
+            raise ValueError("Reference window size {0} needs to be a positive number!".format(ref_size))
+        self._ref_size = ref_size
+        return self._ref_size
+
+    def pattern_size(self, pattern_size=None):
+        if pattern_size is None:
+            return self._pattern_size
+        if pattern_size < 1:
+            raise ValueError("Pattern window size {0} needs to be a positive number!".format(pattern_size))
+        if pattern_size >= len(self.data):
+            raise ValueError("Pattern window size {0} needs to be less than the data size!".format(pattern_size))
+        self._pattern_size = pattern_size
+        return self._pattern_size
 
     def calculate(self):
         """
