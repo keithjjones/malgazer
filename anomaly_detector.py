@@ -1,6 +1,7 @@
 import argparse
 import os
 import sqlite3
+from library.anomaly import AnomalyDetector
 
 
 def main():
