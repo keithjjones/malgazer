@@ -63,10 +63,10 @@ class AnomalyDetector(object):
         # Run this on every data point
         for i in range(0, len(self.data)):
             # Fill up our larger pattern window...
-            if len(pattern_window) < self.pattern_size:
+            if len(pattern_window) < self.pattern_size():
                 pattern_window.append(self.data[i])
                 # Fill up our reference window...
-                if i >= self.pattern_size - self.ref_size:
+                if i >= self.pattern_size() - self.reference_size():
                     reference_window.append(self.data[i])
                 continue
 
@@ -78,10 +78,10 @@ class AnomalyDetector(object):
 
             diff = 0
             # Calculate the sliding window differences...
-            print(self.pattern_size-self.ref_size+1)
-            for j in range(0, self.pattern_size - self.ref_size+1):
+            print(self.pattern_size() - self.reference_size() + 1)
+            for j in range(0, self.pattern_size() - self.reference_size() + 1):
                 # Calculate the differences...
-                for k in range(0, self.ref_size):
+                for k in range(0, self.reference_size()):
                     print("{0} {1} size pattern {2} size ref {3}".format(j, k, len(pattern_window), len(reference_window)))
                     diff += abs(pattern_window[j+k] - reference_window[k])
 
