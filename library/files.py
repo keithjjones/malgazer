@@ -128,7 +128,7 @@ class FileObject(object):
                                               offset=offset,
                                               length=length)
                 if len(entval) > 1:
-                    raise Exception("This should happen.  Check this code.")
+                    raise Exception("This shouldn't happen.  Check this code.")
                 entval = entval[0]
 
                 self.parsedfile['entropy']['sections'].append({
