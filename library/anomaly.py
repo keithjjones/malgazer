@@ -1,0 +1,63 @@
+# Algorithm from https://developer.ibm.com/streamsdev/docs/anomaly-detection-in-streams/ written in pure Python
+from collections import deque
+
+
+class AnomalyDetector(object):
+    """Anomaly Detector class."""
+    def __init__(self, data, ref_size, pattern_size):
+        """
+        Creates an Anomaly Detector object.
+
+        :param data: A list of data points
+        :param ref_size: The size of the reference window for detection.
+        :param pattern_size: The size of the pattern window for detection
+        """
+        self.data = data
+        self.ref_size = ref_size
+        self.pattern_size = pattern_size
+
+    def calculate(self):
+        """
+        Calculate the anomaly differences.
+        :return: A list of differences from anomaly detection.
+        """
+        # This is the larger pattern window
+        pattern_window = deque()
+        # This is the smaller reference window
+        reference_window = deque()
+
+        # This holds the indices with anomalies
+        self.anomaly_diffs = list()
+
+        # Run this on every data point
+        for i in range(0, len(self.data)):
+            # Fill up our larger pattern window...
+            if len(pattern_window) < self.pattern_size:
+                pattern_window.append(self.data[i])
+                # Fill up our reference window...
+                if i >= self.pattern_size - self.ref_size:
+                    reference_window.append(self.data[i])
+                continue
+
+            newdata = self.data[i]
+
+            # Update the reference window
+            reference_window.popleft()
+            reference_window.append(newdata)
+
+            diff = 0
+            # Calculate the sliding window differences...
+            print(self.pattern_size-self.ref_size+1)
+            for j in range(0, self.pattern_size - self.ref_size+1):
+                # Calculate the differences...
+                for k in range(0, self.ref_size):
+                    print("{0} {1} size pattern {2} size ref {3}".format(j, k, len(pattern_window), len(reference_window)))
+                    diff += abs(pattern_window[j+k] - reference_window[k])
+
+            self.anomaly_diffs.append((i, diff))
+
+            # Update the pattern window
+            pattern_window.popleft()
+            pattern_window.append(newdata)
+
+        return self.anomaly_diffs
