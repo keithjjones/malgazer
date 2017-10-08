@@ -1,10 +1,7 @@
 import argparse
-from library.files import FileObject
-from library.plots import ScatterPlot
-import time
+from library.anomaly import AnomalyDetector
 import os
 import sqlite3
-from collections import defaultdict
 
 
 def main():
@@ -14,6 +11,12 @@ def main():
     parser.add_argument('SQLFile',
                         help='The SQLite file for entropy calculations.'
                              '')
+    parser.add_argument("-r", "--referencesize", type=int, default=2,
+                        help="Reference size for anomaly detection."
+                             "", required=True)
+    parser.add_argument("-p", "--patternsize", type=int, default=5,
+                        help="Pattern size for anomaly detection."
+                             "", required=True)
 
     args = parser.parse_args()
 
@@ -37,6 +40,8 @@ def main():
         entropy_results = entropy_cursor.fetchone()
 
         entropy_values = dict()
+        entropy_offsets = dict()
+        entropy_anomalies = dict()
 
         while entropy_results:
             windowsize = entropy_results[1]
@@ -45,13 +50,34 @@ def main():
 
             if windowsize not in entropy_values:
                 entropy_values[windowsize] = list()
+            if windowsize not in entropy_offsets:
+                entropy_offsets[windowsize] = list()
 
             entropy_values[windowsize].append(entropy)
+            entropy_offsets[windowsize].append(offset)
+
             entropy_results = entropy_cursor.fetchone()
 
-        print(entropy_values)
-
         entropy_conn.close()
+
+        for window in entropy_values:
+            entropy_anomalies[window] = AnomalyDetector(entropy_values[window],
+                                                        args.referencesize,
+                                                        args.patternsize).calculate()
+
+            print(entropy_anomalies[window])
+
+        # anomaly_conn = sqlite3.connect(dbfile_anomaly)
+        # anomaly_cursor = main_conn.cursor()
+        #
+        # anomaly_cursor.execute('CREATE TABLE IF NOT EXISTS anomaly(' +
+        #                        'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
+        #                        'offset INT NOT NULL,'
+        #                        'windowsize INT NOT NULL,'
+        #                        'anomaly REAL,'
+        #                        ');')
+        # anomaly_conn.commit()
+
 
     main_conn.close()
 
