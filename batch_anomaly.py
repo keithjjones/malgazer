@@ -29,7 +29,10 @@ def main():
 
     while metadata_results:
         dbfile_entropy = metadata_results[7]
-        dbfile_anomaly = os.path.splitext(dbfile_entropy)[0]+'_anomaly.db'
+        dbfile_anomaly_dir = os.path.split(dbfile_entropy)[0]+"_anomaly"
+        dbfile_anomaly = os.path.join(dbfile_anomaly_dir,
+                                      os.path.split(os.path.splitext(dbfile_entropy)[0])[1])
+        dbfile_anomaly += "_anomaly.db"
         metadata_results = main_cursor.fetchone()
 
         entropy_conn = sqlite3.connect(dbfile_entropy)
@@ -65,19 +68,39 @@ def main():
                                                         args.referencesize,
                                                         args.patternsize).calculate()
 
-            print(entropy_anomalies[window])
+        # Create the directory if needed...
+        try:
+            os.stat(dbfile_anomaly_dir)
+        except:
+            os.mkdir(dbfile_anomaly_dir)
 
-        # anomaly_conn = sqlite3.connect(dbfile_anomaly)
-        # anomaly_cursor = main_conn.cursor()
-        #
-        # anomaly_cursor.execute('CREATE TABLE IF NOT EXISTS anomaly(' +
-        #                        'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
-        #                        'offset INT NOT NULL,'
-        #                        'windowsize INT NOT NULL,'
-        #                        'anomaly REAL,'
-        #                        ');')
-        # anomaly_conn.commit()
+        # Create the anomaly DB
+        anomaly_conn = sqlite3.connect(dbfile_anomaly)
+        anomaly_cursor = main_conn.cursor()
 
+        anomaly_cursor.execute('CREATE TABLE IF NOT EXISTS anomaly(' +
+                               'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
+                               'offset INT NOT NULL,'
+                               'windowsize INT NOT NULL,'
+                               'anomaly REAL,'
+                               ');')
+        anomaly_conn.commit()
+
+        for window in entropy_values:
+            for anomaly in entropy_values[window]:
+                off = anomaly[0]
+                diff = anomaly[1]
+                # Prepare and execute SQL for anomaly DB...
+                sql = "INSERT INTO anomaly (offset, windowsize, anomaly, " + \
+                      "VALUES " + \
+                      "(:offset, :windowsize, :anomaly); "
+                params = {'offset': off, 'filesize': window,
+                          'anomaly': anomaly}
+                anomaly_cursor.execute(sql, params)
+                anomaly_conn.commit()
+
+        anomaly_conn.commit()
+        anomaly_conn.close()
 
     main_conn.close()
 
