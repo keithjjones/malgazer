@@ -2,6 +2,8 @@
 import argparse
 from library.files import FileObject
 from library.plots import ScatterPlot
+from sklearn.neighbors import LocalOutlierFactor
+
 import numpy
 import time
 
@@ -34,6 +36,9 @@ def main():
                              "entropy plot (html).",
                         default="malgzer_running_entropy.html",
                         required=False)
+    parser.add_argument("-l", "--lofneighbors", type=int, default=20,
+                        help="Number of neighbors for local outlier factor anomaly detection."
+                             "", required=False)
 
     args = parser.parse_args()
 
