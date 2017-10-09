@@ -24,6 +24,9 @@ def main():
     parser.add_argument("-n", "--nonormalize", action='store_true',
                         help="Disables entropy normalization."
                              "", required=False)
+    parser.add_argument("-m", "--maxsamples", type=int, default=0,
+                        help="Maximum number of samples to process, zero for all."
+                             "", required=False)
 
     args = parser.parse_args()
 
@@ -63,6 +66,7 @@ def main():
 
     # Crawl the directories for malware
     for root, dirs, files in os.walk(args.MalwareDirectory):
+        samples_processed = 0
         for f in files:
             # Create the malware file name...
             malwarepath = os.path.join(root, f)
@@ -75,24 +79,25 @@ def main():
                 print("\tCalculating: {0} Type: {1}".format(m.filename, m.filetype))
 
                 # Create the DB file name by first creating the directory...
-                dbfile = os.path.join(root + "_db", f)
+                dbfile_root = root.rstrip(os.path.sep)+"_db"
+                dbfile = os.path.join(dbfile_root, f)
                 dbfile = dbfile + ".db"
 
                 # Create the directory if needed...
                 try:
-                    os.stat(root + "_db")
+                    os.stat(dbfile_root)
                 except:
-                    os.mkdir(root + "_db")
+                    os.mkdir(dbfile_root)
 
                 sql = "SELECT COUNT(*) FROM metadata where md5 = :md5;"
                 params = {'md5': m.md5}
                 main_cursor.execute(sql, params)
                 results = main_cursor.fetchone()
 
-                if results[0] <= 0:
-                    # Calculate the entropy of the file...
-                    fileentropy = m.entropy(normalize)
+                # Calculate the entropy of the file...
+                fileentropy = m.entropy(normalize)
 
+                if results[0] <= 0:
                     # Prepare and execute SQL for main DB...
                     sql = "INSERT INTO metadata (filepath, filesize, filetype, " + \
                           "fileentropy, MD5, SHA256, DBFile) VALUES " + \
@@ -196,6 +201,11 @@ def main():
 
                     malware_conn.commit()
                     malware_conn.close()
+
+                samples_processed += 1
+                print("{0:n} samples processed...".format(samples_processed))
+                if args.maxsamples > 0 and samples_processed >= args.maxsamples:
+                    break
 
     main_conn.commit()
     main_conn.close()
