@@ -210,6 +210,7 @@ def main():
                                 malware_conn.commit()
 
                                 # Calculate anomalies
+                                print("\t\t\tCalculating anomalies...")
                                 lof = LocalOutlierFactor(args.lofneighbors)
                                 anomalies = lof.fit_predict(
                                     numpy.array(running_entropy).reshape(-1, 1))
