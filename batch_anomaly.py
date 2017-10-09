@@ -75,6 +75,7 @@ def main():
             os.mkdir(dbfile_anomaly_dir)
 
         # Create the anomaly DB
+        print("Writing {0}".format(dbfile_anomaly))
         anomaly_conn = sqlite3.connect(dbfile_anomaly)
         anomaly_cursor = main_conn.cursor()
 
@@ -82,20 +83,20 @@ def main():
                                'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
                                'offset INT NOT NULL,'
                                'windowsize INT NOT NULL,'
-                               'anomaly REAL,'
+                               'anomaly REAL'
                                ');')
         anomaly_conn.commit()
 
-        for window in entropy_values:
-            for anomaly in entropy_values[window]:
+        for window in entropy_anomalies:
+            for anomaly in entropy_anomalies[window]:
                 off = anomaly[0]
                 diff = anomaly[1]
                 # Prepare and execute SQL for anomaly DB...
-                sql = "INSERT INTO anomaly (offset, windowsize, anomaly, " + \
+                sql = "INSERT INTO anomaly (offset, windowsize, anomaly) " + \
                       "VALUES " + \
                       "(:offset, :windowsize, :anomaly); "
-                params = {'offset': off, 'filesize': window,
-                          'anomaly': anomaly}
+                params = {'offset': off, 'windowsize': window,
+                          'anomaly': diff}
                 anomaly_cursor.execute(sql, params)
                 anomaly_conn.commit()
 
