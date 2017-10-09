@@ -1,12 +1,9 @@
 import argparse
 from library.files import FileObject
-from library.plots import ScatterPlot
 from sklearn.neighbors import LocalOutlierFactor
 import numpy
-import time
 import os
 import sqlite3
-from collections import defaultdict
 
 
 def main():
@@ -190,6 +187,12 @@ def main():
                                 malware_cursor.execute(sql, params)
                                 malware_conn.commit()
 
+                                # Delete any old runs...
+                                sql = "DELETE FROM anomalies WHERE windowsize=:windowsize;"
+                                params = {'windowsize': w}
+                                malware_cursor.execute(sql, params)
+                                malware_conn.commit()
+
                                 # Add running entropy to the database...
                                 malware_offset = 0
                                 for r in running_entropy:
@@ -207,7 +210,6 @@ def main():
                                       "VALUES (:windowsize, :normalized)"
                                 params = {'windowsize': w, 'normalized': normalize}
                                 malware_cursor.execute(sql, params)
-                                malware_conn.commit()
 
                                 # Calculate anomalies
                                 print("\t\t\tCalculating anomalies...")
@@ -219,11 +221,12 @@ def main():
                                     # Add the anomaly to the database...
                                     sql = "INSERT INTO anomalies (offset, windowsize, n_neighbors) " + \
                                           "VALUES (:offset, :windowsize, :n_neighbors)"
-                                    params = {'offset': offset,
+                                    params = {'offset': int(offset),
                                               'windowsize': w,
                                               'n_neighbors': args.lofneighbors}
                                     malware_cursor.execute(sql, params)
-                                    malware_conn.commit()
+                                # Commit all our data...
+                                malware_conn.commit()
                             else:
                                 print("\t\t\tAlready calculated...")
 
