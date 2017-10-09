@@ -165,6 +165,7 @@ def main():
                     malware_cursor.execute('CREATE TABLE IF NOT EXISTS anomalies(' +
                                            'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
                                            'offset INT NOT NULL,'
+                                           'windowsize INT NOT NULL,'
                                            'n_neighbors INT NOT NULL'
                                            ');')
                     malware_conn.commit()
@@ -215,9 +216,10 @@ def main():
                                 anomaly_offsets = numpy.where(anomalies == -1)[0]
                                 for offset in anomaly_offsets:
                                     # Add the anomaly to the database...
-                                    sql = "INSERT INTO anomalies (offset, n_neighbors) " + \
-                                          "VALUES (:offset, :n_neighbors)"
+                                    sql = "INSERT INTO anomalies (offset, windowsize, n_neighbors) " + \
+                                          "VALUES (:offset, :windowsize, :n_neighbors)"
                                     params = {'offset': offset,
+                                              'windowsize': w,
                                               'n_neighbors': args.lofneighbors}
                                     malware_cursor.execute(sql, params)
                                     malware_conn.commit()
