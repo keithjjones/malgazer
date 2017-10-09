@@ -77,7 +77,7 @@ def main():
         # Create the anomaly DB
         print("Writing {0}".format(dbfile_anomaly))
         anomaly_conn = sqlite3.connect(dbfile_anomaly)
-        anomaly_cursor = main_conn.cursor()
+        anomaly_cursor = anomaly_conn.cursor()
 
         anomaly_cursor.execute('CREATE TABLE IF NOT EXISTS anomaly(' +
                                'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
