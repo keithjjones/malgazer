@@ -1,6 +1,8 @@
 import argparse
 from library.files import FileObject
 from library.plots import ScatterPlot
+from sklearn.neighbors import LocalOutlierFactor
+import numpy
 import time
 import os
 import sqlite3
@@ -26,6 +28,9 @@ def main():
                              "", required=False)
     parser.add_argument("-m", "--maxsamples", type=int, default=0,
                         help="Maximum number of samples to process, zero for all."
+                             "", required=False)
+    parser.add_argument("-l", "--lofneighbors", type=int, default=20,
+                        help="Number of neighbors for local outlier factor anomaly detection."
                              "", required=False)
 
     args = parser.parse_args()
@@ -157,6 +162,12 @@ def main():
                                            'normalized INT NOT NULL'
                                            ');')
                     malware_conn.commit()
+                    malware_cursor.execute('CREATE TABLE IF NOT EXISTS anomalies(' +
+                                           'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
+                                           'offset INT NOT NULL,'
+                                           'n_neighbors INT NOT NULL'
+                                           ');')
+                    malware_conn.commit()
 
                     for w in windows:
                         if w < m.file_size:
@@ -196,6 +207,20 @@ def main():
                                 params = {'windowsize': w, 'normalized': normalize}
                                 malware_cursor.execute(sql, params)
                                 malware_conn.commit()
+
+                                # Calculate anomalies
+                                lof = LocalOutlierFactor(args.lofneighbors)
+                                anomalies = lof.fit_predict(
+                                    numpy.array(running_entropy).reshape(-1, 1))
+                                anomaly_offsets = numpy.where(anomalies == -1)[0]
+                                for offset in anomaly_offsets:
+                                    # Add the anomaly to the database...
+                                    sql = "INSERT INTO anomalies (offset, n_neighbors) " + \
+                                          "VALUES (:offset, :n_neighbors)"
+                                    params = {'offset': offset,
+                                              'n_neighbors': args.lofneighbors}
+                                    malware_cursor.execute(sql, params)
+                                    malware_conn.commit()
                             else:
                                 print("\t\t\tAlready calculated...")
 
