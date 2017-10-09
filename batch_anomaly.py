@@ -104,17 +104,45 @@ def main():
                                'SHA256 TEXT NOT NULL,'
                                'DBFile TEXT NOT NULL'
                                ');')
+        anomaly_cursor.execute('CREATE TABLE IF NOT EXISTS anomalyinfo(' +
+                               'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
+                               'referencesize INT NOT NULL,'
+                               'patternsize INT NOT NULL'
+                               ');')
         anomaly_conn.commit()
 
-        sql = "INSERT INTO metadata (filepath, filesize, filetype, " + \
-              "fileentropy, MD5, SHA256, DBFile) VALUES " + \
-              "(:filepath, :filesize, :filetype, :fileentropy, " + \
-              ":md5, :sha256, :dbfile);"
-        params = {'filepath': filepath, 'filesize': filesize,
-                  'filetype': filetype, 'fileentropy': fileentropy,
-                  'md5': file_md5, 'sha256': file_sh256, 'dbfile': file_dbfile}
+        # See if this data is already in the database...
+        sql = "SELECT COUNT(*) FROM metadata;"
+        params = {}
         anomaly_cursor.execute(sql, params)
-        anomaly_conn.commit()
+        results = anomaly_cursor.fetchone()
+
+        if results[0] > 0:
+            sql = "INSERT INTO metadata (filepath, filesize, filetype, " + \
+                  "fileentropy, MD5, SHA256, DBFile) VALUES " + \
+                  "(:filepath, :filesize, :filetype, :fileentropy, " + \
+                  ":md5, :sha256, :dbfile);"
+            params = {'filepath': filepath, 'filesize': filesize,
+                      'filetype': filetype, 'fileentropy': fileentropy,
+                      'md5': file_md5, 'sha256': file_sh256, 'dbfile': file_dbfile}
+            anomaly_cursor.execute(sql, params)
+            anomaly_conn.commit()
+
+        # See if this data is already in the database...
+        sql = "SELECT COUNT(*) FROM anomalyinfo WHERE referencesize=:referencesize AND patternsize=:patternsize;"
+        params = {'referencesize': args.referencesize,
+                  'patternsize': args.patternsize}
+        anomaly_cursor.execute(sql, params)
+        results = anomaly_cursor.fetchone()
+
+        if results[0] > 0:
+            sql = "INSERT INTO anomalyinfo (referencesize, patternsize) " + \
+                  "VALUES " + \
+                  "(:referencesize, :patternsize);"
+            params = {'referencesize': args.referencesize,
+                      'patternsize': args.patternsize}
+            anomaly_cursor.execute(sql, params)
+            anomaly_conn.commit()
 
         for window in entropy_anomalies:
             for anomaly in entropy_anomalies[window]:
