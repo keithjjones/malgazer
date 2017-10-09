@@ -28,7 +28,14 @@ def main():
     metadata_results = main_cursor.fetchone()
 
     while metadata_results:
-        dbfile_entropy = metadata_results[7]
+        filepath = metadata_results[1]
+        filesize = metadata_results[2]
+        filetype = metadata_results[3]
+        fileentropy = metadata_results[4]
+        file_md5 = metadata_results[5]
+        file_sh256 = metadata_results[6]
+        file_dbfile = metadata_results[7]
+        dbfile_entropy = file_dbfile
         dbfile_anomaly_dir = os.path.split(dbfile_entropy)[0]+"_anomaly"
         dbfile_anomaly = os.path.join(dbfile_anomaly_dir,
                                       os.path.split(os.path.splitext(dbfile_entropy)[0])[1])
@@ -85,6 +92,26 @@ def main():
                                'windowsize INT NOT NULL,'
                                'anomaly REAL'
                                ');')
+        anomaly_cursor.execute('CREATE TABLE IF NOT EXISTS metadata(' +
+                               'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
+                               'filepath TEXT NOT NULL,'
+                               'filesize INT NOT NULL,'
+                               'filetype TEXT,'
+                               'fileentropy REAL,'
+                               'MD5 TEXT,'
+                               'SHA256 TEXT,'
+                               'DBFile TEXT'
+                               ');')
+        anomaly_conn.commit()
+
+        sql = "INSERT INTO metadata (filepath, filesize, filetype, " + \
+              "fileentropy, MD5, SHA256, DBFile) VALUES " + \
+              "(:filepath, :filesize, :filetype, :fileentropy, " + \
+              ":md5, :sha256, :dbfile);"
+        params = {'filepath': filepath, 'filesize': filesize,
+                  'filetype': filetype, 'fileentropy': fileentropy,
+                  'md5': file_md5, 'sha256': file_sh256, 'dbfile': file_dbfile}
+        anomaly_cursor.execute(sql, params)
         anomaly_conn.commit()
 
         for window in entropy_anomalies:
