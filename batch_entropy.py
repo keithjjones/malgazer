@@ -56,11 +56,11 @@ def main():
                         'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
                         'filepath TEXT NOT NULL,'
                         'filesize INT NOT NULL,'
-                        'filetype TEXT,'
-                        'fileentropy REAL,'
-                        'MD5 TEXT,'
-                        'SHA256 TEXT,'
-                        'DBFile TEXT'
+                        'filetype TEXT NOT NULL,'
+                        'fileentropy REAL NOT NULL,'
+                        'MD5 TEXT NOT NULL,'
+                        'SHA256 TEXT NOT NULL,'
+                        'DBFile TEXT NOT NULL'
                         ');')
     main_conn.commit()
 
@@ -122,11 +122,11 @@ def main():
                                            'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
                                            'filepath TEXT NOT NULL,'
                                            'filesize INT NOT NULL,'
-                                           'filetype TEXT,'
-                                           'fileentropy REAL,'
-                                           'MD5 TEXT,'
-                                           'SHA256 TEXT,'
-                                           'DBFile TEXT'
+                                           'filetype TEXT NOT NULL,'
+                                           'fileentropy REAL NOT NULL,'
+                                           'MD5 TEXT NOT NULL,'
+                                           'SHA256 TEXT NOT NULL,'
+                                           'DBFile TEXT NOT NULL'
                                            ');')
                     # See if this data is already in the database...
                     sql = "SELECT COUNT(*) FROM metadata;"

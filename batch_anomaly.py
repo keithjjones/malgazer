@@ -90,17 +90,19 @@ def main():
                                'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
                                'offset INT NOT NULL,'
                                'windowsize INT NOT NULL,'
-                               'anomaly REAL'
+                               'referencesize INT NOT NULL,'
+                               'patternsize INT NOT NULL,'
+                               'anomaly REAL NOT NULL'
                                ');')
         anomaly_cursor.execute('CREATE TABLE IF NOT EXISTS metadata(' +
                                'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
                                'filepath TEXT NOT NULL,'
                                'filesize INT NOT NULL,'
-                               'filetype TEXT,'
-                               'fileentropy REAL,'
-                               'MD5 TEXT,'
-                               'SHA256 TEXT,'
-                               'DBFile TEXT'
+                               'filetype TEXT NOT NULL,'
+                               'fileentropy REAL NOT NULL,'
+                               'MD5 TEXT NOT NULL,'
+                               'SHA256 TEXT NOT NULL,'
+                               'DBFile TEXT NOT NULL'
                                ');')
         anomaly_conn.commit()
 
@@ -119,11 +121,13 @@ def main():
                 off = anomaly[0]
                 diff = anomaly[1]
                 # Prepare and execute SQL for anomaly DB...
-                sql = "INSERT INTO anomaly (offset, windowsize, anomaly) " + \
+                sql = "INSERT INTO anomaly (offset, windowsize, " \
+                      "referencesize, patternsize, anomaly) " + \
                       "VALUES " + \
-                      "(:offset, :windowsize, :anomaly); "
+                      "(:offset, :windowsize, :referencesize, :patternsize, :anomaly); "
                 params = {'offset': off, 'windowsize': window,
-                          'anomaly': diff}
+                          'anomaly': diff, 'referencesize': args.referencesize,
+                          'patternsize': args.patternsize}
                 anomaly_cursor.execute(sql, params)
                 anomaly_conn.commit()
 
