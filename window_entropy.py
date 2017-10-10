@@ -2,6 +2,8 @@
 import argparse
 from library.files import FileObject
 from library.plots import ScatterPlot
+from sklearn.covariance import EllipticEnvelope
+from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
 
 import numpy
@@ -36,8 +38,8 @@ def main():
                              "entropy plot (html).",
                         default="malgzer_running_entropy.html",
                         required=False)
-    parser.add_argument("-l", "--lofneighbors", type=int, default=20,
-                        help="Number of neighbors for local outlier factor anomaly detection."
+    parser.add_argument("-c", "--contamination", type=float, default=0.05,
+                        help="Outlier contamination factor."
                              "", required=False)
 
     args = parser.parse_args()
@@ -77,13 +79,33 @@ def main():
         # Generic data...
         running_start_time = time.time()
         print("Running Window Entropy:")
-        print("\tRunning Entropy Window Size (bytes): {0}".format(args.window))
+        print("\tRunning Entropy Window Size (bytes): {0:n}".format(args.window))
         running_entropy = f.running_entropy(int(args.window), normalize)
         n = numpy.array(running_entropy)
         print("\tRunning Entropy Mean: {0:.6f}".format(n.mean()))
         print("\tRunning Entropy Min: {0:.6f}".format(n.min()))
         print("\tRunning Entropy Max: {0:.6f}".format(n.max()))
         print("\tRunning Entropy Calculation Time: {0:.6f} seconds"
+              .format(round(time.time() - running_start_time, 6)))
+
+        # Find anomalies...
+        running_start_time = time.time()
+        print("Anomalies:")
+        anomaly_detector = EllipticEnvelope(contamination=args.contamination)
+        # anomaly_detector = LocalOutlierFactor(n_neighbors=args.lofneighbors, n_jobs=10, contamination=.0001)
+        n_data = n.reshape(-1, 1)
+        # anomalies = lof.fit_predict(n_data)
+        anomaly_detector.fit(n_data)
+        anomalies = anomaly_detector.predict(n_data)
+        # Fix the data so 1 is an anomaly
+        anomalies[anomalies==1] = 0
+        anomalies[anomalies==-1] = 1
+        anomaly_x_tuple = numpy.where(anomalies==1)
+        anomaly_y = anomalies[anomaly_x_tuple]
+        anomaly_x = anomaly_x_tuple[0]
+        print("\tNumber of anomalies: {0:,}".format(len(anomalies[numpy.where(anomalies == 1)])))
+        print("\tContamination: {0:6f}".format(args.contamination))
+        print("\tAnomaly Calculation Time: {0:.6f} seconds"
               .format(round(time.time() - running_start_time, 6)))
 
         # Windows PE sections...
@@ -127,13 +149,14 @@ def main():
                      .format(args.window))
             xtitle = "Byte Location"
             ytitle = "Entropy Value"
-            datatitle = args.MalwareFile
+            datatitle = ["Entropy", 'Anomalies']
+            mode = ["lines", "markers"]
             if args.plotrunningentropyskip > 1:
                 xtitle += (" (skip value = {0} bytes)"
                            .format(int(args.plotrunningentropyskip)))
-            myplot = ScatterPlot(x=x, datatitle=datatitle, xtitle=xtitle,
-                                 y=y, ytitle=ytitle,
-                                 plottitle=title)
+            myplot = ScatterPlot(x=[x, anomaly_x], datatitle=datatitle, xtitle=xtitle,
+                                 y=[y, anomaly_y], ytitle=ytitle,
+                                 plottitle=title, mode=mode)
             html.append(myplot.plot_div())
 
             # Plot Windows PE sections...
@@ -155,9 +178,9 @@ def main():
                     if args.plotrunningentropyskip > 1:
                         xtitle += (" (skip value = {0} bytes)"
                                    .format(int(args.plotrunningentropyskip)))
-                    myplot = ScatterPlot(x=x, datatitle=datatitle,
+                    myplot = ScatterPlot(x=[x], datatitle=datatitle,
                                          xtitle=xtitle,
-                                         y=y, ytitle=ytitle,
+                                         y=[y], ytitle=ytitle,
                                          plottitle=title)
                     html.append(myplot.plot_div())
 

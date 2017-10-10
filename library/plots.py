@@ -7,25 +7,34 @@ from plotly.tools import FigureFactory as FF
 
 
 class ScatterPlot(object):
-    def __init__(self, x, datatitle, xtitle, y, ytitle, plottitle):
+    def __init__(self, x, datatitle, xtitle, y, ytitle, plottitle, mode=None):
         """
         Creates a scatter plot from the data.
         
-        :param x:  X values, as a list. 
-        :param datatitle:  Title for the data in the legend.
+        :param x:  X axis values, as a list.  It is a list of lists.
+        :param datatitle:  A list of titles for the data in the legend for each Y axis.
         :param xtitle:  Title for the X axis.
-        :param y:  Y values, as a list.
+        :param y:  Y axis values, as a list.  It is a list of lists.
         :param ytitle:  Title for the Y axis.
-        :param plottitle:  Title for the overall plot. 
+        :param plottitle:  Title for the overall plot.
+        :param mode: A list of modes for the scatter plot, None is line
         """
         self._output = []
 
-        # Add current scatter plot
-        self._output.append(Scatter(name=datatitle,
-                                   x=x,
-                                   y=y,
-                                   hoverinfo="x+y"
-                                   ))
+        # Add for each y in the multi plot
+        for i in range(0, len(y)):
+            # Get the mode if available
+            if mode is None:
+                mymode = 'line'
+            else:
+                mymode = mode[i]
+            # Add current scatter plot
+            self._output.append(Scatter(name=datatitle[i],
+                                        x=x[i],
+                                        y=y[i],
+                                        hoverinfo="x+y",
+                                        mode=mymode
+                                       ))
 
         self._plotlayout = Layout(showlegend=True, title=plottitle,
                             xaxis=dict(title=xtitle),
