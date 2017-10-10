@@ -38,8 +38,11 @@ def main():
                              "entropy plot (html).",
                         default="malgzer_running_entropy.html",
                         required=False)
-    parser.add_argument("-c", "--contamination", type=float, default=0.05,
+    parser.add_argument("-c", "--contamination", type=float, default=0.00075,
                         help="Outlier contamination factor."
+                             "", required=False)
+    parser.add_argument("-l", "--lofneighbors", type=int, default=300,
+                        help="Local outlier factor neighbors."
                              "", required=False)
 
     args = parser.parse_args()
@@ -91,12 +94,14 @@ def main():
         # Find anomalies...
         running_start_time = time.time()
         print("Anomalies:")
-        anomaly_detector = EllipticEnvelope(contamination=args.contamination)
-        # anomaly_detector = LocalOutlierFactor(n_neighbors=args.lofneighbors, n_jobs=10, contamination=.0001)
+        # anomaly_detector = EllipticEnvelope(contamination=args.contamination)
+        anomaly_detector = LocalOutlierFactor(n_neighbors=args.lofneighbors,
+                                              n_jobs=10,
+                                              contamination=args.contamination)
         n_data = n.reshape(-1, 1)
-        # anomalies = lof.fit_predict(n_data)
-        anomaly_detector.fit(n_data)
-        anomalies = anomaly_detector.predict(n_data)
+        anomalies = anomaly_detector.fit_predict(n_data)
+        # anomaly_detector.fit(n_data)
+        # anomalies = anomaly_detector.predict(n_data)
         # Fix the data so 1 is an anomaly
         anomalies[anomalies==1] = 0
         anomalies[anomalies==-1] = 1
@@ -178,7 +183,7 @@ def main():
                     if args.plotrunningentropyskip > 1:
                         xtitle += (" (skip value = {0} bytes)"
                                    .format(int(args.plotrunningentropyskip)))
-                    myplot = ScatterPlot(x=[x], datatitle=datatitle,
+                    myplot = ScatterPlot(x=[x], datatitle=[datatitle],
                                          xtitle=xtitle,
                                          y=[y], ytitle=ytitle,
                                          plottitle=title)
