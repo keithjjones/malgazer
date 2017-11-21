@@ -165,7 +165,7 @@ def main():
             if args.anomaly:
                 x_vals.append(anomaly_x)
                 y_vals.append(anomaly_y)
-                datatitle.append('Anomalies')
+                datatitle.append('Anomalies (Contamination={0})'.format(args.contamination))
 
             if args.plotrunningentropyskip > 1:
                 xtitle += (" (skip value = {0} bytes)"
