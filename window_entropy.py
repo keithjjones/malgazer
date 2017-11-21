@@ -41,7 +41,7 @@ def main():
     parser.add_argument("-a", "--anomaly", action='store_true',
                         help="Enable anomaly detection."
                              "", required=False)
-    parser.add_argument("-c", "--contamination", type=float, default=0.00075,
+    parser.add_argument("-c", "--contamination", type=float, default=0.1,
                         help="Outlier contamination factor."
                              "", required=False)
     parser.add_argument("-l", "--lofneighbors", type=int, default=300,
@@ -98,14 +98,14 @@ def main():
             # Find anomalies...
             running_start_time = time.time()
             print("Anomalies:")
-            # anomaly_detector = EllipticEnvelope(contamination=args.contamination)
-            anomaly_detector = LocalOutlierFactor(n_neighbors=args.lofneighbors,
-                                                  n_jobs=10,
-                                                  contamination=args.contamination)
+            anomaly_detector = EllipticEnvelope(contamination=args.contamination)
+            # anomaly_detector = LocalOutlierFactor(n_neighbors=args.lofneighbors,
+            #                                       n_jobs=10,
+            #                                       contamination=args.contamination)
             n_data = n.reshape(-1, 1)
-            anomalies = anomaly_detector.fit_predict(n_data)
-            # anomaly_detector.fit(n_data)
-            # anomalies = anomaly_detector.predict(n_data)
+            # anomalies = anomaly_detector.fit_predict(n_data)
+            anomaly_detector.fit(n_data)
+            anomalies = anomaly_detector.predict(n_data)
             # Fix the data so 1 is an anomaly
             anomalies[anomalies==1] = 0
             anomalies[anomalies==-1] = 1
