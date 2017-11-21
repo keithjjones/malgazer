@@ -38,6 +38,9 @@ def main():
                              "entropy plot (html).",
                         default="malgzer_running_entropy.html",
                         required=False)
+    parser.add_argument("-a", "--anomaly", action='store_true',
+                        help="Enable anomaly detection."
+                             "", required=False)
     parser.add_argument("-c", "--contamination", type=float, default=0.00075,
                         help="Outlier contamination factor."
                              "", required=False)
@@ -91,27 +94,28 @@ def main():
         print("\tRunning Entropy Calculation Time: {0:.6f} seconds"
               .format(round(time.time() - running_start_time, 6)))
 
-        # Find anomalies...
-        running_start_time = time.time()
-        print("Anomalies:")
-        # anomaly_detector = EllipticEnvelope(contamination=args.contamination)
-        anomaly_detector = LocalOutlierFactor(n_neighbors=args.lofneighbors,
-                                              n_jobs=10,
-                                              contamination=args.contamination)
-        n_data = n.reshape(-1, 1)
-        anomalies = anomaly_detector.fit_predict(n_data)
-        # anomaly_detector.fit(n_data)
-        # anomalies = anomaly_detector.predict(n_data)
-        # Fix the data so 1 is an anomaly
-        anomalies[anomalies==1] = 0
-        anomalies[anomalies==-1] = 1
-        anomaly_x_tuple = numpy.where(anomalies==1)
-        anomaly_y = anomalies[anomaly_x_tuple]
-        anomaly_x = anomaly_x_tuple[0]
-        print("\tNumber of anomalies: {0:,}".format(len(anomalies[numpy.where(anomalies == 1)])))
-        print("\tContamination: {0:6f}".format(args.contamination))
-        print("\tAnomaly Calculation Time: {0:.6f} seconds"
-              .format(round(time.time() - running_start_time, 6)))
+        if args.anomaly:
+            # Find anomalies...
+            running_start_time = time.time()
+            print("Anomalies:")
+            # anomaly_detector = EllipticEnvelope(contamination=args.contamination)
+            anomaly_detector = LocalOutlierFactor(n_neighbors=args.lofneighbors,
+                                                  n_jobs=10,
+                                                  contamination=args.contamination)
+            n_data = n.reshape(-1, 1)
+            anomalies = anomaly_detector.fit_predict(n_data)
+            # anomaly_detector.fit(n_data)
+            # anomalies = anomaly_detector.predict(n_data)
+            # Fix the data so 1 is an anomaly
+            anomalies[anomalies==1] = 0
+            anomalies[anomalies==-1] = 1
+            anomaly_x_tuple = numpy.where(anomalies==1)
+            anomaly_y = anomalies[anomaly_x_tuple]
+            anomaly_x = anomaly_x_tuple[0]
+            print("\tNumber of anomalies: {0:,}".format(len(anomalies[numpy.where(anomalies == 1)])))
+            print("\tContamination: {0:6f}".format(args.contamination))
+            print("\tAnomaly Calculation Time: {0:.6f} seconds"
+                  .format(round(time.time() - running_start_time, 6)))
 
         # Windows PE sections...
         if f.parsedfile is not None and f.parsedfile['type'] == 'pefile':
@@ -154,13 +158,20 @@ def main():
                      .format(args.window))
             xtitle = "Byte Location"
             ytitle = "Entropy Value"
-            datatitle = ["Entropy", 'Anomalies']
+            datatitle = ["Entropy"]
             mode = ["lines", "markers"]
+            x_vals = [x]
+            y_vals = [y]
+            if args.anomaly:
+                x_vals.append(anomaly_x)
+                y_vals.append(anomaly_y)
+                datatitle.append('Anomalies')
+
             if args.plotrunningentropyskip > 1:
                 xtitle += (" (skip value = {0} bytes)"
                            .format(int(args.plotrunningentropyskip)))
-            myplot = ScatterPlot(x=[x, anomaly_x], datatitle=datatitle, xtitle=xtitle,
-                                 y=[y, anomaly_y], ytitle=ytitle,
+            myplot = ScatterPlot(x=x_vals, datatitle=datatitle, xtitle=xtitle,
+                                 y=y_vals, ytitle=ytitle,
                                  plottitle=title, mode=mode)
             html.append(myplot.plot_div())
 
