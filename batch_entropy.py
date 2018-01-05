@@ -1,6 +1,6 @@
 import argparse
 from library.files import FileObject
-from sklearn.neighbors import LocalOutlierFactor
+from sklearn.neighbors import LocalOutlierFactor, EllipticEnvelope
 import numpy
 import os
 import sqlite3
@@ -24,15 +24,6 @@ def main():
                              "", required=False)
     parser.add_argument("-m", "--maxsamples", type=int, default=0,
                         help="Maximum number of samples to process, zero for all."
-                             "", required=False)
-    parser.add_argument("-a", "--anomaly", action='store_true',
-                        help="Enable anomaly detection."
-                             "", required=False)
-    parser.add_argument("-c", "--contamination", type=float, default=0.1,
-                        help="Outlier contamination factor."
-                             "", required=False)
-    parser.add_argument("-l", "--lofneighbors", type=int, default=20,
-                        help="Number of neighbors for local outlier factor anomaly detection."
                              "", required=False)
     args = parser.parse_args()
 
@@ -165,15 +156,6 @@ def main():
                                        ');')
                 malware_conn.commit()
 
-                # Cerate table for anomalies in malware db...
-                malware_cursor.execute('CREATE TABLE IF NOT EXISTS anomalies(' +
-                                       'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
-                                       'offset INT NOT NULL,'
-                                       'windowsize INT NOT NULL,'
-                                       'n_neighbors INT NOT NULL'
-                                       ');')
-                malware_conn.commit()
-
                 # Iterate through the window sizes...
                 for w in windows:
                     if w < m.file_size:
@@ -211,21 +193,6 @@ def main():
                               "VALUES (:windowsize, :normalized)"
                         params = {'windowsize': w, 'normalized': normalize}
                         malware_cursor.execute(sql, params)
-
-                        # Calculate anomalies
-                        print("\t\t\tCalculating anomalies...")
-                        lof = LocalOutlierFactor(args.lofneighbors)
-                        anomalies = lof.fit_predict(
-                            numpy.array(running_entropy).reshape(-1, 1))
-                        anomaly_offsets = numpy.where(anomalies == -1)[0]
-                        for offset in anomaly_offsets:
-                            # Add the anomaly to the database...
-                            sql = "INSERT INTO anomalies (offset, windowsize, n_neighbors) " + \
-                                  "VALUES (:offset, :windowsize, :n_neighbors)"
-                            params = {'offset': int(offset),
-                                      'windowsize': w,
-                                      'n_neighbors': args.lofneighbors}
-                            malware_cursor.execute(sql, params)
 
                         # Commit all our data...
                         malware_conn.commit()
