@@ -166,7 +166,7 @@ def main():
                 # Iterate through the window sizes...
                 for w in windows:
                     if w < m.file_size:
-                        print("\t\tCalculating window size {0}".format(w))
+                        print("\t\tCalculating window size {0:,}".format(w))
 
                         # Capture the running time
                         start_time = time.time()
