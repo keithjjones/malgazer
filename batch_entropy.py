@@ -26,10 +26,15 @@ def main():
     parser.add_argument("-m", "--maxsamples", type=int, default=0,
                         help="Maximum number of samples to process, zero for all."
                              "", required=False)
+    parser.add_argument("-a", "--anomaly", action='store_true',
+                        help="Enable anomaly detection."
+                             "", required=False)
+    parser.add_argument("-c", "--contamination", type=float, default=0.1,
+                        help="Outlier contamination factor."
+                             "", required=False)
     parser.add_argument("-l", "--lofneighbors", type=int, default=20,
                         help="Number of neighbors for local outlier factor anomaly detection."
                              "", required=False)
-
     args = parser.parse_args()
 
     # Normalize setup...

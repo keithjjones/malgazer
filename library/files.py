@@ -8,6 +8,13 @@ from . import entropy
 
 
 class FileObject(object):
+
+    # Below, the format is matching RE, file type,
+    # and optional function to run on the file name
+    FILE_TYPES = [
+        ["PE.*MS Windows.*", "pefile", pefile.PE]
+    ]
+
     def __init__(self, filename):
         """
         Creates a file object for a malware sample.
@@ -55,10 +62,12 @@ class FileObject(object):
         
         :return:  Nothing. 
         """
-        # Detect Windows PE Files...
-        if re.match("PE.*MS Windows.*", self.filetype):
-            self.parsedfile = {"type": "pefile",
-                               "file": pefile.PE(self.filename)}
+        for FILE_TYPE in self.FILE_TYPES:
+            if re.match(FILE_TYPE[0], self.filetype):
+                self.parsedfile = {"type": FILE_TYPE[1]}
+                if (len(FILE_TYPE) > 2 and FILE_TYPE[2] is not None
+                        and callable(FILE_TYPE[2])):
+                    self.parsedfile['file'] = FILE_TYPE[2](self.filename)
 
     def parsed_file_running_entropy(self, window_size=256, normalize=True):
         """
