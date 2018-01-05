@@ -1,9 +1,10 @@
 import argparse
 from library.files import FileObject
-from sklearn.neighbors import LocalOutlierFactor, EllipticEnvelope
 import numpy
 import os
 import sqlite3
+import time
+import shutil
 
 
 def main():
@@ -42,7 +43,12 @@ def main():
 
     # Delete old data...
     try:
-        os.rmdir(args.DBDirectory)
+        shutil.rmtree(args.DBDirectory, ignore_errors=True)
+    except:
+        pass
+
+    # Create DB director...
+    try:
         os.mkdir(args.DBDirectory)
     except:
         pass
@@ -152,7 +158,8 @@ def main():
                 malware_cursor.execute('CREATE TABLE IF NOT EXISTS windows(' +
                                        'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
                                        'windowsize INT NOT NULL,'
-                                       'normalized INT NOT NULL'
+                                       'normalized INT NOT NULL,'
+                                       'calctime REAL NOT NULL'
                                        ');')
                 malware_conn.commit()
 
@@ -161,8 +168,14 @@ def main():
                     if w < m.file_size:
                         print("\t\tCalculating window size {0}".format(w))
 
+                        # Capture the running time
+                        start_time = time.time()
+
                         # Calculate running entropy...
                         running_entropy = m.running_entropy(w, normalize)
+
+                        # Capture the running time
+                        end_time = time.time()
 
                         # # Delete any old runs...
                         # sql = "DELETE FROM windowentropy WHERE windowsize=:windowsize;"
@@ -189,9 +202,10 @@ def main():
                             malware_offset += 1
 
                         # Add the window size to the database signifying it is done...
-                        sql = "INSERT INTO windows (windowsize, normalized) " + \
-                              "VALUES (:windowsize, :normalized)"
-                        params = {'windowsize': w, 'normalized': normalize}
+                        sql = "INSERT INTO windows (windowsize, normalized, calctime) " + \
+                              "VALUES (:windowsize, :normalized, :calctime)"
+                        params = {'windowsize': w, 'normalized': normalize,
+                                  'calctime': end_time-start_time}
                         malware_cursor.execute(sql, params)
 
                         # Commit all our data...
