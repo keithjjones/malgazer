@@ -208,9 +208,7 @@ def main():
                                   'calctime': end_time-start_time}
                         malware_cursor.execute(sql, params)
 
-                        # Commit all our data...
-                        malware_conn.commit()
-
+                # Commit all our data...
                 malware_conn.commit()
                 malware_conn.close()
 
