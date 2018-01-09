@@ -177,18 +177,6 @@ def main():
                         # Capture the running time
                         end_time = time.time()
 
-                        # # Delete any old runs...
-                        # sql = "DELETE FROM windowentropy WHERE windowsize=:windowsize;"
-                        # params = {'windowsize': w}
-                        # malware_cursor.execute(sql, params)
-                        # malware_conn.commit()
-                        #
-                        # # Delete any old runs...
-                        # sql = "DELETE FROM anomalies WHERE windowsize=:windowsize;"
-                        # params = {'windowsize': w}
-                        # malware_cursor.execute(sql, params)
-                        # malware_conn.commit()
-
                         # Add running entropy to the database...
                         malware_offset = 0
                         for r in running_entropy:
