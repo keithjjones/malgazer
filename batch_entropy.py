@@ -119,86 +119,41 @@ def main():
 
             # Calculate the window entropy for malware samples...
             if windows is not None:
-                # Create malware table structure...
-                malware_conn = sqlite3.connect(dbfile)
-                malware_cursor = malware_conn.cursor()
-                malware_cursor.execute('CREATE TABLE IF NOT EXISTS metadata(' +
-                                       'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
-                                       'filepath TEXT NOT NULL,'
-                                       'filesize INT NOT NULL,'
-                                       'filetype TEXT NOT NULL,'
-                                       'fileentropy REAL NOT NULL,'
-                                       'MD5 TEXT NOT NULL,'
-                                       'SHA256 TEXT NOT NULL,'
-                                       'DBFile TEXT NOT NULL'
-                                       ');')
-
-                # Prepare and execute SQL for malware DB...
-                sql = "INSERT INTO metadata (filepath, filesize, filetype, " + \
-                      "fileentropy, MD5, SHA256, DBFile) VALUES " + \
-                      "(:filepath, :filesize, :filetype, :fileentropy, " + \
-                      ":md5, :sha256, :dbfile);"
-                params = {'filepath': m.filename, 'filesize': m.file_size,
-                          'filetype': m.filetype, 'fileentropy': fileentropy,
-                          'md5': m.md5, 'sha256': m.sha256, 'dbfile': dbfile}
-                malware_cursor.execute(sql, params)
-                malware_conn.commit()
-
-                # Create table for window entropy in malware db...
-                malware_cursor.execute(
-                    'CREATE TABLE IF NOT EXISTS windowentropy(' +
-                    'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
-                    'windowsize INT NOT NULL,'
-                    'offset INT NOT NULL,'
-                    'entropy REAL NOT NULL'
-                    ');')
-                malware_conn.commit()
-
-                # Create table for window sizes in malware db...
-                malware_cursor.execute('CREATE TABLE IF NOT EXISTS windows(' +
-                                       'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
-                                       'windowsize INT NOT NULL,'
-                                       'normalized INT NOT NULL,'
-                                       'calctime REAL NOT NULL'
-                                       ');')
-                malware_conn.commit()
+                # # Create malware table structure...
+                # malware_conn = sqlite3.connect(dbfile)
+                # malware_cursor = malware_conn.cursor()
+                # malware_cursor.execute('CREATE TABLE IF NOT EXISTS metadata(' +
+                #                        'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
+                #                        'filepath TEXT NOT NULL,'
+                #                        'filesize INT NOT NULL,'
+                #                        'filetype TEXT NOT NULL,'
+                #                        'fileentropy REAL NOT NULL,'
+                #                        'MD5 TEXT NOT NULL,'
+                #                        'SHA256 TEXT NOT NULL,'
+                #                        'DBFile TEXT NOT NULL'
+                #                        ');')
+                #
+                # # Prepare and execute SQL for malware DB...
+                # sql = "INSERT INTO metadata (filepath, filesize, filetype, " + \
+                #       "fileentropy, MD5, SHA256, DBFile) VALUES " + \
+                #       "(:filepath, :filesize, :filetype, :fileentropy, " + \
+                #       ":md5, :sha256, :dbfile);"
+                # params = {'filepath': m.filename, 'filesize': m.file_size,
+                #           'filetype': m.filetype, 'fileentropy': fileentropy,
+                #           'md5': m.md5, 'sha256': m.sha256, 'dbfile': dbfile}
+                # malware_cursor.execute(sql, params)
+                # malware_conn.commit()
 
                 # Iterate through the window sizes...
                 for w in windows:
                     if w < m.file_size:
                         print("\t\tCalculating window size {0:,}".format(w))
 
-                        # Capture the running time
-                        start_time = time.time()
-
                         # Calculate running entropy...
-                        running_entropy = m.running_entropy(w, normalize)
+                        m.running_entropy(w, normalize)
 
-                        # Capture the running time
-                        end_time = time.time()
-
-                        # Add running entropy to the database...
-                        malware_offset = 0
-                        for r in running_entropy:
-                            sql = "INSERT INTO windowentropy " + \
-                                  "(windowsize, offset, entropy) " + \
-                                  "VALUES (:windowsize, :offset, :entropy);"
-                            params = {'windowsize': w,
-                                      'offset': malware_offset,
-                                      'entropy': r}
-                            malware_cursor.execute(sql, params)
-                            malware_offset += 1
-
-                        # Add the window size to the database signifying it is done...
-                        sql = "INSERT INTO windows (windowsize, normalized, calctime) " + \
-                              "VALUES (:windowsize, :normalized, :calctime)"
-                        params = {'windowsize': w, 'normalized': normalize,
-                                  'calctime': end_time-start_time}
-                        malware_cursor.execute(sql, params)
-
-                # Commit all our data...
-                malware_conn.commit()
-                malware_conn.close()
+                # Write the running entropy...
+                m.write_entropy(dbfile)
 
             samples_processed += 1
             print("{0:n} samples processed...".format(samples_processed))

@@ -6,6 +6,7 @@ from library.plots import ScatterPlot
 from sklearn.covariance import EllipticEnvelope
 from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
+from library.entropy import RunningEntropy
 
 import numpy
 import time
@@ -46,30 +47,10 @@ def main():
     args = parser.parse_args()
 
 
-    main_conn = sqlite3.connect(args.SQLFile)
-    main_cursor = main_conn.cursor()
+    running_entropy = RunningEntropy()
+    running_entropy.read(args.SQLFile)
 
-    # Find the windows calculated...
-    main_cursor.execute('SELECT * from windows;')
-    results = main_cursor.fetchone()
-    windows = []
-
-    while (results):
-        windows.append(results[1])
-        results = main_cursor.fetchone()
-
-    # Setup running entropy variables...
-    running_entropy = dict()
-    for w in windows:
-        running_entropy[w] = list()
-
-    # Read in running entropy values...
-    main_cursor.execute('SELECT * from windowentropy ORDER BY offset;')
-    results = main_cursor.fetchone()
-
-    while(results):
-        running_entropy[results[1]].append(results[3])
-        results = main_cursor.fetchone()
+    # Do stuff here...
 
     # Print the running time...
     print()
