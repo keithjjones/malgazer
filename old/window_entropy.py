@@ -200,7 +200,7 @@ def main():
                                          plottitle=title)
                     html.append(myplot.plot_div())
 
-            with open('malgazer.html', 'w') as m:
+            with open(args.plotrunningentropyfilename, 'w') as m:
                 m.write("<HTML><TITLE>Malgazer</TITLE><BODY>")
                 for h in html:
                     m.write(h)
