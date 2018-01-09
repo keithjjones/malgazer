@@ -108,10 +108,11 @@ class FileObject(object):
     #                                                         length=length)})
     #         return self.parsedfile['running_entropy']
     #
-    # def parsed_file_entropy(self, normalize=True):
+    # def parsed_file_entropy(self, window_size=256, normalize=True):
     #     """
     #     Calculates the entropy values and other metadata as appropriate
     #     for the file type.
+    #     :param window_size:  The running window size in bytes.
     #     :param normalize: True if the output should be normalized between
     #         0 and 1.
     #     :return:  A dict with entropy and other metadata as appropriate for the
@@ -121,6 +122,23 @@ class FileObject(object):
     #     # Return right away if the data was not parsed...
     #     if self.parsedfile is None:
     #         return None
+    #
+    #     # TODO: Fix this up later...
+    #     # if offset > self.file_size - window_size or offset < 0:
+    #     #     raise IndexError("The offset {0} is not a valid "
+    #     #                      "value for file length {1} "
+    #     #                      "and window size {2}!"
+    #     #                      .format(offset, self.file_size, window_size))
+    #     #
+    #     # if length is not None:
+    #     #     if length + offset > self.file_size:
+    #     #         raise IndexError("The length {0} is not a valid "
+    #     #                          "value for file length {1} "
+    #     #                          "and offset {2}!"
+    #     #                          .format(length, self.file_size, offset))
+    #     # else:
+    #     #     length = self.file_size - offset
+    #     # data = self.data[offset:length + offset]
     #
     #     # Windows PE Files...
     #     if self.parsedfile['type'] == 'pefile':
@@ -133,6 +151,13 @@ class FileObject(object):
     #             # TODO: Above may be section.Misc_VirtualSize - test this.
     #             # More info:
     #             # https://msdn.microsoft.com/en-us/library/ms809762.aspx
+    #
+    #             length = self.file_size - offset
+    #             data = self.data[offset:length + offset]
+    #
+    #             runent = entropy.RunningEntropy()
+    #             entropy_data = runent.calculate(data, window_size, normalize)
+    #
     #             entval = self.running_entropy(length,
     #                                           normalize,
     #                                           offset=offset,
@@ -159,23 +184,6 @@ class FileObject(object):
         """
         runent = self.runningentropy
 
-        # TODO: Fix this up later...
-        # if offset > self.file_size - window_size or offset < 0:
-        #     raise IndexError("The offset {0} is not a valid "
-        #                      "value for file length {1} "
-        #                      "and window size {2}!"
-        #                      .format(offset, self.file_size, window_size))
-        #
-        # if length is not None:
-        #     if length + offset > self.file_size:
-        #         raise IndexError("The length {0} is not a valid "
-        #                          "value for file length {1} "
-        #                          "and offset {2}!"
-        #                          .format(length, self.file_size, offset))
-        # else:
-        #     length = self.file_size - offset
-        # data = self.data[offset:length + offset]
-
         entropy = runent.calculate(self.data, window=window_size, normalize=normalize)
         return entropy
 
@@ -188,13 +196,13 @@ class FileObject(object):
         :return: An entropy value of the whole file.
         """
         runent = self.runningentropy
-        runentvals = runent.calculate(self.data,
-                                      window=len(self.data),
-                                      normalize=normalize)
-        if len(runentvals) > 1:
+        entropy = runent.calculate(self.data,
+                                   window=len(self.data),
+                                   normalize=normalize)
+        if len(entropy) > 1:
             raise Exception("This should happen.  Check this code.")
 
-        return runentvals[0]
+        return entropy[0]
 
     def write_entropy(self, sqlite_filename):
         self.runningentropy.write(sqlite_filename)
