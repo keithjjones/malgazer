@@ -36,7 +36,7 @@ def main():
     parser.add_argument("-prefilename", "--plotrunningentropyfilename",
                         help="The file name of the output file for a running "
                              "entropy plot (html).",
-                        default="malgzer_running_entropy.html",
+                        default="malgazer_running_entropy.html",
                         required=False)
     parser.add_argument("-a", "--anomaly", action='store_true',
                         help="Enable anomaly detection."
