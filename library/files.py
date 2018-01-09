@@ -69,7 +69,7 @@ class FileObject(object):
                         and callable(FILE_TYPE[2])):
                     self.parsedfile['file'] = FILE_TYPE[2](self.filename)
 
-    # TODO: Fix this up later...
+    # TODO: Fix this up later, if I decide I need it again...
     # def parsed_file_running_entropy(self, window_size=256, normalize=True):
     #     """
     #     Calculates the running entropy of the file with respect to the file
