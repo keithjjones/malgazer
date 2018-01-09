@@ -58,6 +58,19 @@ def main():
         windows.append(results[1])
         results = main_cursor.fetchone()
 
+    # Setup running entropy variables...
+    running_entropy = dict()
+    for w in windows:
+        running_entropy[w] = list()
+
+    # Read in running entropy values...
+    main_cursor.execute('SELECT * from windowentropy ORDER BY offset;')
+    results = main_cursor.fetchone()
+
+    while(results):
+        running_entropy[results[1]].append(results[3])
+        results = main_cursor.fetchone()
+
     # Print the running time
     print()
     print("Total running time: {0:.6f} seconds"
