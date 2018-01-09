@@ -118,9 +118,11 @@ class FileObject(object):
             between 0 and 1.
         :return: A list of running entropy values for the given window size.
         """
-        runent = self.runningentropy
-
-        entropy = runent.calculate(self.data, window=window_size, normalize=normalize)
+        entropy = self.runningentropy.calculate(self.data,
+                                                window=window_size,
+                                                normalize=normalize)
+        if len(entropy) != self.file_size - window_size + 1:
+            raise Exception("This should not happen.  Check this code.")
         return entropy
 
     def entropy(self, normalize=True):
@@ -131,12 +133,11 @@ class FileObject(object):
             between 0 and 1.
         :return: An entropy value of the whole file.
         """
-        runent = self.runningentropy
-        entropy = runent.calculate(self.data,
-                                   window=len(self.data),
-                                   normalize=normalize)
+        entropy = self.runningentropy.calculate(self.data,
+                                                window=len(self.data),
+                                                normalize=normalize)
         if len(entropy) > 1:
-            raise Exception("This should happen.  Check this code.")
+            raise Exception("This should not happen.  Check this code.")
 
         return entropy[0]
 
