@@ -32,7 +32,7 @@ def main():
     parser.add_argument("-prefilename", "--plotrunningentropyfilename",
                         help="The file name of the output file for a running "
                              "entropy plot (html).",
-                        default="malgazer_running_entropy.html",
+                        default="malgazer.html",
                         required=False)
     parser.add_argument("-a", "--anomaly", action='store_true',
                         help="Enable anomaly detection."
@@ -50,7 +50,46 @@ def main():
     running_entropy = RunningEntropy()
     running_entropy.read(args.SQLFile)
 
-    # Do stuff here...
+    # if args.plotrunningentropy:
+
+    # This will be our HTML output
+    html = list()
+
+    windows = sorted(running_entropy.entropy_data.keys())
+
+    # Iterate through window sizes...
+    for window in windows:
+        rwe = running_entropy.entropy_data[window]
+        n = numpy.array(rwe)
+
+        # Setup the x axis as location information
+        x = [i for i in range(0, len(rwe))
+             if i % int(args.plotrunningentropyskip) == 0]
+        # Setup the y axis values
+        y = [round(rwe[i], 6)
+             for i in range(0, len(rwe))
+             if i % int(args.plotrunningentropyskip) == 0]
+
+        title = ("Malgazer - Running Entropy Window Size {0} Bytes"
+                 .format(window))
+        xtitle = "Byte Location"
+        ytitle = "Entropy Value"
+        datatitle = ["Entropy"]
+        mode = ["lines", "markers"]
+        x_vals = [x]
+        y_vals = [y]
+
+        myplot = ScatterPlot(x=x_vals, datatitle=datatitle, xtitle=xtitle,
+                             y=y_vals, ytitle=ytitle,
+                             plottitle=title, mode=mode)
+        html.append(myplot.plot_div())
+
+    # Output the HTML...
+    with open(args.plotrunningentropyfilename, 'w') as m:
+        m.write("<HTML><TITLE>Malgazer</TITLE><BODY>")
+        for h in html:
+            m.write(h)
+        m.write("</BODY></HTML>")
 
     # Print the running time...
     print()
