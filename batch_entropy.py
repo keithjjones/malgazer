@@ -47,7 +47,7 @@ def main():
     except:
         pass
 
-    # Create DB director...
+    # Create DB directory...
     try:
         os.mkdir(args.DBDirectory)
     except:
