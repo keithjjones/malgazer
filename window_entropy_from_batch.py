@@ -31,7 +31,7 @@ def main():
     parser.add_argument("-prefilename", "--plotrunningentropyfilename",
                         help="The file name of the output file for a running "
                              "entropy plot (html).",
-                        default="malgzer_running_entropy.html",
+                        default="malgazer_running_entropy.html",
                         required=False)
     parser.add_argument("-a", "--anomaly", action='store_true',
                         help="Enable anomaly detection."
@@ -71,7 +71,7 @@ def main():
         running_entropy[results[1]].append(results[3])
         results = main_cursor.fetchone()
 
-    # Print the running time
+    # Print the running time...
     print()
     print("Total running time: {0:.6f} seconds"
           .format(round(time.time() - start_time, 6)))
