@@ -50,10 +50,18 @@ def main():
     running_entropy = RunningEntropy()
     running_entropy.read(args.SQLFile)
 
-    # if args.plotrunningentropy:
+    f = FileObject(running_entropy.metadata['filepath'])
 
     # This will be our HTML output
     html = list()
+    html.append("<h1>File Metadata</h1>")
+    html.append("<b>Sample:</b> {0}".format(running_entropy.metadata['filepath']))
+    html.append("<br><b>File Type:</b> {0}".format(running_entropy.metadata['filetype']))
+    html.append("<br><b>File Size:</b> {0}".format(running_entropy.metadata['filesize']))
+    html.append("<br><b>File Entropy:</b> {0}".format(running_entropy.metadata['fileentropy']))
+    html.append("<br><b>MD5:</b> {0}".format(running_entropy.metadata['md5']))
+    html.append("<br><b>SHA256:</b> {0}".format(running_entropy.metadata['sha256']))
+    html.append("<h1>Plots</h1>")
 
     windows = sorted(running_entropy.entropy_data.keys())
 
@@ -63,6 +71,20 @@ def main():
         if window != running_entropy.metadata['filesize']:
             rwe = running_entropy.entropy_data[window]
             n = numpy.array(rwe)
+
+            # Add annotations for file types
+            annotations = list()
+
+            # Annotations for PE files...
+            if f.parsedfile['type'] == 'pefile':
+                for section in f.parsedfile['sections']:
+                    annotation = dict()
+                    section_offset = f.parsedfile['sections'][section]['offset']
+                    section_length = f.parsedfile['sections'][section]['length']
+                    annotation['text'] = "{0} ({1:,}-{2:,})".format(section, section_offset, section_offset+section_length-1)
+                    annotation['x'] = section_offset
+                    annotation['y'] = rwe[section_offset]
+                    annotations.append(annotation)
 
             # Setup the x axis as location information
             x = [i for i in range(0, len(rwe))
@@ -83,7 +105,8 @@ def main():
 
             myplot = ScatterPlot(x=x_vals, datatitle=datatitle, xtitle=xtitle,
                                  y=y_vals, ytitle=ytitle,
-                                 plottitle=title, mode=mode)
+                                 plottitle=title, mode=mode,
+                                 text=annotations)
             html.append(myplot.plot_div())
 
     # Output the HTML...

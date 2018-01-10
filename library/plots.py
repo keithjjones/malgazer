@@ -37,21 +37,40 @@ class ScatterPlot(object):
                                         mode=mymode
                                        ))
 
+        annotations = list()
+
         # Add text annotations
         if text:
             for t in text:
-                mymode = 'text'
                 # Add annotations
-                self._output.append(Scatter(text=[t['text']],
-                                            x=[t['x']],
-                                            y=[t['y']],
-                                            hoverinfo="x",
-                                            mode=mymode
-                                           ))
+                annotations.append(
+                    dict(
+                        x=t['x'],
+                        y=t['y'],
+                        xref='x',
+                        yref='y',
+                        text=t['text'],
+                        showarrow=True
+                    )
+                )
+
+        # # Add text annotations
+        # if text:
+        #     for t in text:
+        #         mymode = 'text'
+        #         # Add annotations
+        #         self._output.append(Scatter(text=[t['text']],
+        #                                     x=[t['x']],
+        #                                     y=[t['y']],
+        #                                     hoverinfo="x",
+        #                                     mode=mymode,
+        #                                     textposition='right'
+        #                                    ))
 
         self._plotlayout = Layout(showlegend=True, title=plottitle,
-                            xaxis=dict(title=xtitle),
-                            yaxis=dict(title=ytitle))
+                                  xaxis=dict(title=xtitle),
+                                  yaxis=dict(title=ytitle),
+                                  annotations=annotations)
         self._plotfigure = Figure(data=self._output, layout=self._plotlayout)
 
     def plot_div(self):
