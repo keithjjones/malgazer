@@ -21,6 +21,9 @@ class RunningEntropy(object):
         self.normalize = dict()
         self.calctime = dict()
 
+        # This can hold metadata info
+        self.metadata = dict()
+
     def calculate(self, inputbytes, window=256, normalize=True):
         """
         Calculates the running entropy of inputbytes with the window size.
@@ -124,12 +127,32 @@ class RunningEntropy(object):
         conn = sqlite3.connect(sqlite_filename)
         cursor = conn.cursor()
 
+        results = None
+
+        # Get metadata...
+        try:
+            cursor.execute('SELECT * FROM metadata;')
+            results = cursor.fetchone()
+        except sqlite3.OperationalError:
+            # Oh well, the table doesn't exist...
+            pass
+
+        # Store the metadata info if it is available...
+        if results:
+            self.metadata['filepath'] = results[1]
+            self.metadata['filesize'] = results[2]
+            self.metadata['filetype'] = results[3]
+            self.metadata['fileentropy'] = results[4]
+            self.metadata['md5'] = results [5]
+            self.metadata['sha256'] = results[6]
+            self.metadata['dbfile'] = results[7]
+
         # Find the windows calculated...
         cursor.execute('SELECT * FROM windows;')
         results = cursor.fetchone()
         windows = list()
 
-        while (results):
+        while results:
             windows.append(results[1])
             self.normalize[results[1]] = results[2]
             self.calctime[results[1]] = results[3]
@@ -144,7 +167,7 @@ class RunningEntropy(object):
         cursor.execute('SELECT * FROM windowentropy ORDER BY offset;')
         results = cursor.fetchone()
 
-        while (results):
+        while results:
             self.entropy_data[results[1]].append(results[3])
             results = cursor.fetchone()
 
@@ -164,6 +187,9 @@ class RunningEntropy(object):
         # Create malware table structure...
         conn = sqlite3.connect(sqlite_filename)
         cursor = conn.cursor()
+
+        # Save the metadata for later...
+        self.metadata = metadata
 
         # If we are given metadata, store it...
         if metadata:
