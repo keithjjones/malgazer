@@ -59,30 +59,32 @@ def main():
 
     # Iterate through window sizes...
     for window in windows:
-        rwe = running_entropy.entropy_data[window]
-        n = numpy.array(rwe)
+        # Don't plot the final window, as it's the full file entropy
+        if window != running_entropy.metadata['filesize']:
+            rwe = running_entropy.entropy_data[window]
+            n = numpy.array(rwe)
 
-        # Setup the x axis as location information
-        x = [i for i in range(0, len(rwe))
-             if i % int(args.plotrunningentropyskip) == 0]
-        # Setup the y axis values
-        y = [round(rwe[i], 6)
-             for i in range(0, len(rwe))
-             if i % int(args.plotrunningentropyskip) == 0]
+            # Setup the x axis as location information
+            x = [i for i in range(0, len(rwe))
+                 if i % int(args.plotrunningentropyskip) == 0]
+            # Setup the y axis values
+            y = [round(rwe[i], 6)
+                 for i in range(0, len(rwe))
+                 if i % int(args.plotrunningentropyskip) == 0]
 
-        title = ("Malgazer - Running Entropy Window Size {0} Bytes"
-                 .format(window))
-        xtitle = "Byte Location"
-        ytitle = "Entropy Value"
-        datatitle = ["Entropy"]
-        mode = ["lines", "markers"]
-        x_vals = [x]
-        y_vals = [y]
+            title = ("Malgazer - Running Entropy Window Size {0} Bytes"
+                     .format(window))
+            xtitle = "Byte Location"
+            ytitle = "Entropy Value"
+            datatitle = ["Entropy"]
+            mode = ["lines", "markers"]
+            x_vals = [x]
+            y_vals = [y]
 
-        myplot = ScatterPlot(x=x_vals, datatitle=datatitle, xtitle=xtitle,
-                             y=y_vals, ytitle=ytitle,
-                             plottitle=title, mode=mode)
-        html.append(myplot.plot_div())
+            myplot = ScatterPlot(x=x_vals, datatitle=datatitle, xtitle=xtitle,
+                                 y=y_vals, ytitle=ytitle,
+                                 plottitle=title, mode=mode)
+            html.append(myplot.plot_div())
 
     # Output the HTML...
     with open(args.plotrunningentropyfilename, 'w') as m:
