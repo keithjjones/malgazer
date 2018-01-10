@@ -57,7 +57,7 @@ def main():
     html.append("<h1>File Metadata</h1>")
     html.append("<b>Sample:</b> {0}".format(running_entropy.metadata['filepath']))
     html.append("<br><b>File Type:</b> {0}".format(running_entropy.metadata['filetype']))
-    html.append("<br><b>File Size:</b> {0}".format(running_entropy.metadata['filesize']))
+    html.append("<br><b>File Size:</b> {0:,}".format(running_entropy.metadata['filesize']))
     html.append("<br><b>File Entropy:</b> {0}".format(running_entropy.metadata['fileentropy']))
     html.append("<br><b>MD5:</b> {0}".format(running_entropy.metadata['md5']))
     html.append("<br><b>SHA256:</b> {0}".format(running_entropy.metadata['sha256']))
