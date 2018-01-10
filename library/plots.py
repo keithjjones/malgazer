@@ -7,7 +7,7 @@ from plotly.tools import FigureFactory as FF
 
 
 class ScatterPlot(object):
-    def __init__(self, x, datatitle, xtitle, y, ytitle, plottitle, mode=None):
+    def __init__(self, x, datatitle, xtitle, y, ytitle, plottitle, mode=None, text=None):
         """
         Creates a scatter plot from the data.
         
@@ -18,6 +18,7 @@ class ScatterPlot(object):
         :param ytitle:  Title for the Y axis.
         :param plottitle:  Title for the overall plot.
         :param mode: A list of modes for the scatter plot, None is line
+        :param text: A list of dicts that has text, x, and y for the text annotation.
         """
         self._output = []
 
@@ -35,6 +36,18 @@ class ScatterPlot(object):
                                         hoverinfo="x+y",
                                         mode=mymode
                                        ))
+
+        # Add text annotations
+        if text:
+            for t in text:
+                mymode = 'text'
+                # Add annotations
+                self._output.append(Scatter(text=[t['text']],
+                                            x=[t['x']],
+                                            y=[t['y']],
+                                            hoverinfo="x",
+                                            mode=mymode
+                                           ))
 
         self._plotlayout = Layout(showlegend=True, title=plottitle,
                             xaxis=dict(title=xtitle),
