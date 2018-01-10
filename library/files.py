@@ -68,6 +68,17 @@ class FileObject(object):
                 if (len(FILE_TYPE) > 2 and FILE_TYPE[2] is not None
                         and callable(FILE_TYPE[2])):
                     self.parsedfile['file'] = FILE_TYPE[2](self.filename)
+                    self.parsedfile['sections'] = dict()
+                    for section in self.parsedfile['file'].sections:
+                        section_name = section.Name.decode('UTF-8').rstrip('\x00')
+                        offset = section.PointerToRawData
+                        length = section.SizeOfRawData
+                        self.parsedfile['sections'][section_name] = dict()
+                        self.parsedfile['sections'][section_name]['offset'] = offset
+                        self.parsedfile['sections'][section_name]['length'] = length
+                        # TODO: Above may be section.Misc_VirtualSize - test this.
+                        # More info:
+                        # https://msdn.microsoft.com/en-us/library/ms809762.aspx
 
     # TODO: Fix this up later, if I decide I need it again...
     # def parsed_file_running_entropy(self, window_size=256, normalize=True):
