@@ -116,7 +116,6 @@ class RunningEntropy(object):
     def read(self, sqlite_filename):
         """
         Reads the running window entropy from a Sqlite DB file.
-        You probably don't need this function from this class.
 
         :param sqlite_filename: SQLite file name
         :return: A dict containing the running window entropy values, keyed

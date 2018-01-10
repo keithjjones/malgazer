@@ -155,6 +155,7 @@ class FileObject(object):
     def read_entropy(self, sqlite_filename):
         """
         Read the entropy data from a sqlite file.
+        You probably don't need this function from this class.
 
         :param sqlite_filename:  The sqlite file name
         :return: Nothing
