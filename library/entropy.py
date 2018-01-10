@@ -2,6 +2,7 @@
 import math
 import sqlite3
 import os
+import json
 import time
 from collections import Counter
 from collections import deque
@@ -151,16 +152,48 @@ class RunningEntropy(object):
 
         return self.entropy_data
 
-    def write(self, sqlite_filename):
+    def write(self, sqlite_filename, metadata=None):
         """
         Writes entropy data to sqlite file.
 
         :param sqlite_filename: SQLite file name
+        :param metadata: Metadata dict to write to the DB file.  Only use this
+            if you know what you are doing.
         :return: Nothing
         """
         # Create malware table structure...
         conn = sqlite3.connect(sqlite_filename)
         cursor = conn.cursor()
+
+        # If we are given metadata, store it...
+        if metadata:
+            # Create table for metadata in malware db...
+            cursor.execute(
+                'CREATE TABLE IF NOT EXISTS metadata(' +
+                'ID INTEGER PRIMARY KEY AUTOINCREMENT,'
+                'filepath TEXT NOT NULL,'
+                'filesize INT NOT NULL,'
+                'filetype TEXT NOT NULL,'
+                'fileentropy REAL NOT NULL,'
+                'MD5 TEXT NOT NULL,'
+                'SHA256 TEXT NOT NULL,'
+                'DBFile TEXT NOT NULL'
+            ');')
+            conn.commit()
+            # Prepare and execute SQL for the metadata...
+            sql = "INSERT INTO metadata (filepath, filesize, filetype, " + \
+                  "fileentropy, MD5, SHA256, DBFile) VALUES " + \
+                  "(:filepath, :filesize, :filetype, :fileentropy, " + \
+                  ":md5, :sha256, :dbfile);"
+            params = {'filepath': metadata.get('filepath', ''),
+                      'filesize': metadata.get('filesize', ''),
+                      'filetype': metadata.get('filetype', ''),
+                      'fileentropy': metadata.get('fileentropy', ''),
+                      'md5': metadata.get('md5', ''),
+                      'sha256': metadata.get('sha256', ''),
+                      'dbfile': metadata.get('dbfile', '')}
+            cursor.execute(sql, params)
+            conn.commit()
 
         # Create table for window entropy in malware db...
         cursor.execute(

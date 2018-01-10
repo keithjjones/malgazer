@@ -141,8 +141,22 @@ class FileObject(object):
 
         return entropy[0]
 
-    def write_entropy(self, sqlite_filename):
-        self.runningentropy.write(sqlite_filename)
+    def write_entropy(self, sqlite_filename, metadata=None):
+        """
+        Write the file entropy data to a sqlite file.
+
+        :param sqlite_filename:  The sqlite file name
+        :param metadata: Extended metadata to be stored.  Only use this if
+            you know what you are doing.
+        :return: Nothing
+        """
+        self.runningentropy.write(sqlite_filename, metadata)
 
     def read_entropy(self, sqlite_filename):
+        """
+        Read the entropy data from a sqlite file.
+
+        :param sqlite_filename:  The sqlite file name
+        :return: Nothing
+        """
         self.runningentropy.read(sqlite_filename)

@@ -117,6 +117,15 @@ def main():
             main_cursor.execute(sql, params)
             main_conn.commit()
 
+            metadata = dict()
+            metadata['filepath'] = m.filename
+            metadata['filesize'] = m.file_size
+            metadata['filetype'] = m.filetype
+            metadata['fileentropy'] = fileentropy
+            metadata['md5'] = m.md5
+            metadata['sha256'] = m.sha256
+            metadata['dbfile'] = dbfile
+
             # Calculate the window entropy for malware samples...
             if windows is not None:
                 # TODO: May add this back in later...
@@ -154,7 +163,7 @@ def main():
                         m.running_entropy(w, normalize)
 
                 # Write the running entropy...
-                m.write_entropy(dbfile)
+                m.write_entropy(dbfile, metadata=metadata)
 
             samples_processed += 1
             print("{0:n} samples processed...".format(samples_processed))
