@@ -26,10 +26,6 @@ def main():
                              "Multiple windows can be identified as comma "
                              "separated values without spaces."
                              "", default='256', type=str, required=False)
-    parser.add_argument("-pre", "--plotrunningentropy", action='store_true',
-                        help="Plot the running entropy values.  Only valid "
-                             "if -w is used!"
-                             "", required=False)
     parser.add_argument("-preskip", "--plotrunningentropyskip",
                         help="Skip this number of bytes in running entropy "
                              "value plot for compression."
