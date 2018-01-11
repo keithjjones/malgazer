@@ -120,6 +120,8 @@ class RunningEntropy(object):
         """
         Reads the running window entropy from a Sqlite DB file.
 
+        Deprecated.  Keeping to reuse logic later.
+
         :param sqlite_filename: SQLite file name
         :return: A dict containing the running window entropy values, keyed
             by running window size.
@@ -178,6 +180,8 @@ class RunningEntropy(object):
     def write(self, sqlite_filename, metadata=None):
         """
         Writes entropy data to sqlite file.
+
+        Deprecated.  Keeping to reuse logic later.
 
         :param sqlite_filename: SQLite file name
         :param metadata: Metadata dict to write to the DB file.  Only use this
