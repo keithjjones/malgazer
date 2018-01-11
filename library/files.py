@@ -168,6 +168,13 @@ class FileObject(object):
         :param filename:  The data file name
         :return: Nothing
         """
+        # Remove any old data...
+        try:
+            os.remote(filename)
+        except:
+            pass
+
+        # Zip up the pickle
         with gzip.open(filename, 'wb') as file:
             pickle.dump(self.malware, file)
 
@@ -182,6 +189,8 @@ class FileObject(object):
         f = FileObject('', load_file=False)
         with gzip.open(filename, 'rb') as file:
             f.malware = pickle.load(file)
+        # Parse up the file type, if available...
+        f._parse_file_type()
         return f
 
 
