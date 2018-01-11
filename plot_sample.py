@@ -73,7 +73,7 @@ def main():
 
     # Iterate through window sizes...
     for window in plot_windows:
-        print('Calculating window {0:,}'.format(window))
+        print('\tCalculating window {0:,}'.format(window))
         rwe = f.running_entropy(window)
         n = numpy.array(rwe)
 
