@@ -1,6 +1,5 @@
 # Script to calculate the entropy of a file already calculated with the batch script.
 import argparse
-import sqlite3
 from library.files import FileObject
 from library.plots import ScatterPlot
 from sklearn.covariance import EllipticEnvelope
@@ -18,9 +17,9 @@ def main():
 
     # Argument parsing
     parser = argparse.ArgumentParser(
-        description='Calculates the entropy of a file calculated from batch processing.')
-    parser.add_argument('SQLFile',
-                        help='The malware SQL file to analyze.')
+        description='Calculates the entropy of a pickle file calculated from batch processing.')
+    parser.add_argument('PickleFile',
+                        help='The malware pickle file to analyze.')
     parser.add_argument("-w", "--window",
                         help="Window size, in bytes, for running entropy."
                              "Multiple windows can be identified as comma "
@@ -54,21 +53,19 @@ def main():
         plot_windows = [x.strip() for x in plot_windows]
         plot_windows = [int(x) for x in plot_windows]
 
-    running_entropy = RunningEntropy()
-    running_entropy.read(args.SQLFile)
-
-    f = FileObject(running_entropy.metadata['filepath'])
+    f = FileObject.read(args.PickleFile)
 
     # This will be our HTML output
     html = list()
     html.append("<h1>File Metadata</h1>")
-    html.append("<b>Sample:</b> {0}".format(running_entropy.metadata['filepath']))
-    html.append("<br><b>File Type:</b> {0}".format(running_entropy.metadata['filetype']))
-    html.append("<br><b>File Size:</b> {0:,}".format(running_entropy.metadata['filesize']))
-    html.append("<br><b>File Entropy:</b> {0}".format(running_entropy.metadata['fileentropy']))
-    html.append("<br><b>MD5:</b> {0}".format(running_entropy.metadata['md5']))
-    html.append("<br><b>SHA256:</b> {0}".format(running_entropy.metadata['sha256']))
+    html.append("<b>Sample:</b> {0}".format(f.malware.filename))
+    html.append("<br><b>File Type:</b> {0}".format(f.malware.filetype))
+    html.append("<br><b>File Size:</b> {0:,}".format(f.malware.file_size))
+    html.append("<br><b>MD5:</b> {0}".format(f.malware.md5))
+    html.append("<br><b>SHA256:</b> {0}".format(f.malware.sha256))
     html.append("<h1>Plots</h1>")
+
+    running_entropy = f.malware.runningentropy
 
     windows = sorted(running_entropy.entropy_data.keys())
 
@@ -77,7 +74,7 @@ def main():
         # Only plot windows, if specified
         if plot_windows is None or window in plot_windows:
             # Don't plot the final window, as it's the full file entropy
-            if window != running_entropy.metadata['filesize']:
+            if window != f.malware.file_size:
                 rwe = running_entropy.entropy_data[window]
                 n = numpy.array(rwe)
 
@@ -85,13 +82,13 @@ def main():
                 annotations = list()
 
                 # Parsed file processing...
-                if f.parsedfile:
+                if f.malware.parsedfile:
                     # Annotations for PE files...
-                    if f.parsedfile['type'] == 'pefile':
-                        for section in f.parsedfile['sections']:
+                    if f.malware.parsedfile['type'] == 'pefile':
+                        for section in f.malware.parsedfile['sections']:
                             annotation = dict()
-                            section_offset = f.parsedfile['sections'][section]['offset']
-                            section_length = f.parsedfile['sections'][section]['length']
+                            section_offset = f.malware.parsedfile['sections'][section]['offset']
+                            section_length = f.malware.parsedfile['sections'][section]['length']
                             annotation['text'] = "{0} ({1:,}-{2:,})".format(section, section_offset, section_offset+section_length-1)
                             annotation['x'] = section_offset
                             annotation['y'] = rwe[section_offset]
