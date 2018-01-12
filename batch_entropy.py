@@ -71,7 +71,7 @@ def main():
             except:
                 continue
 
-            print("\tCalculating: {0} Type: {1}".format(m.filename, m.filetype))
+            print("\tCalculating: {0} Type: {1}".format(m.malware.filename, m.malware.filetype))
 
             # Create the DB file name...
             datadir = os.path.join(args.DataDirectory, subdir)
@@ -92,7 +92,7 @@ def main():
             if windows is not None:
                 # Iterate through the window sizes...
                 for w in windows:
-                    if w < m.file_size:
+                    if w < m.malware.file_size:
                         print("\t\tCalculating window size {0:,}".format(w))
 
                         # Calculate running entropy...
