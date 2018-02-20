@@ -197,7 +197,7 @@ class FileObject(object):
 class MalwareSample(object):
     def __init__(self, filename=None, filetype=None,
                  file_size=None, md5=None, sha256=None, data=None,
-                 runningentropy=None):
+                 runningentropy=None, parsedfile=None):
         """
         Object used to save malware data to pickled files for processing later.
         """
@@ -208,3 +208,4 @@ class MalwareSample(object):
         self.sha256 = sha256
         self.data = data
         self.runningentropy = runningentropy
+        self.parsedfile = parsedfile
