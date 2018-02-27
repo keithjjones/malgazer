@@ -284,7 +284,7 @@ class RunningEntropy(object):
         """
         if window_size not in self.entropy_data:
             # Nothing to return if it does not exist.
-            return None
+            return None, None
         rwe = np.array(self.entropy_data[window_size])
         x_rwe = list(range(len(rwe)))
         step = len(x_rwe)/number_of_data_points
