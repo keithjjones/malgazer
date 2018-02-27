@@ -287,8 +287,11 @@ class RunningEntropy(object):
             return None, None
         rwe = np.array(self.entropy_data[window_size])
         x_rwe = list(range(len(rwe)))
-        step = len(x_rwe)/number_of_data_points
-        xnew = np.arange(0, len(x_rwe), step)
+        step = (len(x_rwe)-1)/number_of_data_points
+        print(step)
+        xnew = np.arange(0, len(x_rwe)-1, step)
+        print(len(xnew))
+        print(xnew)
         interp_rwe = interpolate.interp1d(x_rwe, rwe)
         ynew = interp_rwe(xnew)
         return xnew, ynew
