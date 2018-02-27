@@ -6,6 +6,8 @@ import json
 import time
 from collections import Counter
 from collections import deque
+from scipy import interpolate
+import numpy as np
 
 
 class RunningEntropy(object):
@@ -267,3 +269,26 @@ class RunningEntropy(object):
         # Commit all our data...
         conn.commit()
         conn.close()
+
+    def resample_rwe(self, window_size=256, number_of_data_points=1024):
+        """
+        Returns a resampled numpy array from the original running window
+        entropy with a given window_size.
+
+        :param window_size:  The size in bytes of the running window
+        entropy window size.  This must have been calculated previously!
+        :param number_of_data_points: The number of data points you want in
+        your new data set.
+        :return: xnew,ynew where xnew and ynew are numpy arrays that have
+        been interpolated.
+        """
+        if window_size not in self.entropy_data:
+            # Nothing to return if it does not exist.
+            return None
+        rwe = np.array(self.entropy_data[window_size])
+        x_rwe = list(range(len(rwe)))
+        step = len(x_rwe)/number_of_data_points
+        xnew = np.arange(0, len(x_rwe), step)
+        interp_rwe = interpolate.interp1d(x_rwe, rwe)
+        ynew = interp_rwe(xnew)
+        return xnew, ynew
