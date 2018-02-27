@@ -190,7 +190,7 @@ class FileObject(object):
         with gzip.open(filename, 'rb') as file:
             f.malware = pickle.load(file)
         # Parse up the file type, if available...
-        f._parse_file_type()
+        # f._parse_file_type()
         return f
 
 
