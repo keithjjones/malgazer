@@ -184,18 +184,18 @@ class Utils(object):
                     samples_processed += 1
 
                     classified = ""
-                    if "Encrypted" in root:
+                    if "encrypted" in root.lower():
                         classified = "Encrypted"
-                    elif "Packed" in root:
+                    elif "packed" in root.lower():
                         classified = "Packed"
-                    elif "Unpacked" in root:
+                    elif "unpacked" in root.lower():
                         classified = "Unpacked"
 
-                    if "Malware" in root:
+                    if "malware" in root.lower():
                         classified += "-Malware"
-                    elif "PUP" in root:
+                    elif "pup" in root.lower():
                         classified += "-PUP"
-                    elif "Trusted" in root:
+                    elif "trusted" in root.lower():
                         classified += "-Trusted"
 
                     classifications[file] = classified
