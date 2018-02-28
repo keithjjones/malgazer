@@ -98,7 +98,7 @@ class Utils(object):
 
                     samples_processed += 1
                     print("{0:n} samples processed...".format(samples_processed))
-        print("\tTotal elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+        print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:n} total samples processed...".format(samples_processed))
 
     @staticmethod
@@ -155,7 +155,7 @@ class Utils(object):
                                               default_fc_parameters=settings)
         print("\tElapsed time {0:.6f} seconds".format(
             round(time.time() - start_tsfresh_time, 6)))
-        print("\tTotal elapsed time {0:.6f} seconds".format(
+        print("Total elapsed time {0:.6f} seconds".format(
             round(time.time() - start_time, 6)))
         print("{0:n} total samples processed...".format(samples_processed))
         return extracted_features
