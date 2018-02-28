@@ -16,10 +16,14 @@ def main():
                              "", type=str, required=False)
     args = parser.parse_args()
 
-    extracted_features,df = Utils.batch_tsfresh_rwe_data(args.DataDirectory, args.datapoints, args.window)
+    extracted_features,df = Utils.batch_tsfresh_rwe_data(args.DataDirectory,
+                                                         args.datapoints,
+                                                         args.window)
     classifications = Utils.get_classifications_from_path(args.DataDirectory)
-    classifications_ordered = Utils.create_ordered_classifications(classifications, extracted_features)
-    Utils.save_processed_data(df, classifications, classifications_ordered,
+    classifications_ordered = Utils.create_ordered_classifications(classifications,
+                                                                   extracted_features)
+    Utils.save_processed_data(df, classifications,
+                              classifications_ordered,
                               extracted_features, "data")
 
 
