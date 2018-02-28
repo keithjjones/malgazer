@@ -25,6 +25,13 @@ class Utils(object):
         :param normalize: Set to false to not normalize.
         :return: Nothing
         """
+        if in_directory is None or out_directory is None:
+            raise ValueError('Input and output directories must be real.')
+
+        # Test to make sure the input directory exists
+        os.stat(in_directory)
+
+        # The RE for malware files with sha256 as the name.
         malware_files_re = re.compile('[a-z0-9]{64}',
                                       flags=re.IGNORECASE)
         samples_processed = 0
@@ -77,3 +84,7 @@ class Utils(object):
 
                     samples_processed += 1
                     print("{0:n} samples processed...".format(samples_processed))
+
+    @staticmethod
+    def assemble_rwe_data(in_directory=None):
+        pass
