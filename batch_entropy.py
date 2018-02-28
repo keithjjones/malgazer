@@ -1,5 +1,6 @@
 import argparse
 from library.files import FileObject
+from library.utils import Utils
 import numpy
 import os
 import time
@@ -41,10 +42,10 @@ def main():
         windows = [int(x) for x in windows]
 
     # Delete old data...
-    try:
-        shutil.rmtree(args.DataDirectory, ignore_errors=True)
-    except:
-        pass
+    # try:
+    #     shutil.rmtree(args.DataDirectory, ignore_errors=True)
+    # except:
+    #     pass
 
     # Create DB directory...
     try:
@@ -58,53 +59,11 @@ def main():
     # except:
     #     os.mkdir(args.DBDirectory)
 
-    # Crawl the directories for malware
-    samples_processed = 0
-    for root, dirs, files in os.walk(args.MalwareDirectory):
-        for f in files:
-            subdir = root[len(args.MalwareDirectory):]
-
-            # Create the malware file name...
-            malwarepath = os.path.join(root, f)
-            try:
-                m = FileObject(malwarepath)
-            except:
-                continue
-
-            print("\tCalculating: {0} Type: {1}".format(m.malware.filename, m.malware.filetype))
-
-            # Create the DB file name...
-            datadir = os.path.join(args.DataDirectory, subdir)
-            picklefile = os.path.join(datadir, f) + ".pickle.gz"
-
-            print("\tSaving data to {0}".format(picklefile))
-
-            # Create the directory if needed...
-            try:
-                os.stat(datadir)
-            except:
-                os.mkdir(datadir)
-
-            # Calculate the entropy of the file...
-            fileentropy = m.entropy(normalize)
-
-            # Calculate the window entropy for malware samples...
-            if windows is not None:
-                # Iterate through the window sizes...
-                for w in windows:
-                    if w < m.malware.file_size:
-                        print("\t\tCalculating window size {0:,}".format(w))
-
-                        # Calculate running entropy...
-                        rwe = m.running_entropy(w, normalize)
-
-                # Write the running entropy...
-                m.write(picklefile)
-
-            samples_processed += 1
-            print("{0:n} samples processed...".format(samples_processed))
-            if args.maxsamples > 0 and samples_processed >= args.maxsamples:
-                break
+    # Crawl the directories for malware and calculate rwe
+    Utils.batch_running_window_entropy(args.MalwareDirectory,
+                                       args.DataDirectory,
+                                       window_sizes=windows,
+                                       normalize=normalize)
 
 
 if __name__ == "__main__":
