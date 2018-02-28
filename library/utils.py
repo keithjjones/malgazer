@@ -1,6 +1,7 @@
 # Utilities class
 import os
 import re
+import time
 import pandas as pd
 import numpy as np
 from .files import FileObject
@@ -36,6 +37,9 @@ class Utils(object):
         # if it does not exist.
         os.stat(in_directory)
 
+        # Start the timer
+        start_time = time.time()
+
         # The RE for malware files with sha256 as the name.
         malware_files_re = re.compile('[a-z0-9]{64}',
                                       flags=re.IGNORECASE)
@@ -43,7 +47,10 @@ class Utils(object):
         for root, dirs, files in os.walk(in_directory):
             for file in files:
                 if malware_files_re.match(file):
-                    print("Input file: {0}\n".format(file))
+                    # Start the timer
+                    start_load_time = time.time()
+
+                    print("Input file: {0}".format(file))
                     subdir = root[len(in_directory):]
 
                     # Create the malware file name...
@@ -87,8 +94,12 @@ class Utils(object):
                         # Write the running entropy...
                         m.write(picklefile)
 
+                    print("\tElapsed time {0:.6f} seconds".format(round(time.time() - start_load_time, 6)))
+
                     samples_processed += 1
                     print("{0:n} samples processed...".format(samples_processed))
+        print("\tTotal elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+        print("{0:n} total samples processed...".format(samples_processed))
 
     @staticmethod
     def batch_tsfresh_rwe_data(in_directory=None,
@@ -104,6 +115,8 @@ class Utils(object):
         calculated.
         :return:  A Pandas dataframe containing the tsfresh features.
         """
+        # Start the timer
+        start_time = time.time()
         # Check to see that the input directory exists, this will throw an
         # exception if it does not exist.
         os.stat(in_directory)
@@ -111,10 +124,12 @@ class Utils(object):
         malware_files_re = re.compile('[a-z0-9]{64}.pickle.gz',
                                       flags=re.IGNORECASE)
         df = pd.DataFrame(columns=['id', 'offset', 'rwe'])
+        samples_processed = 0
         for root, dirs, files in os.walk(in_directory):
             for file in files:
                 if malware_files_re.match(file):
-                    print("Reading file: {0}\n".format(file))
+                    start_load_time = time.time()
+                    print("Reading file: {0}".format(file))
                     f = FileObject.read(os.path.join(root, file))
                     running_entropy = f.malware.runningentropy
                     if window_size in running_entropy.entropy_data:
@@ -128,10 +143,19 @@ class Utils(object):
                         d['offset'] = np.arange(0, datapoints)
                         df = df.append(d, ignore_index=True)
                     else:
-                        print("Window size {0} not in this pickle file!".format(window_size))
+                        print("ERROR: Window size {0} not in this pickle file!".format(window_size))
+                    print("\tElapsed time {0:.6f} seconds".format(round(time.time() - start_load_time, 6)))
+                    samples_processed += 1
+                    print("{0:n} samples processed...".format(samples_processed))
         print("Calculating TSFresh Features...")
+        start_tsfresh_time = time.time()
         settings = EfficientFCParameters()
         extracted_features = extract_features(df, column_id="id",
                                               column_sort='offset',
                                               default_fc_parameters=settings)
+        print("\tElapsed time {0:.6f} seconds".format(
+            round(time.time() - start_tsfresh_time, 6)))
+        print("\tTotal elapsed time {0:.6f} seconds".format(
+            round(time.time() - start_time, 6)))
+        print("{0:n} total samples processed...".format(samples_processed))
         return extracted_features
