@@ -25,12 +25,19 @@ def main(arguments=None):
     extracted_features, df = Utils.batch_tsfresh_rwe_data(args.DataDirectory,
                                                           args.datapoints,
                                                           args.window)
+
     classifications = Utils.get_classifications_from_path(args.DataDirectory)
     classifications_ordered = Utils.create_ordered_classifications(classifications,
                                                                    extracted_features)
+
+    print(classifications_ordered)
+
+    # Utils.extract_tsfresh_relevant_features(extracted_features, classifications_ordered['classification'])
+
     Utils.save_processed_data(df, classifications,
                               classifications_ordered,
-                              extracted_features, args.OutputDirectory)
+                              extracted_features, extracted_features,
+                              args.OutputDirectory)
 
 
 if __name__ == "__main__":
