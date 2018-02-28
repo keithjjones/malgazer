@@ -37,6 +37,8 @@ class Utils(object):
         if len(window_sizes) < 1:
             raise ValueError('Specify a window size in a list.')
 
+        print("Starting running window entropy batch processing for malware samples...")
+
         # Test to make sure the input directory exists, will throw exception
         # if it does not exist.
         os.stat(in_directory)
@@ -120,6 +122,8 @@ class Utils(object):
         :return:  A Pandas dataframe containing the tsfresh features, and the
         raw data frame as a tuple.
         """
+        print("Starting batch processing of tsfresh on running window entropy for malware samples...")
+
         # Start the timer
         start_time = time.time()
         # Check to see that the input directory exists, this will throw an
@@ -175,6 +179,8 @@ class Utils(object):
         :return: A dictionary with a key of the sha256 and the value of
         the classification guessed from the full path name.
         """
+        print("Starting classifications from path for malware samples...")
+
         # Check to see that the input directory exists, this will throw an
         # exception if it does not exist.
         os.stat(in_directory)
@@ -221,6 +227,7 @@ class Utils(object):
         :return:  An ordered list of classifications for each row in the TSFresh
         extracted features data frame.
         """
+        print("Starting get classifications in order for malware samples...")
         classifications_ordered = list()
         for index, row in extracted_features.iterrows():
             classifications_ordered.append(classifications_dict[index.upper()])
@@ -244,6 +251,7 @@ class Utils(object):
         will be deleted!
         :return:  Nothing
         """
+        print("Starting the data save for the preprocessed data for malware samples...")
         # Remove previous data
         shutil.rmtree(datadir)
         os.makedirs(datadir)
