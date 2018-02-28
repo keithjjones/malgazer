@@ -2,6 +2,10 @@
 import os
 import re
 import time
+import shutil
+import pickle
+import gzip
+import csv
 import pandas as pd
 import numpy as np
 from .files import FileObject
@@ -210,7 +214,7 @@ class Utils(object):
         This takes a classification dict and extracted_features from TSFresh,
         built with functions above, and creates an ordered classification list
         for each item in the extracted_features data.
-        
+
         :param classifications_dict:  A dict containing keys of sha256 and values
         of the classification.
         :param extracted_features:  A TSFresh extracted features data frame.
@@ -221,3 +225,55 @@ class Utils(object):
         for index, row in extracted_features.iterrows():
             classifications_ordered.append(classifications_dict[index.upper()])
         return classifications_ordered
+
+    @staticmethod
+    def save_processed_data(raw_data, classifications_dict,
+                            classifications_ordered, extracted_features,
+                            datadir):
+        """
+        Saves the pieces of data that were calculated with the functions above
+        to a data directory.
+
+        :param raw_data:  The raw data loaded from the malware sample set.
+        :param classifications_dict:  A dict with key of sha256 and
+        value of classifications.
+        :param classifications_ordered:  A list with classifications in the same
+        order as the data in extracted_features.
+        :param extracted_features:  The TSFresh extracted features data.
+        :param datadir: The data directory to store the data.  Any old data
+        will be deleted!
+        :return:  Nothing
+        """
+        # Remove previous data
+        shutil.rmtree(datadir)
+        os.makedirs(datadir)
+        # Data
+        raw_data.to_csv(os.path.join(datadir, "raw_data.csv.gz"), compression='gzip')
+        with gzip.open(os.path.join(datadir,"raw_data.pickle.gz"), 'wb') as file:
+            pickle.dump(raw_data, file)
+        # Classifications
+        with gzip.open(os.path.join(datadir,"classifications_dict.pickle.gz"), 'wb') as file:
+            pickle.dump(classifications_dict, file)
+        with gzip.open(os.path.join(datadir,"classifications_dict.csv.gz"), 'wt') as csvfile:
+            w = csv.DictWriter(csvfile, ['sha256', 'classification'])
+            w.writeheader()
+            for sha256 in classifications_dict:
+                cl = dict()
+                cl['sha256'] = sha256
+                cl['classification'] = classifications_dict[sha256]
+                w.writerow(cl)
+        # Classifications in order
+        with gzip.open(os.path.join(datadir,"classifications_ordered.pickle.gz"), 'wb') as file:
+            pickle.dump(classifications_ordered, file)
+        with gzip.open(os.path.join(datadir,"classifications_ordered.csv.gz"), 'wt') as csvfile:
+            w = csv.DictWriter(csvfile, ['classification'])
+            w.writeheader()
+            for classification in classifications_ordered:
+                cl = dict()
+                cl['classification'] = classification
+                w.writerow(cl)
+        # Extracted Features
+        extracted_features.to_csv(os.path.join(datadir,'extracted_features.csv.gz'),
+                                  compression='gzip')
+        with gzip.open(os.path.join(datadir,"extracted_features.pickle.gz"), 'wb') as file:
+            pickle.dump(extracted_features, file)
