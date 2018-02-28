@@ -7,7 +7,7 @@ import time
 import shutil
 
 
-def main():
+def main(arguments=None):
     # Argument parsing
     parser = argparse.ArgumentParser(
         description='Calculates the entropy of a file.')
@@ -26,7 +26,11 @@ def main():
     parser.add_argument("-m", "--maxsamples", type=int, default=0,
                         help="Maximum number of samples to process, zero for all."
                              "", required=False)
-    args = parser.parse_args()
+
+    if isinstance(arguments, list):
+        args = parser.parse_args(arguments)
+    else:
+        args = parser.parse_args()
 
     # Normalize setup...
     if args.nonormalize:

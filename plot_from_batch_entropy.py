@@ -11,7 +11,7 @@ import numpy
 import time
 
 
-def main():
+def main(arguments=None):
     # Capture the running time
     start_time = time.time()
 
@@ -44,7 +44,10 @@ def main():
                         help="Local outlier factor neighbors."
                              "", required=False)
 
-    args = parser.parse_args()
+    if isinstance(arguments, list):
+        args = parser.parse_args(arguments)
+    else:
+        args = parser.parse_args()
 
     # Find window sizes
     plot_windows = None
