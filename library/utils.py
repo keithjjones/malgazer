@@ -247,7 +247,7 @@ class Utils(object):
         # Remove previous data
         shutil.rmtree(datadir)
         os.makedirs(datadir)
-        # Data
+        # Raw data
         raw_data.to_csv(os.path.join(datadir, "raw_data.csv.gz"), compression='gzip')
         with gzip.open(os.path.join(datadir,"raw_data.pickle.gz"), 'wb') as file:
             pickle.dump(raw_data, file)
