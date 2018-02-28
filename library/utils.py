@@ -2,8 +2,10 @@
 import os
 import re
 import pandas as pd
+import numpy as np
 from .files import FileObject
-
+from tsfresh import extract_features
+from tsfresh.feature_extraction import EfficientFCParameters
 
 class Utils(object):
     def __init__(self):
@@ -27,6 +29,8 @@ class Utils(object):
         """
         if in_directory is None or out_directory is None:
             raise ValueError('Input and output directories must be real.')
+        if len(window_sizes) < 1:
+            raise ValueError('Specify a window size in a list.')
 
         # Test to make sure the input directory exists, will throw exception
         # if it does not exist.
@@ -87,5 +91,47 @@ class Utils(object):
                     print("{0:n} samples processed...".format(samples_processed))
 
     @staticmethod
-    def assemble_rwe_data(in_directory=None):
-        pass
+    def batch_tsfresh_rwe_data(in_directory=None,
+                               datapoints=512,
+                               window_size=256):
+        """
+        Return extracted features of malware using tsfresh.
+
+        :param in_directory:  The directory containing the malware pickle files
+        created in with the batch function above.
+        :param datapoints: The number of datapoints to resample RWE.
+        :param window_size:  The window size of the RWE, that must be already
+        calculated.
+        :return:  A Pandas dataframe containing the tsfresh features.
+        """
+        # Check to see that the input directory exists, this will throw an
+        # exception if it does not exist.
+        os.stat(in_directory)
+        # Only find pickle malware files created by the batch function above.
+        malware_files_re = re.compile('[a-z0-9]{64}.pickle.gz',
+                                      flags=re.IGNORECASE)
+        df = pd.DataFrame(columns=['id', 'offset', 'rwe'])
+        for root, dirs, files in os.walk(in_directory):
+            for file in files:
+                if malware_files_re.match(file):
+                    print("Reading file: {0}\n".format(file))
+                    f = FileObject.read(os.path.join(root, file))
+                    running_entropy = f.malware.runningentropy
+                    if window_size in running_entropy.entropy_data:
+                        # Reduce RWE data points
+                        xnew, ynew = running_entropy.resample_rwe(window_size=window_size,
+                                                                  number_of_data_points=datapoints)
+                        # Create dataframe
+                        d = pd.DataFrame(columns=['id', 'offset', 'rwe'])
+                        d['rwe'] = ynew
+                        d['id'] = f.malware.sha256.upper()
+                        d['offset'] = np.arange(0, datapoints)
+                        df = df.append(d, ignore_index=True)
+                    else:
+                        print("Window size {0} not in this pickle file!".format(window_size))
+        print("Calculating TSFresh Features...")
+        settings = EfficientFCParameters()
+        extracted_features = extract_features(df, column_id="id",
+                                              column_sort='offset',
+                                              default_fc_parameters=settings)
+        return extracted_features
