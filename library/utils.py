@@ -53,7 +53,7 @@ class Utils(object):
                     try:
                         os.stat(datadir)
                     except:
-                        os.mkdir(datadir)
+                        os.makedirs(datadir)
 
                     # Calculate the entropy of the file...
                     fileentropy = m.entropy(normalize)
