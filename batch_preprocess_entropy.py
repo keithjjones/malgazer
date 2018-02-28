@@ -2,7 +2,7 @@ import argparse
 from library.utils import Utils
 
 
-def main():
+def main(arguments=None):
     # Argument parsing
     parser = argparse.ArgumentParser(
         description='Calculates the entropy of a file.')
@@ -16,7 +16,11 @@ def main():
     parser.add_argument("-d", "--datapoints",
                         help="The number of data points to sample running window entropy."
                              "", type=int, default=512, required=False)
-    args = parser.parse_args()
+
+    if isinstance(arguments, list):
+        args = parser.parse_args(arguments)
+    else:
+        args = parser.parse_args()
 
     extracted_features, df = Utils.batch_tsfresh_rwe_data(args.DataDirectory,
                                                           args.datapoints,
