@@ -55,6 +55,10 @@ class Utils(object):
                     except:
                         os.makedirs(datadir)
 
+                    # Remove old pickle files...
+                    if os.path.exists(picklefile):
+                        os.remove(picklefile)
+
                     # Calculate the entropy of the file...
                     fileentropy = m.entropy(normalize)
 
