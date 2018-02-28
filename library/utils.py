@@ -159,3 +159,44 @@ class Utils(object):
             round(time.time() - start_time, 6)))
         print("{0:n} total samples processed...".format(samples_processed))
         return extracted_features
+
+    @staticmethod
+    def get_classifications_from_path(in_directory=None):
+        """
+        Loads classifications from key words in the path.
+
+        :param in_directory:  This is the directory containing samples with
+        the sha256 as the file name.
+        :return: A dictionary with a key of the file name and the value of
+        the classification guessed from the full path name.
+        """
+        # Check to see that the input directory exists, this will throw an
+        # exception if it does not exist.
+        os.stat(in_directory)
+        # The RE for malware files with sha256 as the name.
+        malware_files_re = re.compile('[a-z0-9]{64}',
+                                      flags=re.IGNORECASE)
+        samples_processed = 0
+        classifications = dict()
+        for root, dirs, files in os.walk(in_directory):
+            for file in files:
+                if malware_files_re.match(file):
+                    samples_processed += 1
+
+                    classified = ""
+                    if "Encrypted" in root:
+                        classified = "Encrypted"
+                    elif "Packed" in root:
+                        classified = "Packed"
+                    elif "Unpacked" in root:
+                        classified = "Unpacked"
+
+                    if "Malware" in root:
+                        classified += "-Malware"
+                    elif "PUP" in root:
+                        classified += "-PUP"
+                    elif "Trusted" in root:
+                        classified += "-Trusted"
+
+                    classifications[file] = classified
+        return classifications
