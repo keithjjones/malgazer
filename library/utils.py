@@ -200,13 +200,15 @@ class Utils(object):
 
         :param in_directory:  This is the directory containing batch processed
         samples with the batch function above (results are pickled).
-        :return: A dictionary with a key of the sha256 and the value of
+        :return: A DataFrame with an index of the sha256 and the value of
         the classification guessed from the full path name.
         """
         print("Starting classifications from path for malware samples...")
 
         # Keep track so we don't duplicate work
         processed_sha256 = []
+
+        df = pd.DataFrame(columns=['classification'])
 
         # Check to see that the input directory exists, this will throw an
         # exception if it does not exist.
@@ -215,7 +217,6 @@ class Utils(object):
         malware_files_re = re.compile('[a-z0-9]{64}',
                                       flags=re.IGNORECASE)
         samples_processed = 0
-        classifications = dict()
         for root, dirs, files in os.walk(in_directory):
             for file in files:
                 if malware_files_re.match(file):
@@ -231,6 +232,8 @@ class Utils(object):
                             classified = "Packed"
                         elif "unpacked" in root.lower():
                             classified = "Unpacked"
+                        else:
+                            classified = ""
 
                         if "malware" in root.lower():
                             classified += "-Malware"
@@ -238,61 +241,33 @@ class Utils(object):
                             classified += "-PUP"
                         elif "trusted" in root.lower():
                             classified += "-Trusted"
+                        else:
+                            classified += ""
 
-                        classifications[f.malware.sha256.upper()] = classified
+                        d = dict()
+                        d['classification'] = classified
+                        ds = pd.Series(d)
+                        ds.name = f.malware.sha256.upper()
+                        df = df.append(ds)
 
                         processed_sha256.append(f.malware.sha256.upper())
 
                         samples_processed += 1
-        return classifications
+        return df
 
     @staticmethod
-    def create_ordered_classifications(classifications_dict, extracted_features):
-        """
-        This takes a classification dict and extracted_features from TSFresh,
-        built with functions above, and creates an ordered classification list
-        for each item in the extracted_features data.
-
-        :param classifications_dict:  A dict containing keys of sha256 and values
-        of the classification.
-        :param extracted_features:  A TSFresh extracted features data frame.
-        :return:  A DataFrame of classifications for each row in the TSFresh
-        extracted features data frame.
-        """
-        # print("Starting get classifications in order for malware samples...")
-        # classifications_ordered = pd.DataFrame(columns=['sha256', 'classification'])
-        # for index, row in extracted_features.iterrows():
-        #     d = dict()
-        #     d['sha256'] = index.upper()
-        #     d['classification'] = classifications_dict[index.upper()]
-        #     ds = pd.Series(d)
-        #     classifications_ordered = classifications_ordered.append(ds, ignore_index=True)
-        # return classifications_ordered
-        print("Starting get classifications in order for malware samples...")
-        classifications_ordered = pd.DataFrame(columns=['classification'])
-        for index, row in extracted_features.iterrows():
-            d = dict()
-            d['classification'] = classifications_dict[index.upper()]
-            ds = pd.Series(d)
-            ds.name = index.upper()
-            classifications_ordered = classifications_ordered.append(ds)
-        return classifications_ordered
-
-    @staticmethod
-    def save_processed_data(raw_data, classifications_dict,
-                            classifications_ordered, extracted_features,
-                            relevant_features, datadir):
+    def save_processed_data(raw_data,
+                            classifications,
+                            extracted_features,
+                            datadir):
         """
         Saves the pieces of data that were calculated with the functions above
         to a data directory.
 
         :param raw_data:  The raw data loaded from the malware sample set.
-        :param classifications_dict:  A dict with key of sha256 and
+        :param classifications:  A DataFrame with index of sha256 and
         value of classifications.
-        :param classifications_ordered:  A list with classifications in the same
-        order as the data in extracted_features.
         :param extracted_features:  The TSFresh extracted features data.
-        :param relevant_features:  The TSFresh extracted relevant features data.
         :param datadir: The data directory to store the data.  Any old data
         will be deleted!
         :return:  Nothing
@@ -309,30 +284,14 @@ class Utils(object):
         with gzip.open(os.path.join(datadir,"raw_data.pickle.gz"), 'wb') as file:
             pickle.dump(raw_data, file)
         # Classifications
-        with gzip.open(os.path.join(datadir,"classifications_dict.pickle.gz"), 'wb') as file:
-            pickle.dump(classifications_dict, file)
-        with gzip.open(os.path.join(datadir,"classifications_dict.csv.gz"), 'wt') as csvfile:
-            w = csv.DictWriter(csvfile, ['sha256', 'classification'])
-            w.writeheader()
-            for sha256 in classifications_dict:
-                cl = dict()
-                cl['sha256'] = sha256
-                cl['classification'] = classifications_dict[sha256]
-                w.writerow(cl)
-        # Classifications in order
-        classifications_ordered.to_csv(os.path.join(datadir,"classifications_ordered.csv.gz"), compression='gzip')
-        with gzip.open(os.path.join(datadir,"classifications_ordered.pickle.gz"), 'wb') as file:
-            pickle.dump(classifications_ordered, file)
+        classifications.to_csv(os.path.join(datadir, "classifications.csv.gz"), compression='gzip')
+        with gzip.open(os.path.join(datadir,"classifications.pickle.gz"), 'wb') as file:
+            pickle.dump(classifications, file)
         # Extracted Features
         extracted_features.to_csv(os.path.join(datadir,'extracted_features.csv.gz'),
                                   compression='gzip')
         with gzip.open(os.path.join(datadir,"extracted_features.pickle.gz"), 'wb') as file:
             pickle.dump(extracted_features, file)
-        # Relevant Features
-        relevant_features.to_csv(os.path.join(datadir,'relevant_features.csv.gz'),
-                                 compression='gzip')
-        with gzip.open(os.path.join(datadir,"relevant_features.pickle.gz"), 'wb') as file:
-            pickle.dump(relevant_features, file)
 
     @staticmethod
     def load_processed_data(datadir):
@@ -340,20 +299,16 @@ class Utils(object):
         Loads the data saved from preprocessing.
 
         :param datadir:  The data directory that contains the data.
-        :return:  raw_data, classifications_dict, classifications_ordered, extracted_features, relevant_features tuple
+        :return:  raw_data, classifications, extracted_features tuple
         """
         # Check to see that the data directory exists, this will throw an
         # exception if it does not exist.
         os.stat(datadir)
         with gzip.open(os.path.join(datadir,"raw_data.pickle.gz"), 'rb') as file:
             df = pickle.load(file)
-        with gzip.open(os.path.join(datadir,"classifications_dict.pickle.gz"), 'rb') as file:
-            classification_dict = pickle.load(file)
-        with gzip.open(os.path.join(datadir,"classifications_ordered.pickle.gz"), 'rb') as file:
-            classifications_ordered = pickle.load(file)
+        with gzip.open(os.path.join(datadir,"classifications.pickle.gz"), 'rb') as file:
+            classifications = pickle.load(file)
         with gzip.open(os.path.join(datadir,"extracted_features.pickle.gz"), 'rb') as file:
             extracted_features = pickle.load(file)
-        with gzip.open(os.path.join(datadir,"relevant_features.pickle.gz"), 'rb') as file:
-            relevant_features = pickle.load(file)
-        return df, classification_dict, classifications_ordered, extracted_features, relevant_features
+        return df, classifications, extracted_features
 
