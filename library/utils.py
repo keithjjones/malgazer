@@ -28,7 +28,8 @@ class Utils(object):
         if in_directory is None or out_directory is None:
             raise ValueError('Input and output directories must be real.')
 
-        # Test to make sure the input directory exists
+        # Test to make sure the input directory exists, will throw exception
+        # if it does not exist.
         os.stat(in_directory)
 
         # The RE for malware files with sha256 as the name.
