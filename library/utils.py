@@ -113,7 +113,8 @@ class Utils(object):
         :param datapoints: The number of datapoints to resample RWE.
         :param window_size:  The window size of the RWE, that must be already
         calculated.
-        :return:  A Pandas dataframe containing the tsfresh features.
+        :return:  A Pandas dataframe containing the tsfresh features, and the
+        raw data frame as a tuple.
         """
         # Start the timer
         start_time = time.time()
@@ -158,16 +159,16 @@ class Utils(object):
         print("Total elapsed time {0:.6f} seconds".format(
             round(time.time() - start_time, 6)))
         print("{0:n} total samples processed...".format(samples_processed))
-        return extracted_features
+        return extracted_features, df
 
     @staticmethod
     def get_classifications_from_path(in_directory=None):
         """
         Loads classifications from key words in the path.
 
-        :param in_directory:  This is the directory containing samples with
-        the sha256 as the file name.
-        :return: A dictionary with a key of the file name and the value of
+        :param in_directory:  This is the directory containing batch processed
+        samples with the batch function above (results are pickled).
+        :return: A dictionary with a key of the sha256 and the value of
         the classification guessed from the full path name.
         """
         # Check to see that the input directory exists, this will throw an
@@ -182,6 +183,8 @@ class Utils(object):
             for file in files:
                 if malware_files_re.match(file):
                     samples_processed += 1
+
+                    f = FileObject.read(os.path.join(root, file))
 
                     classified = ""
                     if "encrypted" in root.lower():
@@ -198,5 +201,23 @@ class Utils(object):
                     elif "trusted" in root.lower():
                         classified += "-Trusted"
 
-                    classifications[file] = classified
+                    classifications[f.malware.sha256.upper()] = classified
         return classifications
+
+    @staticmethod
+    def create_ordered_classifications(classifications_dict, extracted_features):
+        """
+        This takes a classification dict and extracted_features from TSFresh,
+        built with functions above, and creates an ordered classification list
+        for each item in the extracted_features data.
+        
+        :param classifications_dict:  A dict containing keys of sha256 and values
+        of the classification.
+        :param extracted_features:  A TSFresh extracted features data frame.
+        :return:  An ordered list of classifications for each row in the TSFresh
+        extracted features data frame.
+        """
+        classifications_ordered = list()
+        for index, row in extracted_features.iterrows():
+            classifications_ordered.append(classifications_dict[index.upper()])
+        return classifications_ordered
