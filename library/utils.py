@@ -305,8 +305,8 @@ class Utils(object):
         with gzip.open(os.path.join(datadir,"classifications_dict.pickle.gz"), 'rb') as file:
             classification_dict = pickle.load(file)
         with gzip.open(os.path.join(datadir,"classifications_ordered.pickle.gz"), 'rb') as file:
-            classifications_ordered = pickle.dump(file)
+            classifications_ordered = pickle.load(file)
         with gzip.open(os.path.join(datadir,"extracted_features.pickle.gz"), 'rb') as file:
-            extracted_features = pickle.dump(file)
+            extracted_features = pickle.load(file)
         return df, classification_dict, classifications_ordered, extracted_features
 
