@@ -288,3 +288,25 @@ class Utils(object):
                                   compression='gzip')
         with gzip.open(os.path.join(datadir,"extracted_features.pickle.gz"), 'wb') as file:
             pickle.dump(extracted_features, file)
+
+    @staticmethod
+    def load_processed_data(datadir):
+        """
+        Loads the data saved from preprocessing.
+
+        :param datadir:  The data directory that contains the data.
+        :return:  raw_data, classifications_dict, classifications_ordered, extracted_features
+        """
+        # Check to see that the data directory exists, this will throw an
+        # exception if it does not exist.
+        os.stat(datadir)
+        with gzip.open(os.path.join(datadir,"raw_data.pickle.gz"), 'rb') as file:
+            df = pickle.load(file)
+        with gzip.open(os.path.join(datadir,"classifications_dict.pickle.gz"), 'rb') as file:
+            classification_dict = pickle.load(file)
+        with gzip.open(os.path.join(datadir,"classifications_ordered.pickle.gz"), 'rb') as file:
+            classifications_ordered = pickle.dump(file)
+        with gzip.open(os.path.join(datadir,"extracted_features.pickle.gz"), 'rb') as file:
+            extracted_features = pickle.dump(file)
+        return df, classification_dict, classifications_ordered, extracted_features
+
