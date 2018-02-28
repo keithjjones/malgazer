@@ -253,7 +253,10 @@ class Utils(object):
         """
         print("Starting the data save for the preprocessed data for malware samples...")
         # Remove previous data
-        shutil.rmtree(datadir)
+        try:
+            shutil.rmtree(datadir)
+        except:
+            pass
         os.makedirs(datadir)
         # Raw data
         raw_data.to_csv(os.path.join(datadir, "raw_data.csv.gz"), compression='gzip')
