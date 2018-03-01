@@ -228,10 +228,10 @@ class Utils(object):
                         classified = ""
                         if "encrypted" in root.lower():
                             classified = "Encrypted"
-                        elif "packed" in root.lower():
-                            classified = "Packed"
                         elif "unpacked" in root.lower():
                             classified = "Unpacked"
+                        elif "packed" in root.lower():
+                            classified = "Packed"
                         else:
                             classified = ""
 
