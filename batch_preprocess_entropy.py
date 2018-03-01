@@ -22,17 +22,17 @@ def main(arguments=None):
     else:
         args = parser.parse_args()
 
-    extracted_features, df = Utils.batch_tsfresh_rwe_data(args.DataDirectory,
-                                                          args.datapoints,
-                                                          args.window)
+
+    df = Utils.batch_preprocess_rwe_data(args.DataDirectory,
+                                         args.datapoints,
+                                         args.window)
 
     classifications = Utils.get_classifications_from_path(args.DataDirectory)
 
     # Utils.extract_tsfresh_relevant_features(extracted_features, classifications_ordered['classification'])
 
-    Utils.save_processed_tsfresh_data(df, classifications,
-                                      extracted_features,
-                                      args.OutputDirectory)
+    Utils.save_preprocessed_data(df, classifications,
+                                 args.OutputDirectory)
 
 
 if __name__ == "__main__":

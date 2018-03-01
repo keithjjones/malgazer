@@ -109,8 +109,65 @@ class Utils(object):
         print("{0:n} total samples processed...".format(samples_processed))
 
     @staticmethod
+    def batch_preprocess_rwe_data(in_directory = None,
+                                  datapoints = 512,
+                                  window_size = 256):
+        """
+        Return rwe of malware in a dataframe.
+
+        :param in_directory:  The directory containing the malware pickle files
+        created in with the batch function above.
+        :param datapoints: The number of datapoints to resample RWE.
+        :param window_size:  The window size of the RWE, that must be already
+        calculated.
+        :return:  A Pandas dataframe containing the rwe.
+        """
+        print("Starting batch processing of running window entropy for malware samples...")
+        # Keep track so we don't duplicate work
+        processed_sha256 = []
+
+        # Start the timer
+        start_time = time.time()
+        # Check to see that the input directory exists, this will throw an
+        # exception if it does not exist.
+        os.stat(in_directory)
+        # Only find pickle malware files created by the batch function above.
+        malware_files_re = re.compile('[a-z0-9]{64}.pickle.gz',
+                                      flags=re.IGNORECASE)
+        df = pd.DataFrame()
+        samples_processed = 0
+        for root, dirs, files in os.walk(in_directory):
+            for file in files:
+                if malware_files_re.match(file):
+                    start_load_time = time.time()
+                    print("Reading file: {0}".format(file))
+                    f = FileObject.read(os.path.join(root, file))
+                    if f.malware.sha256.upper() not in processed_sha256:
+                        running_entropy = f.malware.runningentropy
+
+                        if window_size in running_entropy.entropy_data:
+                            # Reduce RWE data points
+                            xnew, ynew = running_entropy.resample_rwe(window_size=window_size,
+                                                                      number_of_data_points=datapoints)
+                            s = pd.Series(ynew)
+                            s.name = f.malware.sha256.upper()
+                            df = df.append(s)
+                            processed_sha256.append(f.malware.sha256.upper())
+                            print("\tElapsed time {0:.6f} seconds".format(
+                                 round(time.time() - start_load_time, 6)))
+                            samples_processed += 1
+                            print("{0:n} samples processed...".format(
+                                 samples_processed))
+                        else:
+                            print(
+                                "ERROR: Window size {0} not in this pickle file!".format(window_size))
+        print("Total elapsed time {0:.6f} seconds".format(
+              round(time.time() - start_time, 6)))
+        print("{0:n} total samples processed...".format(samples_processed))
+        return df
+
+    @staticmethod
     def batch_tsfresh_rwe_data(in_directory=None,
-                               classifications=None,
                                datapoints=512,
                                window_size=256):
         """
@@ -272,7 +329,7 @@ class Utils(object):
         will be deleted!
         :return:  Nothing
         """
-        print("Starting the data save for the preprocessed data for malware samples...")
+        print("Starting the data save for the tsfresh data for malware samples...")
         # Remove previous data
         try:
             shutil.rmtree(datadir)
@@ -296,7 +353,7 @@ class Utils(object):
     @staticmethod
     def load_processed_tsfresh_data(datadir):
         """
-        Loads the data saved from preprocessing.
+        Loads the data saved from tsfresh.
 
         :param datadir:  The data directory that contains the data.
         :return:  raw_data, classifications, extracted_features tuple
@@ -312,3 +369,50 @@ class Utils(object):
             extracted_features = pickle.load(file)
         return df, classifications, extracted_features
 
+    @staticmethod
+    def save_preprocessed_data(raw_data,
+                               classifications,
+                               datadir):
+        """
+        Saves the pieces of data that were calculated with the functions above
+        to a data directory.
+
+        :param raw_data:  The raw data loaded from the malware sample set.
+        :param classifications:  A DataFrame with index of sha256 and
+        value of classifications.
+        :param datadir: The data directory to store the data.  Any old data
+        will be deleted!
+        :return:  Nothing
+        """
+        print("Starting the data save for the preprocessed data for malware samples...")
+        # Remove previous data
+        try:
+            shutil.rmtree(datadir)
+        except:
+            pass
+        os.makedirs(datadir)
+        # Raw data
+        raw_data.to_csv(os.path.join(datadir, "raw_data.csv.gz"), compression='gzip')
+        with gzip.open(os.path.join(datadir,"raw_data.pickle.gz"), 'wb') as file:
+            pickle.dump(raw_data, file)
+        # Classifications
+        classifications.to_csv(os.path.join(datadir, "classifications.csv.gz"), compression='gzip')
+        with gzip.open(os.path.join(datadir,"classifications.pickle.gz"), 'wb') as file:
+            pickle.dump(classifications, file)
+
+    @staticmethod
+    def load_preprocessed_data(datadir):
+        """
+        Loads the data saved from preprocessing.
+
+        :param datadir:  The data directory that contains the data.
+        :return:  raw_data, classifications tuple
+        """
+        # Check to see that the data directory exists, this will throw an
+        # exception if it does not exist.
+        os.stat(datadir)
+        with gzip.open(os.path.join(datadir,"raw_data.pickle.gz"), 'rb') as file:
+            df = pickle.load(file)
+        with gzip.open(os.path.join(datadir,"classifications.pickle.gz"), 'rb') as file:
+            classifications = pickle.load(file)
+        return df, classifications
