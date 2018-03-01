@@ -338,16 +338,16 @@ class Utils(object):
         os.makedirs(datadir)
         # Raw data
         raw_data.to_csv(os.path.join(datadir, "raw_data.csv.gz"), compression='gzip')
-        with gzip.open(os.path.join(datadir,"raw_data.pickle.gz"), 'wb') as file:
+        with gzip.open(os.path.join(datadir, "raw_data.pickle.gz"), 'wb') as file:
             pickle.dump(raw_data, file)
         # Classifications
         classifications.to_csv(os.path.join(datadir, "classifications.csv.gz"), compression='gzip')
-        with gzip.open(os.path.join(datadir,"classifications.pickle.gz"), 'wb') as file:
+        with gzip.open(os.path.join(datadir, "classifications.pickle.gz"), 'wb') as file:
             pickle.dump(classifications, file)
         # Extracted Features
-        extracted_features.to_csv(os.path.join(datadir,'extracted_features.csv.gz'),
+        extracted_features.to_csv(os.path.join(datadir, 'extracted_features.csv.gz'),
                                   compression='gzip')
-        with gzip.open(os.path.join(datadir,"extracted_features.pickle.gz"), 'wb') as file:
+        with gzip.open(os.path.join(datadir, "extracted_features.pickle.gz"), 'wb') as file:
             pickle.dump(extracted_features, file)
 
     @staticmethod
@@ -361,11 +361,11 @@ class Utils(object):
         # Check to see that the data directory exists, this will throw an
         # exception if it does not exist.
         os.stat(datadir)
-        with gzip.open(os.path.join(datadir,"raw_data.pickle.gz"), 'rb') as file:
+        with gzip.open(os.path.join(datadir, "raw_data.pickle.gz"), 'rb') as file:
             df = pickle.load(file)
-        with gzip.open(os.path.join(datadir,"classifications.pickle.gz"), 'rb') as file:
+        with gzip.open(os.path.join(datadir, "classifications.pickle.gz"), 'rb') as file:
             classifications = pickle.load(file)
-        with gzip.open(os.path.join(datadir,"extracted_features.pickle.gz"), 'rb') as file:
+        with gzip.open(os.path.join(datadir, "extracted_features.pickle.gz"), 'rb') as file:
             extracted_features = pickle.load(file)
         return df, classifications, extracted_features
 
@@ -393,11 +393,11 @@ class Utils(object):
         os.makedirs(datadir)
         # Raw data
         raw_data.to_csv(os.path.join(datadir, "raw_data.csv.gz"), compression='gzip')
-        with gzip.open(os.path.join(datadir,"raw_data.pickle.gz"), 'wb') as file:
+        with gzip.open(os.path.join(datadir, "raw_data.pickle.gz"), 'wb') as file:
             pickle.dump(raw_data, file)
         # Classifications
         classifications.to_csv(os.path.join(datadir, "classifications.csv.gz"), compression='gzip')
-        with gzip.open(os.path.join(datadir,"classifications.pickle.gz"), 'wb') as file:
+        with gzip.open(os.path.join(datadir, "classifications.pickle.gz"), 'wb') as file:
             pickle.dump(classifications, file)
 
     @staticmethod
@@ -411,8 +411,8 @@ class Utils(object):
         # Check to see that the data directory exists, this will throw an
         # exception if it does not exist.
         os.stat(datadir)
-        with gzip.open(os.path.join(datadir,"raw_data.pickle.gz"), 'rb') as file:
+        with gzip.open(os.path.join(datadir, "raw_data.pickle.gz"), 'rb') as file:
             df = pickle.load(file)
-        with gzip.open(os.path.join(datadir,"classifications.pickle.gz"), 'rb') as file:
+        with gzip.open(os.path.join(datadir, "classifications.pickle.gz"), 'rb') as file:
             classifications = pickle.load(file)
         return df, classifications
