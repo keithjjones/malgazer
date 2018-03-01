@@ -28,8 +28,6 @@ def main(arguments=None):
 
     classifications = Utils.get_classifications_from_path(args.DataDirectory)
 
-    print(classifications)
-
     # Utils.extract_tsfresh_relevant_features(extracted_features, classifications_ordered['classification'])
 
     Utils.save_processed_data(df, classifications,
