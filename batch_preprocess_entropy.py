@@ -30,9 +30,9 @@ def main(arguments=None):
 
     # Utils.extract_tsfresh_relevant_features(extracted_features, classifications_ordered['classification'])
 
-    Utils.save_processed_data(df, classifications,
-                              extracted_features,
-                              args.OutputDirectory)
+    Utils.save_processed_tsfresh_data(df, classifications,
+                                      extracted_features,
+                                      args.OutputDirectory)
 
 
 if __name__ == "__main__":

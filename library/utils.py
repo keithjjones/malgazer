@@ -256,10 +256,10 @@ class Utils(object):
         return df
 
     @staticmethod
-    def save_processed_data(raw_data,
-                            classifications,
-                            extracted_features,
-                            datadir):
+    def save_processed_tsfresh_data(raw_data,
+                                    classifications,
+                                    extracted_features,
+                                    datadir):
         """
         Saves the pieces of data that were calculated with the functions above
         to a data directory.
@@ -294,7 +294,7 @@ class Utils(object):
             pickle.dump(extracted_features, file)
 
     @staticmethod
-    def load_processed_data(datadir):
+    def load_processed_tsfresh_data(datadir):
         """
         Loads the data saved from preprocessing.
 
