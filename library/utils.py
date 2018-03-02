@@ -320,6 +320,26 @@ class Utils(object):
                         samples_processed += 1
         return df
 
+
+    @staticmethod
+    def parse_classifications(classifications):
+        """
+        Parses the classifications from guessed classifications from the paths.
+
+        :param classifications:  A dataframe holding the guessed classifications.
+        :return:  The parsed classifications, as a DataFrame.
+        """
+        cls = pd.DataFrame(columns=['classification'])
+        for index, row in classifications.iterrows():
+            cl = row[0]
+            c = cl.split('-')
+            d = dict()
+            d['classification'] = c[0]
+            ds = pd.Series(d)
+            ds.name = index
+            cls = cls.append(ds)
+        return cls
+
     @staticmethod
     def save_processed_tsfresh_data(raw_data,
                                     classifications,
