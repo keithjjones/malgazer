@@ -42,7 +42,7 @@ class ML(object):
                              activation='softmax'))
         classifier.compile(optimizer='adam',
                            loss='categorical_crossentropy',
-                           metrics=['categorical_accuracy'])
+                           metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
     def build_ann(self, datapoints=1024):

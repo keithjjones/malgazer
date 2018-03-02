@@ -33,27 +33,27 @@ X_train, X_test, y_train, y_test = ml.train_test_split(X, y)
 classifier = ml.build_ann(datapoints)
 
 # Train the ANN
-#classifier = ml.train_nn(X_train, y_train, batch_size=50, epochs=100)
+classifier = ml.train_nn(X_train, y_train, batch_size=50, epochs=100)
 
 # Predict the results
-#y_pred = ml.predict_nn(X_test)
+y_pred = ml.predict_nn(X_test)
 
 # Making the Confusion Matrix
-#accuracy, cm = ml.confusion_matrix(y_test, y_pred)
-#
-#print("Confusion Matrix:")
-#print(cm)
-#print("Accuracy:")
-#print(accuracy)
+accuracy, cm = ml.confusion_matrix(y_test, y_pred)
+
+print("Confusion Matrix:")
+print(cm)
+print("Accuracy:")
+print(accuracy)
 
 # Cross Fold Validation
-def model():
-    return ML.build_ann_static(datapoints)
-accuracies, mean, variance = ML.cross_fold_validation(model,
-                                                      X_train, y_train, 
-                                                      batch_size=10, 
-                                                      epochs=100, 
-                                                      cv=10, 
-                                                      n_jobs=2)
-print("CFV Mean: {0}".format(mean))
-print("CFV Var: {0}".format(variance))
+#def model():
+#    return ML.build_ann_static(datapoints)
+#accuracies, mean, variance = ML.cross_fold_validation(model,
+#                                                      X_train, y_train, 
+#                                                      batch_size=10, 
+#                                                      epochs=100, 
+#                                                      cv=10, 
+#                                                      n_jobs=2)
+#print("CFV Mean: {0}".format(mean))
+#print("CFV Var: {0}".format(variance))
