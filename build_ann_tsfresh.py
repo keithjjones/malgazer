@@ -9,6 +9,7 @@ source_dir = '/Dirty/malgazer/Test_Set/'
 datapoints = 1024
 subdir = 'data_tsfresh_{0}'.format(datapoints)
 arguments = ['-w', '256', '-d', str(datapoints), source_dir, subdir]
+outputs = 9
 
 #classifications = Utils.get_classifications_from_path(source_dir)
 
@@ -30,7 +31,7 @@ X, X_scaler = ml.scale_features_preprocessed_data(X)
 X_train, X_test, y_train, y_test = ml.train_test_split(X, y)
 
 # Create the ANN
-classifier = ml.build_ann(788)
+classifier = ml.build_ann(788, outputs)
 
 # Train the ANN
 classifier = ml.train_nn(X_train, y_train, batch_size=10, epochs=100)
@@ -48,7 +49,7 @@ print(accuracy)
 
 # Cross Fold Validation
 #def model():
-#    return ML.build_ann_static(datapoints)
+#    return ML.build_ann_static(788, outputs)
 #accuracies, mean, variance = ml.cross_fold_validation(model,
 #                                                      X_train, y_train, 
 #                                                      batch_size=10, 

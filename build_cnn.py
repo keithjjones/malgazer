@@ -9,6 +9,7 @@ source_dir = '/Dirty/malgazer/Test_Set/'
 datapoints = 1024
 subdir = 'data_{0}'.format(datapoints)
 arguments = ['-w', '256', '-d', str(datapoints), source_dir, subdir]
+outputs = 9
 
 #classifications = Utils.get_classifications_from_path(source_dir)
 
@@ -32,7 +33,7 @@ Xt = np.expand_dims(X_train, axis=2)
 yt = y_train
 
 # Create the CNN
-classifier = ml.build_cnn(Xt)
+classifier = ml.build_cnn(Xt, outputs)
 
 # Train the CNN
 classifier = ml.train_nn(Xt, yt, batch_size=10, epochs=100)
@@ -51,7 +52,7 @@ print(accuracy)
 
 ## Cross Fold Validation
 #def model():
-#    return ML.build_cnn_static(Xt)
+#    return ML.build_cnn_static(Xt, outputs)
 #accuracies, mean, variance = ml.cross_fold_validation(model,
 #                                                      Xt, yt, 
 #                                                      batch_size=10, 

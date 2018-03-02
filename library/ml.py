@@ -21,7 +21,7 @@ class ML(object):
         self.X_sc = None
 
     @staticmethod
-    def build_ann_static(datapoints=1024):
+    def build_ann_static(datapoints=1024, outputs=9):
         """
         Create a generic ANN.
 
@@ -37,7 +37,7 @@ class ML(object):
         classifier.add(Dense(units=100,
                              kernel_initializer='uniform',
                              activation='relu'))
-        classifier.add(Dense(units=3,
+        classifier.add(Dense(units=outputs,
                              kernel_initializer='uniform',
                              activation='softmax'))
         classifier.compile(optimizer='adam',
@@ -45,19 +45,19 @@ class ML(object):
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_ann(self, datapoints=1024):
+    def build_ann(self, datapoints=1024, outputs=9):
         """
         Create a generic ANN.
 
         :param datapoints:  The number of data points on the input.
         :return:  The classifier.
         """
-        self.classifier = ML.build_ann_static(datapoints)
+        self.classifier = ML.build_ann_static(datapoints, outputs)
         self.classifier.summary()
         return self.classifier
 
     @staticmethod
-    def build_cnn_static(input):
+    def build_cnn_static(input, outputs=9):
         """
         Create a generic CNN.
 
@@ -74,19 +74,19 @@ class ML(object):
         classifier.add(Dense(units=512, activation='relu'))
         classifier.add(Dense(units=128, activation='relu'))
         classifier.add(Dense(units=64, activation='relu'))
-        classifier.add(Dense(units=3, activation='softmax'))
+        classifier.add(Dense(units=outputs, activation='softmax'))
         classifier.compile(optimizer='adam', loss='categorical_crossentropy',
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_cnn(self, input):
+    def build_cnn(self, input, outputs=9):
         """
         Create a generic CNN.
 
         :param input:  The input to the CNN, used to find input shape.
         :return:  The classifier.
         """
-        self.classifier = ML.build_cnn_static(input)
+        self.classifier = ML.build_cnn_static(input, outputs)
         self.classifier.summary()
         return self.classifier
 
