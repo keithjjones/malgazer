@@ -38,6 +38,14 @@ classifier = ml.train_nn(X_train, y_train, batch_size=50, epochs=100)
 # Predict the results
 y_pred = ml.predict_nn(X_test)
 
+# Making the Confusion Matrix
+accuracy, cm = ml.confusion_matrix(y_test, y_pred)
+
+print("Confusion Matrix:")
+print(cm)
+print("Accuracy:")
+print(accuracy)
+
 # Cross Fold Validation
 #accuracies, mean, variance = ml.cross_fold_validation(X_train, y_train, 
 #                                                      batch_size=10, 
@@ -46,12 +54,3 @@ y_pred = ml.predict_nn(X_test)
 #                                                      n_jobs=4)
 #print("CFV Mean: {0}".format(mean))
 #print("CFV Var: {0}".format(variance))
-
-
-# Making the Confusion Matrix
-accuracy, cm = ml.confusion_matrix(y_test, y_pred)
-
-print("Confusion Matrix:")
-print(cm)
-print("Accuracy:")
-print(accuracy)
