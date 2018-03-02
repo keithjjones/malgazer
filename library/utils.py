@@ -315,7 +315,7 @@ class Utils(object):
 
 
     @staticmethod
-    def parse_classifications(classifications):
+    def parse_classifications_from_path(classifications):
         """
         Parses the classifications from guessed classifications from the paths.
 

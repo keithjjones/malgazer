@@ -14,7 +14,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 
-
 class ML(object):
     def __init__(self):
         super(ML, self).__init__()
@@ -43,8 +42,9 @@ class ML(object):
         classifier.compile(optimizer='adam',
                            loss='categorical_crossentropy',
                            metrics=['categorical_accuracy'])
-        self.classifer = classifier
-        return classifier
+        self.classifier = classifier
+        classifier.summary()
+        return self.classifier
 
     def build_cnn(self):
         """
@@ -65,8 +65,9 @@ class ML(object):
         classifier.add(Dense(units=3, activation='softmax'))
         classifier.compile(optimizer='adam', loss='categorical_crossentropy',
                            metrics=['categorical_accuracy'])
-        self.classifer = classifier
-        return classifier
+        self.classifier = classifier
+        classifier.summary()
+        return self.classifier
 
     def train_nn(self, X_train, y_train, batch_size=50, epochs=100):
         """
@@ -126,6 +127,10 @@ class ML(object):
             X_scaled = self.X_sc.fit_transform(X)
         else:
             X_scaled = self.X_sc.transform(X)
+        # onehotencoder = OneHotEncoder(categorical_features = [0])
+        # y = onehotencoder.fit_transform(y).toarray()
+        # inverted = labelencoder_y.inverse_transform([argmax(y)])
+        # y = y[:, 1:]
 
         return X_scaled, self.X_sc
 
