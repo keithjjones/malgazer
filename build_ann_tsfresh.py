@@ -1,4 +1,4 @@
-import batch_preprocess_entropy
+import batch_tsfresh_entropy
 from library.utils import Utils
 from library.ml import ML
 import pandas as pd
@@ -7,16 +7,16 @@ import numpy as np
 # Calculate features
 source_dir = '/Dirty/malgazer/Test_Set/'
 datapoints = 1024
-subdir = 'data_{0}'.format(datapoints)
+subdir = 'data_tsfresh_{0}'.format(datapoints)
 arguments = ['-w', '256', '-d', str(datapoints), source_dir, subdir]
 
 #classifications = Utils.get_classifications_from_path(source_dir)
 
 # Uncomment to process data
-#batch_preprocess_entropy.main(arguments)
+#batch_tsfresh_entropy.main(arguments)
 
 # Load data
-raw_data, classifications = Utils.load_preprocessed_data(subdir)
+raw_data, classifications, extracted_features = Utils.load_processed_tsfresh_data(subdir)
 
 # Wrangle classifications
 cls = Utils.parse_classifications_from_path(classifications)
@@ -28,21 +28,18 @@ ml = ML()
 y, y_encoder = ml.encode_preprocessed_data(y)
 X, X_scaler = ml.scale_features_preprocessed_data(X)
 X_train, X_test, y_train, y_test = ml.train_test_split(X, y)
-Xt = np.expand_dims(X_train, axis=2)
-yt = y_train
 
-# Create the CNN
-classifier = ml.build_cnn(Xt)
+# Create the ANN
+classifier = ml.build_ann(788)
 
-# Train the CNN
-classifier = ml.train_nn(Xt, yt, batch_size=50, epochs=100)
+# Train the ANN
+classifier = ml.train_nn(X_train, y_train, batch_size=50, epochs=100)
 
 # Predict the results
-Xtest = np.expand_dims(X_test, axis=2)
-y_pred = ml.predict_nn(Xtest)
+y_pred = ml.predict_nn(X_test)
 
-## Cross Fold Validation
-#accuracies, mean, variance = ml.cross_fold_validation(Xt, yt, 
+# Cross Fold Validation
+#accuracies, mean, variance = ml.cross_fold_validation(X_train, y_train, 
 #                                                      batch_size=10, 
 #                                                      epochs=100, 
 #                                                      cv=10, 

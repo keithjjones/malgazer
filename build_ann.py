@@ -12,10 +12,13 @@ arguments = ['-w', '256', '-d', str(datapoints), source_dir, subdir]
 
 #classifications = Utils.get_classifications_from_path(source_dir)
 
+# Uncomment to process data
 #batch_preprocess_entropy.main(arguments)
 
+# Load data
 raw_data, classifications = Utils.load_preprocessed_data(subdir)
 
+# Wrangle classifications
 cls = Utils.parse_classifications_from_path(classifications)
 X = raw_data.as_matrix().copy()
 y = cls.as_matrix().copy()
