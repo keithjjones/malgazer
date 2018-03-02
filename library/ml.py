@@ -1,19 +1,25 @@
 # Machine Learning Module
 import pandas as pd
 import numpy as np
-import keras
+from numpy import argmax
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.model_selection import cross_val_score
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, MaxPooling1D, Conv1D, InputLayer
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from keras.utils import to_categorical
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
 
 
 class ML(object):
     def __init__(self):
         super(ML, self).__init__()
         self.classifer = None
+        self.X_sc = None
 
     def build_ann(self, datapoints=1024):
         """
@@ -107,3 +113,48 @@ class ML(object):
             accuracy += cm[i, i]
         accuracy = accuracy/cm.sum()
         return accuracy, cm
+
+    def scale_features_preprocessed_data(self, X):
+        """
+        Scales features in the X data.
+
+        :param X:  The data to scale.
+        :return: A tuple of X_scaled and the scaler as X_scaled, scaler
+        """
+        if self.X_sc is None:
+            self.X_sc = StandardScaler()
+            X_scaled = self.X_sc.fit_transform(X)
+        else:
+            X_scaled = self.X_sc.transform(X)
+
+        return X_scaled, self.X_sc
+
+    @staticmethod
+    def encode_preprocessed_data(y):
+        """
+        Encodes the classifications.
+
+        :param y:  The preprocessed data as a DataFrame.
+        :return:  A tuple of the encoded data y and the encoder (for inverting)
+        as y,encoder.
+        """
+        labelencoder_y = LabelEncoder()
+        y[:, 0] = labelencoder_y.fit_transform(y[:, 0])
+        y = to_categorical(y)
+        return y, labelencoder_y
+
+    @staticmethod
+    def train_test_split(X, y, test_size=0.2, random_state=0):
+        """
+        Creates a training and testing data sets.
+
+        :param X:  The X values as a DataFrame.
+        :param y:  The y values as a DataFrame.
+        :param test_size: The percentage, as a decimal, of the test data set size.
+        :param random_state:  The random seed.
+        :return: A tuple of X_train, X_test, y_train, y_test
+        """
+        X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                                            test_size=test_size,
+                                                            random_state=random_state)
+        return X_train, X_test, y_train, y_test
