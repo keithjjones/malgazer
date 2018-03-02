@@ -164,3 +164,33 @@ class ML(object):
                                                             test_size=test_size,
                                                             random_state=random_state)
         return X_train, X_test, y_train, y_test
+
+    def cross_fold_validation(self, X_train, y_train,
+                              batch_size = 10, epochs=100,
+                              cv=10, n_jobs=-1):
+        """
+        Calculates the cross fold validation mean and variance.
+
+        :param X_train:  The X training data.
+        :param y_train:  The y training data.
+        :param batch_size:  The batch size.
+        :param epochs:  The number of epochs.
+        :param cv:  The number of cfv groups.
+        :param n_jobs:  The number of jobs.  Use -1 to use all CPU cores.
+        :return:  A tuple of accuracies, mean, and variance.  Will return None
+        if the classifier was not already trained.
+        """
+        if self.classifier is not None:
+            classifier = KerasClassifier(build_fn=self.classifier,
+                                         batch_size=batch_size,
+                                         epochs=epochs)
+            accuracies = cross_val_score(estimator=classifier,
+                                         X=X_train,
+                                         y=y_train,
+                                         cv=cv,
+                                         n_jobs=n_jobs)
+            mean = accuracies.mean()
+            variance = accuracies.std()
+            return accuracies, mean, variance
+        else:
+            return None, None, None
