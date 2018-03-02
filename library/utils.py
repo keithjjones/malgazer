@@ -1,4 +1,4 @@
-# Utilities class
+# Utilities Module
 import os
 import re
 import time
@@ -12,6 +12,7 @@ from .files import FileObject
 from tsfresh import extract_features, select_features, extract_relevant_features
 from tsfresh.utilities.dataframe_functions import impute
 from tsfresh.feature_extraction import EfficientFCParameters
+
 
 class Utils(object):
     def __init__(self):
