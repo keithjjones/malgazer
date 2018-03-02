@@ -110,7 +110,7 @@ class ML(object):
         """
         cm = confusion_matrix(y_test.argmax(1), y_pred.argmax(1))
         accuracy = 0.
-        for i in len(cm):
+        for i in range(0, len(cm)):
             accuracy += cm[i, i]
         accuracy = accuracy/cm.sum()
         return accuracy, cm
