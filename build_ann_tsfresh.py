@@ -9,6 +9,8 @@ source_dir = '/Dirty/malgazer/Test_Set/'
 datapoints = 1024
 subdir = 'data_tsfresh_{0}'.format(datapoints)
 arguments = ['-w', '256', '-d', str(datapoints), source_dir, subdir]
+batch_size = 10
+epochs = 100
 
 #classifications = Utils.get_classifications_from_path(source_dir)
 
@@ -34,7 +36,7 @@ outputs = y_test.shape[1]
 classifier = ml.build_ann(788, outputs)
 
 # Train the ANN
-classifier = ml.train_nn(X_train, y_train, batch_size=10, epochs=100)
+classifier = ml.train_nn(X_train, y_train, batch_size=batch_size, epochs=epocs)
 
 # Predict the results
 y_pred = ml.predict_nn(X_test)
@@ -52,8 +54,8 @@ print(accuracy)
 #    return ML.build_ann_static(788, outputs)
 #accuracies, mean, variance = ml.cross_fold_validation(model,
 #                                                      X_train, y_train, 
-#                                                      batch_size=10, 
-#                                                      epochs=100, 
+#                                                      batch_size=batch_size, 
+#                                                      epochs=epochs, 
 #                                                      cv=10, 
 #                                                      n_jobs=2)
 #print("CFV Mean: {0}".format(mean))
