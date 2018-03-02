@@ -42,16 +42,19 @@ Xtest = np.expand_dims(X_test, axis=2)
 y_pred = ml.predict_nn(Xtest)
 
 ## Cross Fold Validation
-#accuracies, mean, variance = ml.cross_fold_validation(Xt, yt, 
-#                                                      batch_size=10, 
-#                                                      epochs=100, 
-#                                                      cv=10, 
-#                                                      n_jobs=4)
+accuracies, mean, variance = ml.cross_fold_validation(Xt, yt, 
+                                                      batch_size=10, 
+                                                      epochs=100, 
+                                                      cv=10, 
+                                                      n_jobs=4)
+print("CFV Mean: {0}".format(mean))
+print("CFV Var: {0}".format(variance))
+
 
 # Making the Confusion Matrix
 accuracy, cm = ml.confusion_matrix(y_test, y_pred)
 
-print()
+print("Confusion Matrix:")
 print(cm)
-print()
+print("Accuracy:")
 print(accuracy)

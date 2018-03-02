@@ -44,11 +44,14 @@ y_pred = ml.predict_nn(X_test)
 #                                                      epochs=100, 
 #                                                      cv=10, 
 #                                                      n_jobs=4)
+#print("CFV Mean: {0}".format(mean))
+#print("CFV Var: {0}".format(variance))
+
 
 # Making the Confusion Matrix
 accuracy, cm = ml.confusion_matrix(y_test, y_pred)
 
-print()
+print("Confusion Matrix:")
 print(cm)
-print()
+print("Accuracy:")
 print(accuracy)
