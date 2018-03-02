@@ -86,7 +86,7 @@ class ML(object):
         :param input:  The input to the CNN, used to find input shape.
         :return:  The classifier.
         """
-        self.classifier = ML.build_cnn(input)
+        self.classifier = ML.build_cnn_static(input)
         self.classifier.summary()
         return self.classifier
 
