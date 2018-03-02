@@ -57,7 +57,7 @@ class ML(object):
         return self.classifier
 
     @staticmethod
-    def build_cnn(input):
+    def build_cnn_static(input):
         """
         Create a generic CNN.
 
