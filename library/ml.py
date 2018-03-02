@@ -77,6 +77,12 @@ class ML(object):
         return self.classifier
 
     def predict_nn(self, X_test):
+        """
+        Perform a prediction based upon our model.
+
+        :param X_test:  The X testing data for the prediction.
+        :return:  The predictions.
+        """
         y_pred = self.classifier.predict(X_test)
         # Pick the best match
         for i in range(0, len(y_pred)):
