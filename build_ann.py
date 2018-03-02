@@ -6,7 +6,7 @@ import numpy as np
 
 # Calculate features
 source_dir = '/Dirty/malgazer/Test_Set/'
-datapoints = 1024
+datapoints = 2048
 subdir = 'data_{0}'.format(datapoints)
 arguments = ['-w', '256', '-d', str(datapoints), source_dir, subdir]
 batch_size = 10

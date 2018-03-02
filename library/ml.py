@@ -12,6 +12,7 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import keras.backend as K
 
 
 class ML(object):
@@ -66,14 +67,15 @@ class ML(object):
         """
         classifier = Sequential()
         classifier.add(InputLayer(input_shape=input.shape[1:]))
-        classifier.add(Conv1D(filters=32, kernel_size=50, activation='relu'))
+        classifier.add(Conv1D(filters=100, kernel_size=100, activation='relu'))
+        classifier.add(MaxPooling1D(pool_size=16))
+        classifier.add(Conv1D(filters=100, kernel_size=20, activation='relu'))
         classifier.add(MaxPooling1D(pool_size=4))
-        classifier.add(Conv1D(filters=32, kernel_size=20, activation='relu'))
-        classifier.add(MaxPooling1D(pool_size=2))
         classifier.add(Flatten())
-        classifier.add(Dense(units=512, activation='relu'))
-        classifier.add(Dense(units=128, activation='relu'))
-        classifier.add(Dense(units=64, activation='relu'))
+        classifier.add(Dense(units=1250, activation='relu'))
+        classifier.add(Dense(units=700, activation='relu'))
+        classifier.add(Dense(units=250, activation='relu'))
+        classifier.add(Dense(units=50, activation='relu'))
         classifier.add(Dense(units=outputs, activation='softmax'))
         classifier.compile(optimizer='adam', loss='categorical_crossentropy',
                            metrics=['categorical_accuracy', 'accuracy'])
