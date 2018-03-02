@@ -20,7 +20,8 @@ class ML(object):
         self.classifer = None
         self.X_sc = None
 
-    def build_ann(self, datapoints=1024):
+    @staticmethod
+    def build_ann_static(datapoints=1024):
         """
         Create a generic ANN.
 
@@ -42,11 +43,21 @@ class ML(object):
         classifier.compile(optimizer='adam',
                            loss='categorical_crossentropy',
                            metrics=['categorical_accuracy'])
-        self.classifier = classifier
-        classifier.summary()
+        return classifier
+
+    def build_ann(self, datapoints=1024):
+        """
+        Create a generic ANN.
+
+        :param datapoints:  The number of data points on the input.
+        :return:  The classifier.
+        """
+        self.classifier = ML.build_ann_static(datapoints)
+        self.classifier.summary()
         return self.classifier
 
-    def build_cnn(self, input):
+    @staticmethod
+    def build_cnn(input):
         """
         Create a generic CNN.
 
@@ -66,8 +77,17 @@ class ML(object):
         classifier.add(Dense(units=3, activation='softmax'))
         classifier.compile(optimizer='adam', loss='categorical_crossentropy',
                            metrics=['categorical_accuracy'])
-        self.classifier = classifier
-        classifier.summary()
+        return classifier
+
+    def build_cnn(self, input):
+        """
+        Create a generic CNN.
+
+        :param input:  The input to the CNN, used to find input shape.
+        :return:  The classifier.
+        """
+        self.classifier = ML.build_cnn(input)
+        self.classifier.summary()
         return self.classifier
 
     def train_nn(self, X_train, y_train, batch_size=50, epochs=100):
@@ -165,32 +185,30 @@ class ML(object):
                                                             random_state=random_state)
         return X_train, X_test, y_train, y_test
 
-    def cross_fold_validation(self, X_train, y_train,
+    @staticmethod
+    def cross_fold_validation(classifier_fn, X_train, y_train,
                               batch_size = 10, epochs=100,
                               cv=10, n_jobs=-1):
         """
         Calculates the cross fold validation mean and variance.
 
+        :param classifier_fn:  The function that builds the classifier.
         :param X_train:  The X training data.
         :param y_train:  The y training data.
         :param batch_size:  The batch size.
         :param epochs:  The number of epochs.
         :param cv:  The number of cfv groups.
         :param n_jobs:  The number of jobs.  Use -1 to use all CPU cores.
-        :return:  A tuple of accuracies, mean, and variance.  Will return None
-        if the classifier was not already trained.
+        :return:  A tuple of accuracies, mean, and variance.
         """
-        if self.classifier is not None:
-            classifier = KerasClassifier(build_fn=self.classifier,
-                                         batch_size=batch_size,
-                                         epochs=epochs)
-            accuracies = cross_val_score(estimator=classifier,
-                                         X=X_train,
-                                         y=y_train,
-                                         cv=cv,
-                                         n_jobs=n_jobs)
-            mean = accuracies.mean()
-            variance = accuracies.std()
-            return accuracies, mean, variance
-        else:
-            return None, None, None
+        keras_classifier = KerasClassifier(build_fn=classifier_fn,
+                                     batch_size=batch_size,
+                                     epochs=epochs)
+        accuracies = cross_val_score(estimator=keras_classifier,
+                                     X=X_train,
+                                     y=y_train,
+                                     cv=cv,
+                                     n_jobs=n_jobs)
+        mean = accuracies.mean()
+        variance = accuracies.std()
+        return accuracies, mean, variance

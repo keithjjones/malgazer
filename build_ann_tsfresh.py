@@ -47,10 +47,13 @@ print("Accuracy:")
 print(accuracy)
 
 # Cross Fold Validation
-#accuracies, mean, variance = ml.cross_fold_validation(X_train, y_train, 
+#def model():
+#    return ML.build_ann_static(datapoints)
+#accuracies, mean, variance = ml.cross_fold_validation(model,
+#                                                      X_train, y_train, 
 #                                                      batch_size=10, 
 #                                                      epochs=100, 
 #                                                      cv=10, 
-#                                                      n_jobs=4)
+#                                                      n_jobs=2)
 #print("CFV Mean: {0}".format(mean))
 #print("CFV Var: {0}".format(variance))
