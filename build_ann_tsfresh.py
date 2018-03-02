@@ -20,7 +20,7 @@ raw_data, classifications, extracted_features = Utils.load_processed_tsfresh_dat
 
 # Wrangle classifications
 cls = Utils.parse_classifications_from_path(classifications)
-X = raw_data.as_matrix().copy()
+X = extracted_features.as_matrix().copy()
 y = cls.as_matrix().copy()
 
 # Preprocess the data
