@@ -9,7 +9,6 @@ source_dir = '/Dirty/malgazer/Test_Set/'
 datapoints = 1024
 subdir = 'data_tsfresh_{0}'.format(datapoints)
 arguments = ['-w', '256', '-d', str(datapoints), source_dir, subdir]
-outputs = 9
 
 #classifications = Utils.get_classifications_from_path(source_dir)
 
@@ -29,6 +28,7 @@ ml = ML()
 y, y_encoder = ml.encode_preprocessed_data(y)
 X, X_scaler = ml.scale_features_preprocessed_data(X)
 X_train, X_test, y_train, y_test = ml.train_test_split(X, y)
+outputs = y_test.shape[1]
 
 # Create the ANN
 classifier = ml.build_ann(788, outputs)

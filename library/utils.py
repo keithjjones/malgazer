@@ -327,8 +327,8 @@ class Utils(object):
             cl = row[0]
             c = cl.split('-')
             d = dict()
-            d['classification'] = cl
-            # d['classification'] = c[1]
+            # d['classification'] = cl
+            d['classification'] = c[1]
             ds = pd.Series(d)
             ds.name = index
             cls = cls.append(ds)

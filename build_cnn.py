@@ -9,7 +9,6 @@ source_dir = '/Dirty/malgazer/Test_Set/'
 datapoints = 1024
 subdir = 'data_{0}'.format(datapoints)
 arguments = ['-w', '256', '-d', str(datapoints), source_dir, subdir]
-outputs = 9
 
 #classifications = Utils.get_classifications_from_path(source_dir)
 
@@ -31,6 +30,7 @@ X, X_scaler = ml.scale_features_preprocessed_data(X)
 X_train, X_test, y_train, y_test = ml.train_test_split(X, y)
 Xt = np.expand_dims(X_train, axis=2)
 yt = y_train
+outputs = yt.shape[1]
 
 # Create the CNN
 classifier = ml.build_cnn(Xt, outputs)
