@@ -46,14 +46,15 @@ class ML(object):
         classifier.summary()
         return self.classifier
 
-    def build_cnn(self):
+    def build_cnn(self, input):
         """
         Create a generic CNN.
 
+        :param input:  The input to the CNN, used to find input shape.
         :return:  The classifier.
         """
         classifier = Sequential()
-        classifier.add(InputLayer(input_shape=Xt.shape[1:]))
+        classifier.add(InputLayer(input_shape=input.shape[1:]))
         classifier.add(Conv1D(filters=32, kernel_size=50, activation='relu'))
         classifier.add(MaxPooling1D(pool_size=4))
         classifier.add(Conv1D(filters=32, kernel_size=20, activation='relu'))
