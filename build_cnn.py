@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 # Calculate features
-source_dir = '/Source'
+source_dir = '/Dirty/malgazer/Test_Set/'
 datapoints = 1024
 subdir = 'data_{0}'.format(datapoints)
 arguments = ['-w', '256', '-d', str(datapoints), source_dir, subdir]
