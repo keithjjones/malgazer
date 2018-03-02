@@ -33,7 +33,7 @@ X_train, X_test, y_train, y_test = ml.train_test_split(X, y)
 classifier = ml.build_ann(datapoints)
 
 # Train the ANN
-classifier = ml.train_nn(X_train, y_train, batch_size=50, epochs=100)
+classifier = ml.train_nn(X_train, y_train, batch_size=10, epochs=100)
 
 # Predict the results
 y_pred = ml.predict_nn(X_test)

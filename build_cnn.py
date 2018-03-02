@@ -35,13 +35,13 @@ yt = y_train
 classifier = ml.build_cnn(Xt)
 
 # Train the CNN
-#classifier = ml.train_nn(Xt, yt, batch_size=50, epochs=100)
-#
-## Predict the results
+#classifier = ml.train_nn(Xt, yt, batch_size=10, epochs=100)
+
+# Predict the results
 #Xtest = np.expand_dims(X_test, axis=2)
 #y_pred = ml.predict_nn(Xtest)
-#
-## Making the Confusion Matrix
+
+# Making the Confusion Matrix
 #accuracy, cm = ml.confusion_matrix(y_test, y_pred)
 #
 #print("Confusion Matrix:")
