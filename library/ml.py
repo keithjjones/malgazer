@@ -71,6 +71,8 @@ class ML(object):
         classifier.add(MaxPooling1D(pool_size=16))
         classifier.add(Conv1D(filters=100, kernel_size=20, activation='relu'))
         classifier.add(MaxPooling1D(pool_size=4))
+        classifier.add(Conv1D(filters=100, kernel_size=3, activation='relu'))
+        classifier.add(MaxPooling1D(pool_size=2))
         classifier.add(Flatten())
         classifier.add(Dense(units=1250, activation='relu'))
         classifier.add(Dense(units=700, activation='relu'))
