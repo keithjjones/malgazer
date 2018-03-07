@@ -13,6 +13,7 @@ from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import keras.backend as K
+import keras.callbacks
 
 
 class ML(object):
@@ -93,7 +94,9 @@ class ML(object):
         self.classifier.summary()
         return self.classifier
 
-    def train_nn(self, X_train, y_train, batch_size=50, epochs=100):
+    def train_nn(self, X_train, y_train,
+                 batch_size=50, epochs=100,
+                 tensorboard=False):
         """
         Trains a given neural network with X_train and y_train.
 
@@ -102,9 +105,25 @@ class ML(object):
         :param y_train:  The y training data.
         :param batch_size:  The batch size.
         :param epochs:  The number of epochs.
+        :param tensorboard:  Set to True to include tensorboard
+        data in the local directory under ./Graph
         :return: The classifier after training.
         """
-        self.classifier.fit(X_train, y_train, batch_size=batch_size, epochs=epochs)
+        if tensorboard is True:
+            tb = keras.callbacks.TensorBoard(log_dir='Graph',
+                                             histogram_freq=1,
+                                             write_grads=True,
+                                             write_graph=True,
+                                             write_images=True)
+            self.classifier.fit(X_train, y_train,
+                                batch_size=batch_size,
+                                epochs=epochs,
+                                callbacks=[tb])
+        else:
+            self.classifier.fit(X_train, y_train,
+                                batch_size=batch_size,
+                                epochs=epochs)
+
         return self.classifier
 
     def predict_nn(self, X_test):
