@@ -6,7 +6,7 @@ import numpy as np
 
 # Calculate features
 source_dir = '/Dirty/malgazer/Test_Set/'
-datapoints = 2048
+datapoints = 1024
 subdir = 'data_{0}'.format(datapoints)
 arguments = ['-w', '256', '-d', str(datapoints), source_dir, subdir]
 batch_size = 10
@@ -36,7 +36,7 @@ outputs = y_train.shape[1]
 classifier = ml.build_ann(datapoints, outputs)
 
 # Train the ANN
-classifier = ml.train_nn(X_train, y_train, batch_size=batch_size, epochs=epochs)
+classifier = ml.train_nn(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=True)
 
 # Predict the results
 y_pred = ml.predict_nn(X_test)

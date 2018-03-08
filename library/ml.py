@@ -111,7 +111,7 @@ class ML(object):
         """
         if tensorboard is True:
             tb = keras.callbacks.TensorBoard(log_dir='Graph',
-                                             histogram_freq=1,
+                                             histogram_freq=0,
                                              write_grads=True,
                                              write_graph=True,
                                              write_images=True)
