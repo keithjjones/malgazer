@@ -30,13 +30,14 @@ def main():
         samplestodelete = []
         results = None
         while results is None:
-            nextpage, results = api.get_intel_notifications_feed(nextpage)
-            if results.status_code != 200:
+            results = api.get_intel_notifications_feed(nextpage)
+            nextpage = results['results']['next']
+            results = results['results']
+            if 'error' in results:
                 print("\t\t\tError, retrying...")
                 time.sleep(60)
                 results = None
-            else:
-                results = results.json()
+
         print("Downloading {0} Samples..."
               .format(len(results['notifications'])))
 
