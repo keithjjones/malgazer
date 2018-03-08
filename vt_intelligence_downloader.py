@@ -18,14 +18,14 @@ import json
 import logging
 import optparse
 import os
-import Queue
+import queue
 import re
 import socket
 import sys
 import threading
 import time
 import urllib
-import urllib2
+from urllib.request import urlopen, Request
 
 
 API_KEY = 'NOTHING - You can put your key here.'
@@ -102,10 +102,10 @@ def get_matching_files(search, page=None):
   attempts = 0
   parameters = {'query': search, 'apikey': API_KEY, 'page': page}
   data = urllib.urlencode(parameters)
-  request = urllib2.Request(INTELLIGENCE_SEARCH_URL, data)
+  request = Request(INTELLIGENCE_SEARCH_URL, data)
   while attempts < 10:
     try:
-      response = urllib2.urlopen(request).read()
+      response = urlopen(request).read()
       break
     except Exception:
       attempts += 1
@@ -182,7 +182,7 @@ def main():
   logging.info('* VirusTotal Intelligence search: %s', search)
   logging.info('* Number of files to download: %s', numfiles)
 
-  work = Queue.Queue()  # Queues files to download
+  work = queue.Queue()  # Queues files to download
   end_process = False
 
   def worker():
@@ -218,7 +218,7 @@ def main():
       logging.info('Retrieving page of file hashes to download')
       try:
         next_page, hashes = get_matching_files(search, page=next_page)
-      except InvalidQueryError, e:
+      except InvalidQueryError as e:
         logging.info('The search query provided is invalid... %s', e)
         return
       if hashes:
