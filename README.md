@@ -1,6 +1,6 @@
 # malgazer
 
-A Python static malware analysis library.
+A Python malware analysis library.  Mostly for machine learning purposes.
 
 # Documentation
 
