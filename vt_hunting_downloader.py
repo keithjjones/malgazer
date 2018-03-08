@@ -1,6 +1,7 @@
 import argparse
 import os
 import time
+import pandas as pd
 from hashlib import sha256
 from virus_total_apis import IntelApi
 
@@ -25,6 +26,8 @@ def main():
 
     downloads = 0
     nextpage = None
+
+    df = pd.DataFrame()
 
     while True:
         samplestodelete = []
@@ -72,6 +75,10 @@ def main():
                     downloaded = True
                     samplestodelete.append(notification['id'])
 
+            ds = pd.Series(notification)
+            ds.name = notification['sha256']
+            df = df.append(ds)
+
         if len(samplestodelete) > 0:
             api.delete_intel_notifications(samplestodelete)
             print("Deleted {0} Samples From Feed".format(len(samplestodelete)))
@@ -79,6 +86,7 @@ def main():
         if nextpage is None:
             break
 
+    df.to_csv(os.path.join(args.OutputDirectory, "vti_metadata.csv"))
     print("Downloaded {0} Total Samples".format(downloads))
 
 
