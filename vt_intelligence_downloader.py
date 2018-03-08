@@ -1,7 +1,9 @@
 import argparse
+import time
 import os
 from hashlib import sha256
-from virus_total_apis import IntelApi
+from virus_total_apis import IntelApi, PublicApi, PrivateApi
+import pandas as pd
 
 
 def main():
@@ -26,44 +28,73 @@ def main():
     except:
         os.mkdir(args.OutputDirectory)
 
-    api = IntelApi(args.apikey)
+    intel_api = IntelApi(args.apikey)
+    public_api = PublicApi(args.apikey)
+    private_api = PrivateApi(args.apikey)
 
     downloads = 0
     nextpage = None
 
+    df = pd.DataFrame()
+
     while downloads <= args.number_of_samples:
-        nextpage, results = api.get_hashes_from_search(args.Query, nextpage)
-        results = results.json()
+        results = None
+        while results is None:
+            nextpage, results = intel_api.get_hashes_from_search(args.Query, nextpage)
+            if results.status_code != 200:
+                print("\t\t\tError, retrying...")
+                time.sleep(60)
+                results = None
+            else:
+                results = results.json()
         print("Downloading Samples...")
 
         for hash in results['hashes']:
-            filename = os.path.join(args.OutputDirectory,
-                                    hash.upper())
-            try:
-                os.stat(args.OutputDirectory)
-            except:
-                os.mkdir(args.OutputDirectory)
+            if downloads < args.number_of_samples:
+                filename = os.path.join(args.OutputDirectory,
+                                        hash.upper())
+                try:
+                    os.stat(args.OutputDirectory)
+                except:
+                    os.mkdir(args.OutputDirectory)
 
-            print("Downloading {0}".format(hash))
-            response = api.get_file(hash, args.OutputDirectory)
-            print("\tDownloaded {0}".format(hash))
-            print("\tVerifying hash...")
-            expected_hash = hash.upper()
-            dl_hash = sha256_file(filename).upper()
+                print("Downloading {0}".format(hash))
+                downloaded = False
+                while downloaded is False:
+                    response = intel_api.get_file(hash, args.OutputDirectory)
+                    print("\tDownloaded {0}".format(hash))
+                    print("\tVerifying hash...")
+                    expected_hash = hash.upper()
+                    dl_hash = sha256_file(filename).upper()
 
-            if expected_hash != dl_hash:
-                print("**** DOWNLOAD ERROR!  SHA256 Does not match!")
-                print("\tExpected SHA256: {0}".format(expected_hash))
-                print("\tCalculated SHA256: {0}".format(dl_hash))
-                print("\tHave you exceeded your quota?")
+                    if expected_hash != dl_hash:
+                        print("**** DOWNLOAD ERROR!  SHA256 Does not match!")
+                        print("\tExpected SHA256: {0}".format(expected_hash))
+                        print("\tCalculated SHA256: {0}".format(dl_hash))
+                        print("\tHave you exceeded your quota?")
+                    else:
+                        print("\t\tHash verified!")
+                        downloads += 1
+                        downloaded = True
+
+                file_report = None
+                while file_report is None:
+                    print("\tDownloading file report...")
+                    file_report = public_api.get_file_report(hash)
+                    if 'error' in file_report:
+                        print("\t\t\tError, retrying...")
+                        time.sleep(60)
+                        file_report = None
+                ds = pd.Series(file_report['results'])
+                ds.name = hash.upper()
+                df = df.append(ds)
             else:
-                print("\t\tHash verified!")
-                downloads += 1
-                if downloads >= args.number_of_samples:
-                    break
+                break
 
         if nextpage is None or downloads >= args.number_of_samples:
             break
+
+    df.to_csv(os.path.join(args.OutputDirectory, "vti_metadata.csv"))
     print("Downloaded {0} Total Samples".format(downloads))
 
 

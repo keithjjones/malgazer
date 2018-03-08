@@ -1,5 +1,6 @@
 import argparse
 import os
+import time
 from hashlib import sha256
 from virus_total_apis import IntelApi
 
@@ -27,8 +28,15 @@ def main():
 
     while True:
         samplestodelete = []
-        nextpage, results = api.get_intel_notifications_feed(nextpage)
-        results = results.json()
+        results = None
+        while results is None:
+            nextpage, results = api.get_intel_notifications_feed(nextpage)
+            if results.status_code != 200:
+                print("\t\t\tError, retrying...")
+                time.sleep(60)
+                results = None
+            else:
+                results = results.json()
         print("Downloading {0} Samples..."
               .format(len(results['notifications'])))
 
@@ -44,19 +52,24 @@ def main():
                 os.mkdir(subdir)
 
             print("Downloading {0}".format(notification['sha256']))
-            response = api.get_file(notification['sha256'], subdir)
-            print("\tDownloaded {0}".format(notification['sha256']))
-            expected_hash = notification['sha256'].upper()
-            dl_hash = sha256_file(filename).upper()
+            downloaded = False
+            while downloaded is False:
+                response = api.get_file(notification['sha256'], subdir)
+                print("\tDownloaded {0}".format(notification['sha256']))
+                print("\tVerifying hash...")
+                expected_hash = notification['sha256'].upper()
+                dl_hash = sha256_file(filename).upper()
 
-            if expected_hash != dl_hash:
-                print("**** DOWNLOAD ERROR!  SHA256 Does not match!")
-                print("\tExpected SHA256: {0}".format(expected_hash))
-                print("\tCalculated SHA256: {0}".format(dl_hash))
-                print("\tWill not delete this sample from the feed.")
-                print("\tHave you exceeded your quota?")
-            else:
-                samplestodelete.append(notification['id'])
+                if expected_hash != dl_hash:
+                    print("**** DOWNLOAD ERROR!  SHA256 Does not match!")
+                    print("\tExpected SHA256: {0}".format(expected_hash))
+                    print("\tCalculated SHA256: {0}".format(dl_hash))
+                    print("\tWill not delete this sample from the feed.")
+                    print("\tHave you exceeded your quota?")
+                else:
+                    print("\t\tHash verified!")
+                    downloaded = True
+                    samplestodelete.append(notification['id'])
 
         if len(samplestodelete) > 0:
             api.delete_intel_notifications(samplestodelete)
