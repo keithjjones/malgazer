@@ -125,10 +125,14 @@ def main():
 
 def sha256_file(filename):
     hasher = sha256()
-    with open(filename,'rb') as f:
-        buf = f.read()
-        hasher.update(buf)
-    return hasher.hexdigest()
+    if os.path.isfile(filename):
+        with open(filename,'rb') as f:
+            buf = f.read()
+            hasher.update(buf)
+        return hasher.hexdigest()
+    else:
+        return ""
+
 
 if __name__ == "__main__":
     main()
