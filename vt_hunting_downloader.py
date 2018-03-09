@@ -44,7 +44,6 @@ def main():
     df = pd.DataFrame()
 
     while True:
-        samplestodelete = []
         results = None
         while results is None:
             results = api.get_intel_notifications_feed(nextpage)
@@ -87,7 +86,8 @@ def main():
                     else:
                         print("\t\tHash verified!")
                         downloaded = True
-                        samplestodelete.append(notification['id'])
+                        if args.delete_downloads:
+                            api.delete_intel_notifications([notification['id']])
 
                 downloads += 1
 
@@ -99,7 +99,7 @@ def main():
             else:
                 if args.delete_non_matches:
                     # Delete the notification if it does not match
-                    samplestodelete.append(notification['id'])
+                    api.delete_intel_notifications([notification['id']])
 
             if args.number_of_samples > 0 and downloads >= args.number_of_samples:
                 break
@@ -108,9 +108,9 @@ def main():
                                 downloads >= args.number_of_samples):
             break
 
-    if len(samplestodelete) > 0 and args.delete_downloaded:
-        api.delete_intel_notifications(samplestodelete)
-        print("Deleted {0} Samples From Feed".format(len(samplestodelete)))
+    # if len(samplestodelete) > 0 and args.delete_downloaded:
+    #     api.delete_intel_notifications(samplestodelete)
+    #     print("Deleted {0} Samples From Feed".format(len(samplestodelete)))
 
     now = datetime.datetime.now()
     now_str = "{0}_{1:02}_{2:02}_{3:02}_{4:02}_{5:02}_{6}".format(now.year,
