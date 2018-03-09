@@ -21,7 +21,7 @@ def main():
     parser.add_argument("-n", "--number_of_samples",
                         help="The number of files to download.  "
                              "Set to zero for all downloads.",
-                        type=int, default=0, required=True)
+                        type=int, default=0)
 
     args = parser.parse_args()
 
