@@ -22,7 +22,9 @@ def main():
                         help="The number of files to download.  "
                              "Set to zero for all downloads.",
                         type=int, default=0)
-
+    parser.add_argument("-d", "--delete_downloaded",
+                        help="Delete downloaded samples from feed."
+                             "", action='store_true')
     args = parser.parse_args()
 
     try:
@@ -84,6 +86,8 @@ def main():
 
                 downloads += 1
 
+                print("\tDownloaded {0} samples...".format(downloads))
+
                 ds = pd.Series(notification)
                 ds.name = notification['sha256']
                 df = df.append(ds)
@@ -94,13 +98,13 @@ def main():
             if args.number_of_samples > 0 and downloads >= args.number_of_samples:
                 break
 
-        if len(samplestodelete) > 0:
-            api.delete_intel_notifications(samplestodelete)
-            print("Deleted {0} Samples From Feed".format(len(samplestodelete)))
-
         if nextpage is None or (args.number_of_samples > 0 and
                                 downloads >= args.number_of_samples):
             break
+
+    if len(samplestodelete) > 0 and args.delete_downloaded:
+        api.delete_intel_notifications(samplestodelete)
+        print("Deleted {0} Samples From Feed".format(len(samplestodelete)))
 
     df.to_csv(os.path.join(args.OutputDirectory, "vti_metadata.csv"))
     print("Downloaded {0} Total Samples".format(downloads))
