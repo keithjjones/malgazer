@@ -57,7 +57,7 @@ def main():
                 try:
                     os.stat(args.OutputDirectory)
                 except:
-                    os.mkdir(args.OutputDirectory)
+                    os.makedirs(args.OutputDirectory)
 
                 print("Downloading {0}".format(hash))
                 downloaded = False

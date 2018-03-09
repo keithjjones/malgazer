@@ -60,13 +60,14 @@ def main():
         for notification in results['notifications']:
             if int(notification['positives']) >= args.positives:
                 subdir = os.path.join(args.OutputDirectory,
-                                      notification['ruleset_name'])
+                                      notification['ruleset_name'],
+                                      notification['subject'])
                 filename = os.path.join(subdir, notification['sha256'])
 
                 try:
                     os.stat(subdir)
                 except:
-                    os.mkdir(subdir)
+                    os.makedirs(subdir)
 
                 print("Downloading {0}".format(notification['sha256']))
                 downloaded = False
