@@ -58,7 +58,7 @@ def main():
         print("Downloading hashes for samples...")
 
         for notification in results['notifications']:
-            if notification['positives'] >= args.positives:
+            if int(notification['positives']) >= args.positives:
                 subdir = os.path.join(args.OutputDirectory,
                                       notification['ruleset_name'])
                 filename = os.path.join(subdir, notification['sha256'])
