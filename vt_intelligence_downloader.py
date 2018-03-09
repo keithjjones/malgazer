@@ -2,8 +2,8 @@ import argparse
 import datetime
 import time
 import os
-from hashlib import sha256
 from virus_total_apis import IntelApi, PublicApi, PrivateApi
+from library.files import sha256_file
 import pandas as pd
 
 
@@ -107,16 +107,6 @@ def main():
     df.to_csv(os.path.join(args.OutputDirectory, "vti_metadata_{0}.csv".format(now_str)))
     print("Downloaded {0} Total Samples".format(downloads))
 
-
-def sha256_file(filename):
-    hasher = sha256()
-    if os.path.isfile(filename):
-        with open(filename,'rb') as f:
-            buf = f.read()
-            hasher.update(buf)
-        return hasher.hexdigest()
-    else:
-        return ""
 
 if __name__ == "__main__":
     main()

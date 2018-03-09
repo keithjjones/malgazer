@@ -7,6 +7,7 @@ import hashlib
 import pickle
 import gzip
 from . import entropy
+from hashlib import sha256
 
 
 class FileObject(object):
@@ -209,3 +210,14 @@ class MalwareSample(object):
         self.data = data
         self.runningentropy = runningentropy
         self.parsedfile = parsedfile
+
+
+def sha256_file(filename):
+    hasher = sha256()
+    if os.path.isfile(filename):
+        with open(filename, 'rb') as f:
+            buf = f.read()
+            hasher.update(buf)
+        return hasher.hexdigest()
+    else:
+        return ""
