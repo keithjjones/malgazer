@@ -26,6 +26,9 @@ def main():
     parser.add_argument("-d", "--delete_downloaded",
                         help="Delete downloaded samples from feed."
                              "", action='store_true')
+    parser.add_argument("-dn", "--delete_non_matches",
+                        help="Delete samples that do not match from feed."
+                             "", action='store_true')
     args = parser.parse_args()
 
     try:
@@ -93,8 +96,9 @@ def main():
                 ds.name = notification['sha256']
                 df = df.append(ds)
             else:
-                # Delete the notification if it does not match
-                samplestodelete.append(notification['id'])
+                if args.delete_non_matches:
+                    # Delete the notification if it does not match
+                    samplestodelete.append(notification['id'])
 
             if args.number_of_samples > 0 and downloads >= args.number_of_samples:
                 break
