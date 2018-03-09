@@ -51,7 +51,7 @@ def main():
                 time.sleep(60)
                 results = None
 
-        print("Downloading Samples...")
+        print("Downloading hashes for samples...")
 
         for notification in results['notifications']:
             if notification['positives'] >= args.positives:
