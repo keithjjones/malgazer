@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import time
 import os
 from hashlib import sha256
@@ -94,7 +95,15 @@ def main():
         if nextpage is None or downloads >= args.number_of_samples:
             break
 
-    df.to_csv(os.path.join(args.OutputDirectory, "vti_metadata.csv"))
+    now = datetime.datetime.now()
+    now_str = "{0}_{1:02}_{2:02}_{3:02}_{4:02}_{5:02}_{6}".format(now.year,
+                                                                  now.month,
+                                                                  now.day,
+                                                                  now.hour,
+                                                                  now.minute,
+                                                                  now.second,
+                                                                  now.microsecond)
+    df.to_csv(os.path.join(args.OutputDirectory, "vti_metadata_{0}.csv".format(now_str)))
     print("Downloaded {0} Total Samples".format(downloads))
 
 
