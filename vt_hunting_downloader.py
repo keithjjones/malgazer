@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import os
 import time
 import pandas as pd
@@ -106,7 +107,15 @@ def main():
         api.delete_intel_notifications(samplestodelete)
         print("Deleted {0} Samples From Feed".format(len(samplestodelete)))
 
-    df.to_csv(os.path.join(args.OutputDirectory, "vti_metadata.csv"))
+    now = datetime.datetime.now()
+    now_str = "{0}_{1:02}_{2:02}_{3:02}_{4:02}_{5:02}_{6}".format(now.year,
+                                                                  now.month,
+                                                                  now.day,
+                                                                  now.hour,
+                                                                  now.minute,
+                                                                  now.second,
+                                                                  now.microsecond)
+    df.to_csv(os.path.join(args.OutputDirectory, "vti_metadata_{0}.csv".format(now_str)))
     print("Downloaded {0} Total Samples".format(downloads))
 
 

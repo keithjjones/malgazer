@@ -76,6 +76,7 @@ def main():
                     else:
                         print("\t\tHash verified!")
                         downloads += 1
+                        print("\tDownloaded {0} samples...".format(downloads))
                         downloaded = True
 
                 file_report = None
