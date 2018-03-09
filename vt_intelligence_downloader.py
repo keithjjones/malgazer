@@ -20,7 +20,7 @@ def main():
     parser.add_argument("-n", "--number_of_samples",
                         help="The number of files to download."
                              "",
-                        type=int, default=10, required=True)
+                        type=int, default=50, required=True)
 
     args = parser.parse_args()
 
