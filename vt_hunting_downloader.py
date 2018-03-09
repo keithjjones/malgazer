@@ -34,7 +34,7 @@ def main():
     try:
         os.stat(args.OutputDirectory)
     except:
-        os.mkdir(args.OutputDirectory)
+        os.makedirs(args.OutputDirectory)
 
     api = IntelApi(args.apikey)
 
