@@ -31,7 +31,7 @@ def main():
 
     intel_api = IntelApi(args.apikey)
     public_api = PublicApi(args.apikey)
-    private_api = PrivateApi(args.apikey)
+    # private_api = PrivateApi(args.apikey)
 
     downloads = 0
     nextpage = None
