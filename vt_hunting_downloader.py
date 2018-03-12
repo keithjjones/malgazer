@@ -76,7 +76,7 @@ def main():
                         downloaded = False
                         while downloaded is False:
                             response = api.get_file(notification['sha256'], subdir)
-                            print("\t\tDownloaded {0:,}".format(notification['sha256']))
+                            print("\t\tDownloaded {0}".format(notification['sha256']))
                             print("\t\tVerifying hash...")
                             expected_hash = notification['sha256'].upper()
                             dl_hash = sha256_file(filename).upper()
