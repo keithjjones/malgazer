@@ -108,6 +108,7 @@ def main():
                                                                   now.minute,
                                                                   now.second,
                                                                   now.microsecond)
+    print("Writing metadata CSV...")
     df.to_csv(os.path.join(args.OutputDirectory, "vti_metadata_{0}.csv".format(now_str)))
     print("Downloaded {0:,} Total Samples".format(downloads))
 
