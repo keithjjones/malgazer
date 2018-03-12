@@ -106,6 +106,7 @@ def main():
                             downloads += 1
                             print("\t\tDownloaded {0:,} samples...".format(downloads))
                         else:
+                            print("\tSkipping sample download...")
                             if args.delete_downloaded:
                                 print("\t\tDeleting downloaded sample from feed...")
                                 del_response = api.delete_intel_notifications([notification['id']])
