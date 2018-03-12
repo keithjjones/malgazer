@@ -103,12 +103,12 @@ def main():
 
                         print("\t\tDownloaded {0:,} samples...".format(downloads))
 
-                        ds = pd.Series(notification)
-                        ds.name = notification['sha256']
-                        ds_scans = pd.Series(notification['scans'])
-                        ds_scans.name = notification['sha256']
-                        ds = ds.append(ds_scans)
-                        df = df.append(ds)
+                    ds = pd.Series(notification)
+                    ds.name = notification['sha256']
+                    ds_scans = pd.Series(notification['scans'])
+                    ds_scans.name = notification['sha256']
+                    ds = ds.append(ds_scans)
+                    df = df.append(ds)
                 else:
                     if args.delete_non_matches:
                         # Delete the notification if it does not match

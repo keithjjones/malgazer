@@ -95,9 +95,10 @@ def main():
                                 print("\t\t\t\tError, retrying...")
                                 time.sleep(60)
                                 file_report = None
-                        ds = pd.Series(file_report['results'])
-                        ds.name = hash.upper()
-                        df = df.append(ds)
+
+                    ds = pd.Series(file_report['results'])
+                    ds.name = hash.upper()
+                    df = df.append(ds)
                 else:
                     break
 
