@@ -44,7 +44,7 @@ def main():
             while results is None:
                 nextpage, results = intel_api.get_hashes_from_search(args.Query, nextpage)
                 if results.status_code != 200:
-                    print("\t\t\tError, retrying...")
+                    print("\tError downloading hashes, retrying...")
                     time.sleep(60)
                     results = None
                 else:

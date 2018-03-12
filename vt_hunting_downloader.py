@@ -53,7 +53,7 @@ def main():
                 nextpage = results['results']['next']
                 results = results['results']
                 if 'error' in results:
-                    print("\t\t\tError, retrying...")
+                    print("\tError downloading hashes, retrying...")
                     time.sleep(60)
                     results = None
 
