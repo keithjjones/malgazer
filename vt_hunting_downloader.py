@@ -68,35 +68,36 @@ def main():
                 except:
                     os.makedirs(subdir)
 
-                print("Downloading {0}".format(notification['sha256']))
-                downloaded = False
-                while downloaded is False:
-                    response = api.get_file(notification['sha256'], subdir)
-                    print("\tDownloaded {0}".format(notification['sha256']))
-                    print("\tVerifying hash...")
-                    expected_hash = notification['sha256'].upper()
-                    dl_hash = sha256_file(filename).upper()
+                if not os.path.isfile(filename):
+                    print("Downloading {0}".format(notification['sha256']))
+                    downloaded = False
+                    while downloaded is False:
+                        response = api.get_file(notification['sha256'], subdir)
+                        print("\tDownloaded {0}".format(notification['sha256']))
+                        print("\tVerifying hash...")
+                        expected_hash = notification['sha256'].upper()
+                        dl_hash = sha256_file(filename).upper()
 
-                    if expected_hash != dl_hash:
-                        print("**** DOWNLOAD ERROR!  SHA256 Does not match!")
-                        print("\tExpected SHA256: {0}".format(expected_hash))
-                        print("\tCalculated SHA256: {0}".format(dl_hash))
-                        print("\tWill not delete this sample from the feed.")
-                        print("\tHave you exceeded your quota?")
-                    else:
-                        print("\t\tHash verified!")
-                        downloaded = True
-                        if args.delete_downloaded:
-                            print("\tDeleted downloaded sample from feed...")
-                            api.delete_intel_notifications([notification['id']])
+                        if expected_hash != dl_hash:
+                            print("**** DOWNLOAD ERROR!  SHA256 Does not match!")
+                            print("\tExpected SHA256: {0}".format(expected_hash))
+                            print("\tCalculated SHA256: {0}".format(dl_hash))
+                            print("\tWill not delete this sample from the feed.")
+                            print("\tHave you exceeded your quota?")
+                        else:
+                            print("\t\tHash verified!")
+                            downloaded = True
+                            if args.delete_downloaded:
+                                print("\tDeleted downloaded sample from feed...")
+                                del_response = api.delete_intel_notifications([notification['id']])
 
-                downloads += 1
+                    downloads += 1
 
-                print("\tDownloaded {0} samples...".format(downloads))
+                    print("\tDownloaded {0} samples...".format(downloads))
 
-                ds = pd.Series(notification)
-                ds.name = notification['sha256']
-                df = df.append(ds)
+                    ds = pd.Series(notification)
+                    ds.name = notification['sha256']
+                    df = df.append(ds)
             else:
                 if args.delete_non_matches:
                     # Delete the notification if it does not match
