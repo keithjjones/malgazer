@@ -41,8 +41,8 @@ class FileObject(object):
 
         # Load up the file...
         if load_file:
-            if not os.path.exists(filename):
-                raise ValueError("File {0} does not exist!".format(filename))
+            if not os.path.isfile(filename):
+                raise ValueError("File {0} is not valid!".format(filename))
             self.malware.filetype = magic.from_file(self.malware.filename)
             self._read_file()
             self._parse_file_type()
@@ -80,7 +80,7 @@ class FileObject(object):
                     self.PE = FILE_TYPE[2](self.malware.filename)
                     self.malware.parsedfile['sections'] = dict()
                     for section in self.PE.sections:
-                        section_name = section.Name.decode('UTF-8').rstrip('\x00')
+                        section_name = section.Name.decode('UTF-8', 'ignore')
                         offset = section.PointerToRawData
                         length = section.SizeOfRawData
                         self.malware.parsedfile['sections'][section_name] = dict()
