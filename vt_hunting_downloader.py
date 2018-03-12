@@ -46,73 +46,76 @@ def main():
     df = pd.DataFrame()
 
     while True:
-        results = None
-        while results is None:
-            results = api.get_intel_notifications_feed(nextpage)
-            nextpage = results['results']['next']
-            results = results['results']
-            if 'error' in results:
-                print("\t\t\tError, retrying...")
-                time.sleep(60)
-                results = None
+        try:
+            results = None
+            while results is None:
+                results = api.get_intel_notifications_feed(nextpage)
+                nextpage = results['results']['next']
+                results = results['results']
+                if 'error' in results:
+                    print("\t\t\tError, retrying...")
+                    time.sleep(60)
+                    results = None
 
-        print("Downloading hashes for samples...")
+            print("Downloading hashes for samples...")
 
-        for notification in results['notifications']:
-            if int(notification['positives']) >= args.positives:
-                subdir = os.path.join(args.OutputDirectory,
-                                      notification['ruleset_name'],
-                                      notification['subject'])
-                filename = os.path.join(subdir, notification['sha256'])
+            for notification in results['notifications']:
+                if int(notification['positives']) >= args.positives:
+                    subdir = os.path.join(args.OutputDirectory,
+                                          notification['ruleset_name'],
+                                          notification['subject'])
+                    filename = os.path.join(subdir, notification['sha256'])
 
-                try:
-                    os.stat(subdir)
-                except:
-                    os.makedirs(subdir)
+                    try:
+                        os.stat(subdir)
+                    except:
+                        os.makedirs(subdir)
 
-                if not os.path.isfile(filename):
-                    print("Downloading {0}".format(notification['sha256']))
-                    downloaded = False
-                    while downloaded is False:
-                        response = api.get_file(notification['sha256'], subdir)
-                        print("\tDownloaded {0}".format(notification['sha256']))
-                        print("\tVerifying hash...")
-                        expected_hash = notification['sha256'].upper()
-                        dl_hash = sha256_file(filename).upper()
+                    if not os.path.isfile(filename):
+                        print("Downloading {0}".format(notification['sha256']))
+                        downloaded = False
+                        while downloaded is False:
+                            response = api.get_file(notification['sha256'], subdir)
+                            print("\tDownloaded {0}".format(notification['sha256']))
+                            print("\tVerifying hash...")
+                            expected_hash = notification['sha256'].upper()
+                            dl_hash = sha256_file(filename).upper()
 
-                        if expected_hash != dl_hash:
-                            print("**** DOWNLOAD ERROR!  SHA256 Does not match!")
-                            print("\tExpected SHA256: {0}".format(expected_hash))
-                            print("\tCalculated SHA256: {0}".format(dl_hash))
-                            print("\tWill not delete this sample from the feed.")
-                            print("\tHave you exceeded your quota?")
-                        else:
-                            print("\t\tHash verified!")
-                            downloaded = True
-                            if args.delete_downloaded:
-                                print("\tDeleted downloaded sample from feed...")
-                                del_response = api.delete_intel_notifications([notification['id']])
+                            if expected_hash != dl_hash:
+                                print("**** DOWNLOAD ERROR!  SHA256 Does not match!")
+                                print("\tExpected SHA256: {0}".format(expected_hash))
+                                print("\tCalculated SHA256: {0}".format(dl_hash))
+                                print("\tWill not delete this sample from the feed.")
+                                print("\tHave you exceeded your quota?")
+                            else:
+                                print("\t\tHash verified!")
+                                downloaded = True
+                                if args.delete_downloaded:
+                                    print("\tDeleted downloaded sample from feed...")
+                                    del_response = api.delete_intel_notifications([notification['id']])
 
-                    downloads += 1
+                        downloads += 1
 
-                    print("\tDownloaded {0} samples...".format(downloads))
+                        print("\tDownloaded {0} samples...".format(downloads))
 
-                    ds = pd.Series(notification)
-                    ds.name = notification['sha256']
-                    ds_scans = pd.Series(notification['scans'])
-                    ds_scans.name = notification['sha256']
-                    ds = ds.append(ds_scans)
-                    df = df.append(ds)
-            else:
-                if args.delete_non_matches:
-                    # Delete the notification if it does not match
-                    api.delete_intel_notifications([notification['id']])
+                        ds = pd.Series(notification)
+                        ds.name = notification['sha256']
+                        ds_scans = pd.Series(notification['scans'])
+                        ds_scans.name = notification['sha256']
+                        ds = ds.append(ds_scans)
+                        df = df.append(ds)
+                else:
+                    if args.delete_non_matches:
+                        # Delete the notification if it does not match
+                        api.delete_intel_notifications([notification['id']])
 
-            if args.number_of_samples > 0 and downloads >= args.number_of_samples:
+                if args.number_of_samples > 0 and downloads >= args.number_of_samples:
+                    break
+
+            if nextpage is None or (args.number_of_samples > 0 and
+                                    downloads >= args.number_of_samples):
                 break
-
-        if nextpage is None or (args.number_of_samples > 0 and
-                                downloads >= args.number_of_samples):
+        except KeyboardInterrupt:
             break
 
     # if len(samplestodelete) > 0 and args.delete_downloaded:

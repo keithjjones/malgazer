@@ -39,62 +39,65 @@ def main():
     df = pd.DataFrame()
 
     while downloads <= args.number_of_samples:
-        results = None
-        while results is None:
-            nextpage, results = intel_api.get_hashes_from_search(args.Query, nextpage)
-            if results.status_code != 200:
-                print("\t\t\tError, retrying...")
-                time.sleep(60)
-                results = None
-            else:
-                results = results.json()
-        print("Downloading Samples...")
+        try:
+            results = None
+            while results is None:
+                nextpage, results = intel_api.get_hashes_from_search(args.Query, nextpage)
+                if results.status_code != 200:
+                    print("\t\t\tError, retrying...")
+                    time.sleep(60)
+                    results = None
+                else:
+                    results = results.json()
+            print("Downloading Samples...")
 
-        for hash in results['hashes']:
-            if downloads < args.number_of_samples:
-                filename = os.path.join(args.OutputDirectory,
-                                        hash.upper())
-                try:
-                    os.stat(args.OutputDirectory)
-                except:
-                    os.makedirs(args.OutputDirectory)
+            for hash in results['hashes']:
+                if downloads < args.number_of_samples:
+                    filename = os.path.join(args.OutputDirectory,
+                                            hash.upper())
+                    try:
+                        os.stat(args.OutputDirectory)
+                    except:
+                        os.makedirs(args.OutputDirectory)
 
-                if not os.path.isfile(filename):
-                    print("Downloading {0}".format(hash))
-                    downloaded = False
-                    while downloaded is False:
-                        response = intel_api.get_file(hash, args.OutputDirectory)
-                        print("\tDownloaded {0}".format(hash))
-                        print("\tVerifying hash...")
-                        expected_hash = hash.upper()
-                        dl_hash = sha256_file(filename).upper()
+                    if not os.path.isfile(filename):
+                        print("Downloading {0}".format(hash))
+                        downloaded = False
+                        while downloaded is False:
+                            response = intel_api.get_file(hash, args.OutputDirectory)
+                            print("\tDownloaded {0}".format(hash))
+                            print("\tVerifying hash...")
+                            expected_hash = hash.upper()
+                            dl_hash = sha256_file(filename).upper()
 
-                        if expected_hash != dl_hash:
-                            print("**** DOWNLOAD ERROR!  SHA256 Does not match!")
-                            print("\tExpected SHA256: {0}".format(expected_hash))
-                            print("\tCalculated SHA256: {0}".format(dl_hash))
-                            print("\tHave you exceeded your quota?")
-                        else:
-                            print("\t\tHash verified!")
-                            downloads += 1
-                            print("\tDownloaded {0} samples...".format(downloads))
-                            downloaded = True
+                            if expected_hash != dl_hash:
+                                print("**** DOWNLOAD ERROR!  SHA256 Does not match!")
+                                print("\tExpected SHA256: {0}".format(expected_hash))
+                                print("\tCalculated SHA256: {0}".format(dl_hash))
+                                print("\tHave you exceeded your quota?")
+                            else:
+                                print("\t\tHash verified!")
+                                downloads += 1
+                                print("\tDownloaded {0} samples...".format(downloads))
+                                downloaded = True
 
-                    file_report = None
-                    while file_report is None:
-                        print("\tDownloading file report...")
-                        file_report = public_api.get_file_report(hash)
-                        if 'error' in file_report:
-                            print("\t\t\tError, retrying...")
-                            time.sleep(60)
-                            file_report = None
-                    ds = pd.Series(file_report['results'])
-                    ds.name = hash.upper()
-                    df = df.append(ds)
-            else:
+                        file_report = None
+                        while file_report is None:
+                            print("\tDownloading file report...")
+                            file_report = public_api.get_file_report(hash)
+                            if 'error' in file_report:
+                                print("\t\t\tError, retrying...")
+                                time.sleep(60)
+                                file_report = None
+                        ds = pd.Series(file_report['results'])
+                        ds.name = hash.upper()
+                        df = df.append(ds)
+                else:
+                    break
+
+            if nextpage is None or downloads >= args.number_of_samples:
                 break
-
-        if nextpage is None or downloads >= args.number_of_samples:
+        except KeyboardInterrupt:
             break
 
     now = datetime.datetime.now()
