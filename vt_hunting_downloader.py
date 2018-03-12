@@ -100,8 +100,10 @@ def main():
                                     del_response = api.delete_intel_notifications([notification['id']])
 
                         downloads += 1
-
                         print("\t\tDownloaded {0:,} samples...".format(downloads))
+                    else:
+                        print("\tDeleting duplicated sample from feed...")
+                        del_response = api.delete_intel_notifications([notification['id']])
 
                     ds = pd.Series(notification)
                     ds.name = notification['sha256']
