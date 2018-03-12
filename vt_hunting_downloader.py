@@ -116,6 +116,7 @@ def main():
                                     downloads >= args.number_of_samples):
                 break
         except KeyboardInterrupt:
+            print("Caught CTRL-C!")
             break
 
     # if len(samplestodelete) > 0 and args.delete_downloaded:

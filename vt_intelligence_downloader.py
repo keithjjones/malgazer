@@ -98,6 +98,7 @@ def main():
             if nextpage is None or downloads >= args.number_of_samples:
                 break
         except KeyboardInterrupt:
+            print("Caught CTRL-C!")
             break
 
     now = datetime.datetime.now()
