@@ -80,6 +80,7 @@ def main():
                             except KeyboardInterrupt:
                                 if os.path.isfile(filename):
                                     os.remove(filename)
+                                raise
                             print("\t\tDownloaded {0}".format(notification['sha256']))
                             print("\t\tVerifying hash...")
                             expected_hash = notification['sha256'].upper()

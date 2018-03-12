@@ -69,6 +69,7 @@ def main():
                             except KeyboardInterrupt:
                                 if os.path.isfile(filename):
                                     os.remove(filename)
+                                raise
 
                             print("\t\tDownloaded {0}".format(hash))
                             print("\t\tVerifying hash...")
