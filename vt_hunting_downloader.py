@@ -96,7 +96,7 @@ def main():
                                 print("\t\t\tHash verified!")
                                 downloaded = True
                                 if args.delete_downloaded:
-                                    print("\t\tDeleted downloaded sample from feed...")
+                                    print("\t\tDeleting downloaded sample from feed...")
                                     del_response = api.delete_intel_notifications([notification['id']])
 
                         downloads += 1
