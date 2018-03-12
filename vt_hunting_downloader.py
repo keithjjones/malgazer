@@ -76,7 +76,7 @@ def main():
                         downloaded = False
                         while downloaded is False:
                             response = api.get_file(notification['sha256'], subdir)
-                            print("\tDownloaded {0}".format(notification['sha256']))
+                            print("\tDownloaded {0:,}".format(notification['sha256']))
                             print("\tVerifying hash...")
                             expected_hash = notification['sha256'].upper()
                             dl_hash = sha256_file(filename).upper()
@@ -96,7 +96,7 @@ def main():
 
                         downloads += 1
 
-                        print("\tDownloaded {0} samples...".format(downloads))
+                        print("\tDownloaded {0:,} samples...".format(downloads))
 
                         ds = pd.Series(notification)
                         ds.name = notification['sha256']
@@ -131,7 +131,7 @@ def main():
                                                                   now.second,
                                                                   now.microsecond)
     df.to_csv(os.path.join(args.OutputDirectory, "vti_metadata_{0}.csv".format(now_str)))
-    print("Downloaded {0} Total Samples".format(downloads))
+    print("Downloaded {0:,} Total Samples".format(downloads))
 
 
 if __name__ == "__main__":

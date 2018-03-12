@@ -78,7 +78,7 @@ def main():
                             else:
                                 print("\t\tHash verified!")
                                 downloads += 1
-                                print("\tDownloaded {0} samples...".format(downloads))
+                                print("\tDownloaded {0:,} samples...".format(downloads))
                                 downloaded = True
 
                         file_report = None
@@ -109,7 +109,7 @@ def main():
                                                                   now.second,
                                                                   now.microsecond)
     df.to_csv(os.path.join(args.OutputDirectory, "vti_metadata_{0}.csv".format(now_str)))
-    print("Downloaded {0} Total Samples".format(downloads))
+    print("Downloaded {0:,} Total Samples".format(downloads))
 
 
 if __name__ == "__main__":
