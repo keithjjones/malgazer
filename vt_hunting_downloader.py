@@ -102,7 +102,7 @@ def main():
                         downloads += 1
                         print("\t\tDownloaded {0:,} samples...".format(downloads))
                     else:
-                        print("\tDeleting duplicated sample from feed...")
+                        print("\tDeleting duplicate sample from feed...")
                         del_response = api.delete_intel_notifications([notification['id']])
 
                     ds = pd.Series(notification)
