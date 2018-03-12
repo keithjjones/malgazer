@@ -26,10 +26,13 @@ def main():
                              "Set to zero for all downloads.",
                         type=int, default=0)
     parser.add_argument("-d", "--delete_downloaded",
-                        help="Delete downloaded samples from feed."
+                        help="Delete downloaded samples and metadata from feed."
                              "", action='store_true')
     parser.add_argument("-dn", "--delete_non_matches",
                         help="Delete samples that do not match from feed."
+                             "", action='store_true')
+    parser.add_argument("-dd", "--dont_download_sample",
+                        help="Enable to just get metadata, without downloading samples."
                              "", action='store_true')
     args = parser.parse_args()
 
@@ -73,37 +76,44 @@ def main():
 
                     if not os.path.isfile(filename):
                         print("\tDownloading {0}".format(notification['sha256']))
-                        downloaded = False
-                        while downloaded is False:
-                            try:
-                                response = api.get_file(notification['sha256'], subdir)
-                            except KeyboardInterrupt:
-                                if os.path.isfile(filename):
-                                    os.remove(filename)
-                                raise
-                            print("\t\tDownloaded {0}".format(notification['sha256']))
-                            print("\t\tVerifying hash...")
-                            expected_hash = notification['sha256'].upper()
-                            dl_hash = sha256_file(filename).upper()
+                        if not args.dont_download_sample:
+                            downloaded = False
+                            while downloaded is False:
+                                try:
+                                    response = api.get_file(notification['sha256'], subdir)
+                                except KeyboardInterrupt:
+                                    if os.path.isfile(filename):
+                                        os.remove(filename)
+                                    raise
+                                print("\t\tDownloaded {0}".format(notification['sha256']))
+                                print("\t\tVerifying hash...")
+                                expected_hash = notification['sha256'].upper()
+                                dl_hash = sha256_file(filename).upper()
 
-                            if expected_hash != dl_hash:
-                                print("\t**** DOWNLOAD ERROR!  SHA256 Does not match!")
-                                print("\t\tExpected SHA256: {0}".format(expected_hash))
-                                print("\t\tCalculated SHA256: {0}".format(dl_hash))
-                                print("\t\tWill not delete this sample from the feed.")
-                                print("\t\tHave you exceeded your quota?")
-                            else:
-                                print("\t\t\tHash verified!")
-                                downloaded = True
-                                if args.delete_downloaded:
-                                    print("\t\tDeleting downloaded sample from feed...")
-                                    del_response = api.delete_intel_notifications([notification['id']])
+                                if expected_hash != dl_hash:
+                                    print("\t**** DOWNLOAD ERROR!  SHA256 Does not match!")
+                                    print("\t\tExpected SHA256: {0}".format(expected_hash))
+                                    print("\t\tCalculated SHA256: {0}".format(dl_hash))
+                                    print("\t\tWill not delete this sample from the feed.")
+                                    print("\t\tHave you exceeded your quota?")
+                                else:
+                                    print("\t\t\tHash verified!")
+                                    downloaded = True
+                                    if args.delete_downloaded:
+                                        print("\t\tDeleting downloaded sample from feed...")
+                                        del_response = api.delete_intel_notifications([notification['id']])
 
-                        downloads += 1
-                        print("\t\tDownloaded {0:,} samples...".format(downloads))
+                            downloads += 1
+                            print("\t\tDownloaded {0:,} samples...".format(downloads))
+                        else:
+                            if args.delete_downloaded:
+                                print("\t\tDeleting downloaded sample from feed...")
+                                del_response = api.delete_intel_notifications([notification['id']])
+
                     else:
                         print("\tDeleting duplicate sample from feed...")
-                        del_response = api.delete_intel_notifications([notification['id']])
+                        if args.delete_downloaded:
+                            del_response = api.delete_intel_notifications([notification['id']])
 
                     ds = pd.Series(notification)
                     ds.name = notification['sha256']
