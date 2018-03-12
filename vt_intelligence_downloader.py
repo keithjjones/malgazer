@@ -64,7 +64,12 @@ def main():
                         print("Downloading {0}".format(hash))
                         downloaded = False
                         while downloaded is False:
-                            response = intel_api.get_file(hash, args.OutputDirectory)
+                            try:
+                                response = intel_api.get_file(hash, args.OutputDirectory)
+                            except KeyboardInterrupt:
+                                if os.path.isfile(filename):
+                                    os.remove(filename)
+
                             print("\t\tDownloaded {0}".format(hash))
                             print("\t\tVerifying hash...")
                             expected_hash = hash.upper()
