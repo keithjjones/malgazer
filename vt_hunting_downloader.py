@@ -103,7 +103,7 @@ def main():
                                         print("\t\tDeleting downloaded sample from feed...")
                                         del_response = api.delete_intel_notifications([notification['id']])
                         else:
-                            print("\tSkipping sample download...")
+                            print("\tSkipping sample download, downloading metadata...")
                             if args.delete_downloaded:
                                 print("\t\tDeleting downloaded sample from feed...")
                                 del_response = api.delete_intel_notifications([notification['id']])
