@@ -107,7 +107,7 @@ def main():
                 else:
                     if args.delete_non_matches:
                         # Delete the notification if it does not match
-                        api.delete_intel_notifications([notification['id']])
+                        del_response = api.delete_intel_notifications([notification['id']])
 
                 if args.number_of_samples > 0 and downloads >= args.number_of_samples:
                     break
