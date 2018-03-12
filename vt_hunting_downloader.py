@@ -69,12 +69,12 @@ def main():
                                           notification['subject'])
                     filename = os.path.join(subdir, notification['sha256'])
 
-                    try:
-                        os.stat(subdir)
-                    except:
-                        os.makedirs(subdir)
-
                     if not os.path.isfile(filename):
+                        # Make the directory
+                        try:
+                            os.stat(subdir)
+                        except:
+                            os.makedirs(subdir)
                         print("\tDownloading {0}".format(notification['sha256']))
                         if not args.dont_download_sample:
                             downloaded = False
