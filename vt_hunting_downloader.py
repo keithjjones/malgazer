@@ -72,31 +72,31 @@ def main():
                         os.makedirs(subdir)
 
                     if not os.path.isfile(filename):
-                        print("Downloading {0}".format(notification['sha256']))
+                        print("\tDownloading {0}".format(notification['sha256']))
                         downloaded = False
                         while downloaded is False:
                             response = api.get_file(notification['sha256'], subdir)
-                            print("\tDownloaded {0:,}".format(notification['sha256']))
-                            print("\tVerifying hash...")
+                            print("\t\tDownloaded {0:,}".format(notification['sha256']))
+                            print("\t\tVerifying hash...")
                             expected_hash = notification['sha256'].upper()
                             dl_hash = sha256_file(filename).upper()
 
                             if expected_hash != dl_hash:
-                                print("**** DOWNLOAD ERROR!  SHA256 Does not match!")
-                                print("\tExpected SHA256: {0}".format(expected_hash))
-                                print("\tCalculated SHA256: {0}".format(dl_hash))
-                                print("\tWill not delete this sample from the feed.")
-                                print("\tHave you exceeded your quota?")
+                                print("\t**** DOWNLOAD ERROR!  SHA256 Does not match!")
+                                print("\t\tExpected SHA256: {0}".format(expected_hash))
+                                print("\t\tCalculated SHA256: {0}".format(dl_hash))
+                                print("\t\tWill not delete this sample from the feed.")
+                                print("\t\tHave you exceeded your quota?")
                             else:
-                                print("\t\tHash verified!")
+                                print("\t\t\tHash verified!")
                                 downloaded = True
                                 if args.delete_downloaded:
-                                    print("\tDeleted downloaded sample from feed...")
+                                    print("\t\tDeleted downloaded sample from feed...")
                                     del_response = api.delete_intel_notifications([notification['id']])
 
                         downloads += 1
 
-                        print("\tDownloaded {0:,} samples...".format(downloads))
+                        print("\t\tDownloaded {0:,} samples...".format(downloads))
 
                         ds = pd.Series(notification)
                         ds.name = notification['sha256']
