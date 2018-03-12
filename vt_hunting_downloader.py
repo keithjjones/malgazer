@@ -2,6 +2,8 @@ import argparse
 import datetime
 import os
 import time
+import ast
+import json
 import pandas as pd
 from library.files import sha256_file
 from virus_total_apis import IntelApi
@@ -97,6 +99,9 @@ def main():
 
                     ds = pd.Series(notification)
                     ds.name = notification['sha256']
+                    ds_scans = pd.Series(notification['scans'])
+                    ds_scans.name = notification['sha256']
+                    ds = ds.append(ds_scans)
                     df = df.append(ds)
             else:
                 if args.delete_non_matches:
