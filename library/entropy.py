@@ -67,7 +67,7 @@ class RunningEntropy(object):
             if bytescounter[b] > 0:
                 current_entropy -= ((float(bytescounter[b]) / window) *
                                     math.log(float(bytescounter[b]) /
-                                             window), 2)
+                                             window, 2))
 
         # Add entropy value to output
         entropy_list.append(current_entropy)
