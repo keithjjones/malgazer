@@ -9,7 +9,7 @@ def main():
                         help='The VT CSV file.')
     parser.add_argument("-l", "--lowercase",
                         help="Use lower case for hashes."
-                             "", required=True)
+                             "", action='store_true')
     args = parser.parse_args()
 
     df = pd.read_csv(args.VTCSV, index_col=0)
