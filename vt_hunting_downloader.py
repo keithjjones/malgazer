@@ -71,12 +71,12 @@ def main():
 
                     if not os.path.isfile(filename):
                         # Make the directory
-                        try:
-                            os.stat(subdir)
-                        except:
-                            os.makedirs(subdir)
                         print("\tDownloading {0}".format(notification['sha256']))
                         if not args.dont_download_sample:
+                            try:
+                                os.stat(subdir)
+                            except:
+                                os.makedirs(subdir)
                             downloaded = False
                             while downloaded is False:
                                 try:
