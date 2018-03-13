@@ -12,7 +12,7 @@ def main():
     df = pd.read_csv(args.VTCSV, index_col=0)
 
     for index, row in df.iterrows():
-        print(index.lower())
+        print(index.upper())
 
 
 if __name__ == "__main__":
