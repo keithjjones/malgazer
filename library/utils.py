@@ -105,9 +105,9 @@ class Utils(object):
                     print("\tElapsed time {0:.6f} seconds".format(round(time.time() - start_load_time, 6)))
 
                     samples_processed += 1
-                    print("{0:n} samples processed...".format(samples_processed))
+                    print("{0:,} samples processed...".format(samples_processed))
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-        print("{0:n} total samples processed...".format(samples_processed))
+        print("{0:,} total samples processed...".format(samples_processed))
 
     @staticmethod
     def batch_preprocess_rwe_data(in_directory = None,
@@ -157,14 +157,14 @@ class Utils(object):
                             print("\tElapsed time {0:.6f} seconds".format(
                                  round(time.time() - start_load_time, 6)))
                             samples_processed += 1
-                            print("{0:n} samples processed...".format(
+                            print("{0:,} samples processed...".format(
                                  samples_processed))
                         else:
                             print(
                                 "ERROR: Window size {0} not in this pickle file!".format(window_size))
         print("Total elapsed time {0:.6f} seconds".format(
               round(time.time() - start_time, 6)))
-        print("{0:n} total samples processed...".format(samples_processed))
+        print("{0:,} total samples processed...".format(samples_processed))
         return df
 
     @staticmethod
@@ -219,7 +219,7 @@ class Utils(object):
                             print("\tElapsed time {0:.6f} seconds".format(
                             round(time.time() - start_load_time, 6)))
                             samples_processed += 1
-                            print("{0:n} samples processed...".format(samples_processed))
+                            print("{0:,} samples processed...".format(samples_processed))
                         else:
                             print("ERROR: Window size {0} not in this pickle file!".format(window_size))
         print("Calculating TSFresh Features...")
@@ -234,7 +234,7 @@ class Utils(object):
             round(time.time() - start_tsfresh_time, 6)))
         print("Total elapsed time {0:.6f} seconds".format(
             round(time.time() - start_time, 6)))
-        print("{0:n} total samples processed...".format(samples_processed))
+        print("{0:,} total samples processed...".format(samples_processed))
         return extracted_features, df
 
     @staticmethod
