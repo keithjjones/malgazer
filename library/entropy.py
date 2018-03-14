@@ -8,6 +8,7 @@ from collections import Counter
 from collections import deque
 from scipy import interpolate
 import numpy as np
+from numba import jit
 
 
 class RunningEntropy(object):
@@ -65,9 +66,7 @@ class RunningEntropy(object):
         current_entropy = float(0)
         for b in bytescounter:
             if bytescounter[b] > 0:
-                current_entropy -= ((float(bytescounter[b]) / window) *
-                                    math.log(float(bytescounter[b]) /
-                                             window, 2))
+                current_entropy -= calculate_entropy(bytescounter[b], window)
 
         # Add entropy value to output
         entropy_list.append(current_entropy)
@@ -81,26 +80,17 @@ class RunningEntropy(object):
 
             # Remove the old byte from current window and calculate
             oldchar = byteswindow.popleft()
-            current_entropy += ((float(bytescounter[oldchar]) / window) *
-                               math.log(float(bytescounter[oldchar]) /
-                                        window, 2))
+            current_entropy += calculate_entropy(bytescounter[oldchar], window)
             bytescounter[oldchar] -= 1
             if bytescounter[oldchar] > 0:
-                current_entropy -= ((float(bytescounter[oldchar]) / window)
-                                    * math.log(float(bytescounter[oldchar]) /
-                                               window, 2))
+                current_entropy -= calculate_entropy(bytescounter[oldchar], window)
 
             # Calculate the newest added byte to the window
             if bytescounter[currchar] > 0:
-                current_entropy += ((float(bytescounter[currchar]) /
-                                     window) *
-                                    math.log(float(bytescounter[currchar]) /
-                                             window, 2))
+                current_entropy += calculate_entropy(bytescounter[currchar], window)
             byteswindow.append(currchar)
             bytescounter[currchar] += 1
-            current_entropy -= ((float(bytescounter[currchar]) / window) *
-                                math.log(float(bytescounter[currchar]) /
-                                         window, 2))
+            current_entropy -= calculate_entropy(bytescounter[currchar], window)
 
             # Add entropy value to output
             entropy_list.append(current_entropy)
@@ -294,3 +284,15 @@ class RunningEntropy(object):
         if len(ynew) != number_of_data_points:
             raise Exception('Unhandled Exception')
         return xnew, ynew
+
+
+def calculate_entropy(counts, windowsize):
+    """
+    Calculates entropy based upon counts and window size.
+
+    :param counts:  The count of the symbol.
+    :param windowsize:  The size of the window.
+    :return:  The entropy as a float.
+    """
+    ent = ((float(counts) / windowsize) * math.log(float(counts) / windowsize, 2))
+    return ent
