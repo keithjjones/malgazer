@@ -90,45 +90,6 @@ class FileObject(object):
                         # More info:
                         # https://msdn.microsoft.com/en-us/library/ms809762.aspx
 
-    # TODO: Fix this up later, if I decide I need it again...
-    # def parsed_file_running_entropy(self, window_size=256, normalize=True):
-    #     """
-    #     Calculates the running entropy of the file with respect to the file
-    #     type.  For example, Windows PE files entropy will be
-    #     calculated on each section.
-    #
-    #     :param window_size:  The running window size in bytes.
-    #     :param normalize:   True if the output should be normalized between
-    #         0 and 1.
-    #     :return: A dict with running window entropy and other metadata
-    #         as appropriate for the file type.
-    #         Returns None if the file was not parsed successfully.
-    #     """
-    #     # Return right away if the data was not parsed...
-    #     if self.parsedfile is None:
-    #         return None
-    #
-    #     # Windows PE Files...
-    #     if self.parsedfile['type'] == 'pefile':
-    #         self.parsedfile['running_entropy'] = dict()
-    #         self.parsedfile['running_entropy']['sections'] = list()
-    #         for section in self.parsedfile['file'].sections:
-    #             section_name = section.Name.decode('UTF-8').rstrip('\x00')
-    #             offset = section.PointerToRawData
-    #             length = section.SizeOfRawData
-    #             # TODO: Above may be section.Misc_VirtualSize - test this.
-    #             # More info:
-    #             # https://msdn.microsoft.com/en-us/library/ms809762.aspx
-    #             self.parsedfile['running_entropy']['sections'].append({
-    #                 'name': section_name, 'offset': offset, 'length': length,
-    #                 'entropy_window_length': window_size,
-    #                 'normalize': normalize,
-    #                 'running_entropy': self.running_entropy(window_size,
-    #                                                         normalize,
-    #                                                         offset=offset,
-    #                                                         length=length)})
-    #         return self.parsedfile['running_entropy']
-
     def running_entropy(self, window_size=256, normalize=True):
         """
         Calculates the running entropy of the whole generic file object using a
