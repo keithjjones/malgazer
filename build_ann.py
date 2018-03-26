@@ -1,8 +1,13 @@
+# Install the plaidml backend
+import plaidml.keras
+plaidml.keras.install_backend()
+
 import batch_preprocess_entropy
 from library.utils import Utils
 from library.ml import ML
 import pandas as pd
 import numpy as np
+import time
 
 # Calculate features
 source_dir = '/Dirty/malgazer/Test_Set/'
@@ -36,7 +41,9 @@ outputs = y_train.shape[1]
 classifier = ml.build_ann(datapoints, outputs)
 
 # Train the ANN
-classifier = ml.train_nn(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=True)
+start_time = time.time()
+classifier = ml.train_nn(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=False)
+print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
 
 # Predict the results
 y_pred = ml.predict_nn(X_test)
