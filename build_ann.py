@@ -1,6 +1,6 @@
 # Install the plaidml backend
-import plaidml.keras
-plaidml.keras.install_backend()
+#import plaidml.keras
+#plaidml.keras.install_backend()
 
 import batch_preprocess_entropy
 from library.utils import Utils
