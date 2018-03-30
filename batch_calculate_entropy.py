@@ -23,7 +23,7 @@ def main(arguments=None):
     parser.add_argument("-n", "--nonormalize", action='store_true',
                         help="Disables entropy normalization."
                              "", required=False)
-    parser.add_argument("-s", "--skipcomputed", action='store_true',
+    parser.add_argument("-s", "--skipcalculated", action='store_true',
                         help="Skip already computed samples.  "
                              "This will not calculate any windows if ANY data exists."
                              "", required=False)
@@ -72,7 +72,7 @@ def main(arguments=None):
                                        args.DataDirectory,
                                        window_sizes=windows,
                                        normalize=normalize,
-                                       skipcomputed=args.skipcomputed)
+                                       skipcomputed=args.skipcalculated)
 
 
 if __name__ == "__main__":
