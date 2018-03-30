@@ -72,7 +72,7 @@ def main(arguments=None):
                                        args.DataDirectory,
                                        window_sizes=windows,
                                        normalize=normalize,
-                                       skipcomputed=args.skipcalculated)
+                                       skipcalculated=args.skipcalculated)
 
 
 if __name__ == "__main__":
