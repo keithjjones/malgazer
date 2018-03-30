@@ -22,7 +22,8 @@ class Utils(object):
     def batch_running_window_entropy(in_directory=None,
                                      out_directory=None,
                                      window_sizes=[256],
-                                     normalize=True):
+                                     normalize=True,
+                                     skipcalculated=False):
         """
         Calculates the running window entropy of a directory containing
         malware samples that is named from their SHA256 value.  It will
@@ -31,7 +32,8 @@ class Utils(object):
         :param in_directory:  The input directory for malware.
         :param out_directory: The output directory for calculated data.
         :param window_sizes: A list of window sizes to calculate.
-        :param normalize: Set to false to not normalize.
+        :param normalize: Set to False to not normalize.
+        :param skipcalculated: Set to True to skip already calculated samples.
         :return: Nothing
         """
         if in_directory is None or out_directory is None:
@@ -61,20 +63,9 @@ class Utils(object):
                     print("Input file: {0}".format(file))
                     subdir = root[len(in_directory):]
 
-                    # Create the malware file name...
-                    malwarepath = os.path.join(root, file)
-                    try:
-                        m = FileObject(malwarepath)
-                    except:
-                        continue
-
-                    print("\tCalculating: {0} Type: {1}".format(m.malware.filename, m.malware.filetype))
-
                     # Create the DB file name...
                     datadir = os.path.join(out_directory, subdir)
                     picklefile = os.path.join(datadir, file) + ".pickle.gz"
-
-                    print("\tSaving data to {0}".format(picklefile))
 
                     # Create the directory if needed...
                     try:
@@ -82,25 +73,36 @@ class Utils(object):
                     except:
                         os.makedirs(datadir)
 
-                    # Remove old pickle files...
-                    if os.path.exists(picklefile):
-                        os.remove(picklefile)
+                    if not (os.path.exists(picklefile) and skipcalculated):
+                        # Create the malware file name...
+                        malwarepath = os.path.join(root, file)
+                        try:
+                            m = FileObject(malwarepath)
+                        except:
+                            continue
 
-                    # Calculate the entropy of the file...
-                    fileentropy = m.entropy(normalize)
+                        print("\tCalculating: {0} Type: {1}".format(m.malware.filename, m.malware.filetype))
+                        print("\tSaving data to {0}".format(picklefile))
 
-                    # Calculate the window entropy for malware samples...
-                    if window_sizes is not None:
-                        # Iterate through the window sizes...
-                        for w in window_sizes:
-                            if w < m.malware.file_size:
-                                print("\t\tCalculating window size {0:,}".format(w))
+                        # Remove old pickle files...
+                        if os.path.exists(picklefile):
+                            os.remove(picklefile)
 
-                                # Calculate running entropy...
-                                rwe = m.running_entropy(w, normalize)
+                        # Calculate the entropy of the file...
+                        fileentropy = m.entropy(normalize)
 
-                        # Write the running entropy...
-                        m.write(picklefile)
+                        # Calculate the window entropy for malware samples...
+                        if window_sizes is not None:
+                            # Iterate through the window sizes...
+                            for w in window_sizes:
+                                if w < m.malware.file_size:
+                                    print("\t\tCalculating window size {0:,}".format(w))
+
+                                    # Calculate running entropy...
+                                    rwe = m.running_entropy(w, normalize)
+
+                            # Write the running entropy...
+                            m.write(picklefile)
 
                     print("\tElapsed time {0:.6f} seconds".format(round(time.time() - start_load_time, 6)))
 
