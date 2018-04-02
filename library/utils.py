@@ -336,7 +336,7 @@ class Utils(object):
         return cls
 
     @staticmethod
-    def parse_classifications(classifications, column_name):
+    def parse_classifications_with_spaces(classifications, column_name):
         """
         Parses the classification from a DF where the format is:
         <CLASSIFICATION> <SUBCLASSIFICATION>
