@@ -464,4 +464,9 @@ class Utils(object):
                 classifications = pickle.load(file)
         except:
             pass
+        if classifications is None:
+            try:
+                classifications = pd.read_csv(os.path.join(datadir, 'classifications.csv'), index_col=0)
+            except:
+                pass
         return df, classifications
