@@ -27,11 +27,11 @@ def main(arguments=None):
                                          args.datapoints,
                                          args.window)
 
-    classifications = Utils.get_classifications_from_path(args.DataDirectory)
+    # classifications = Utils.get_classifications_from_path(args.DataDirectory)
 
     # Utils.extract_tsfresh_relevant_features(extracted_features, classifications_ordered['classification'])
 
-    Utils.save_preprocessed_data(df, classifications,
+    Utils.save_preprocessed_data(df, None,
                                  args.OutputDirectory)
 
 
