@@ -377,6 +377,8 @@ class Utils(object):
                 c = Utils.parse_symantec_classification(row['Symantec'])
             elif column_name == "Kaspersky":
                 c = Utils.parse_kaspersky_classification(row['Kaspersky'])
+            elif column_name == "Sophos":
+                c = Utils.parse_sophos_classification(row['Sophos'])
             else:
                 # This is an error, so return None
                 return None
@@ -449,6 +451,27 @@ class Utils(object):
                     return c[1]
                 else:
                     return c[0]
+            except:
+                pass
+        return None
+
+    @staticmethod
+    def parse_sophos_classification(classification):
+        """
+        Parses the classification from a Sophos VT string
+
+        :param classification:  The VT string
+        :return: The classification, or None if it could not parse.
+        """
+        if isinstance(classification, str):
+            if classification == 'scan_error':
+                return None
+            try:
+                if "(pua)" in classification.lower():
+                    return classification
+                else:
+                    c = classification.split('/')
+                    return c[1]
             except:
                 pass
         return None
