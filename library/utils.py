@@ -375,6 +375,8 @@ class Utils(object):
                 c = Utils.parse_microsoft_classification(row['Microsoft'])
             elif column_name == "Symantec":
                 c = Utils.parse_symantec_classification(row['Symantec'])
+            elif column_name == "Kaspersky":
+                c = Utils.parse_kaspersky_classification(row['Kaspersky'])
             else:
                 # This is an error, so return None
                 return None
@@ -424,6 +426,28 @@ class Utils(object):
                 else:
                     c = c[1].split('!')
                     c = c[0].split('@')
+                    return c[0]
+            except:
+                pass
+        return None
+
+    @staticmethod
+    def parse_kaspersky_classification(classification):
+        """
+        Parses the classification from a Kaspersky VT string
+
+        :param classification:  The VT string
+        :return: The classification, or None if it could not parse.
+        """
+        if isinstance(classification, str):
+            if classification == 'scan_error':
+                return None
+            try:
+                c = classification.split('.')
+                c = c[0].split(':')
+                if len(c) > 1:
+                    return c[1]
+                else:
                     return c[0]
             except:
                 pass
