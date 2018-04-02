@@ -361,14 +361,41 @@ class Utils(object):
         return cls
 
     @staticmethod
+    def parse_vt_classifications(classifications, column_name):
+        """
+        Parses the classifications from a VT data set
+
+        :param classifications:  The VT data set as a DataFrame.
+        :param column_name:  Which column to parse in the DataFrame.
+        :return: A DataFrame with the classifications, None if error.
+        """
+        cls = pd.DataFrame(columns=['classification'])
+        for index, row in classifications.iterrows():
+            if column_name == 'Microsoft':
+                c = Utils.parse_microsoft_classification(row['Microsoft'])
+            elif column_name == "Symantec":
+                c = Utils.parse_symantec_classification(row['Symantec'])
+            else:
+                # This is an error, so return None
+                return None
+            d = dict()
+            d['classification'] = c
+            ds = pd.Series(d)
+            ds.name = index
+            cls = cls.append(ds)
+        return cls
+
+    @staticmethod
     def parse_microsoft_classification(classification):
         """
         Parses the classification from a Microsoft VT string
 
-        :param classification:  The Microsoft VT string
+        :param classification:  The VT string
         :return: The classification, or None if it could not parse.
         """
         if isinstance(classification, str):
+            if classification == 'scan_error':
+                return None
             try:
                 c = classification.split(':')
                 return c[0]
@@ -377,22 +404,30 @@ class Utils(object):
         return None
 
     @staticmethod
-    def parse_microsoft_classifications(classifications):
+    def parse_symantec_classification(classification):
         """
-        Parses the Microsoft classifications from a Microsoft VT data set
+        Parses the classification from a Symantec VT string
 
-        :param classifications:  The VT data set as a DataFrame
-        :return: A DataFrame with the classifications.
+        :param classification:  The VT string
+        :return: The classification, or None if it could not parse.
         """
-        cls = pd.DataFrame(columns=['classification'])
-        for index, row in classifications.iterrows():
-            c = Utils.parse_microsoft_classification(row['Microsoft'])
-            d = dict()
-            d['classification'] = c
-            ds = pd.Series(d)
-            ds.name = index
-            cls = cls.append(ds)
-        return cls
+        if isinstance(classification, str):
+            if classification == 'scan_error':
+                return None
+            try:
+                c = classification.split('.')
+                if c[0] != 'W32':
+                    c = c[0].split(' ')
+                    c = c[0].split('!')
+                    c = c[0].split('@')
+                    return c[0]
+                else:
+                    c = c[1].split('!')
+                    c = c[0].split('@')
+                    return c[0]
+            except:
+                pass
+        return None
 
     @staticmethod
     def parse_subclassifications_with_delimiter(classifications, column_name, delimiter):
