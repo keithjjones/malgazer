@@ -315,7 +315,6 @@ class Utils(object):
                         samples_processed += 1
         return df
 
-
     @staticmethod
     def parse_classifications_from_path(classifications):
         """
@@ -334,6 +333,29 @@ class Utils(object):
             ds = pd.Series(d)
             ds.name = index
             cls = cls.append(ds)
+        return cls
+
+    @staticmethod
+    def parse_classifications(classifications, column_name):
+        """
+        Parses the classification from a DF where the format is:
+        <CLASSIFICATION> <SUBCLASSIFICATION>
+
+        :param classifications:  The DataFrame containing classification info.
+        The DF must have the index as the file hash.
+        :param column_name: The column name containing the classification info.
+        :return: A DataFrame of classifications for hashes.
+        """
+        cls = pd.DataFrame(columns=['classification'])
+        for index, row in classifications.iterrows():
+            if isinstance(row[column_name], str):
+                cl = row[column_name]
+                c = cl.split(' ')
+                d = dict()
+                d['classification'] = c[0]
+                ds = pd.Series(d)
+                ds.name = index
+                cls = cls.append(ds)
         return cls
 
     @staticmethod
