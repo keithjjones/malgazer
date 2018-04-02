@@ -336,13 +336,15 @@ class Utils(object):
         return cls
 
     @staticmethod
-    def parse_classifications_with_spaces(classifications, column_name):
+    def parse_classifications_with_delimiter(classifications, column_name, delimiter):
         """
         Parses the classification from a DF where the format is:
-        <CLASSIFICATION> <SUBCLASSIFICATION>
+        <CLASSIFICATION><DELIMITER><SUBCLASSIFICATION>
 
         :param classifications:  The DataFrame containing classification info.
         The DF must have the index as the file hash.
+        :param delimiter: the delimiter for the original classification info in
+        the DataFrame.
         :param column_name: The column name containing the classification info.
         :return: A DataFrame of classifications for hashes.
         """
@@ -350,9 +352,34 @@ class Utils(object):
         for index, row in classifications.iterrows():
             if isinstance(row[column_name], str):
                 cl = row[column_name]
-                c = cl.split(' ')
+                c = cl.split(delimiter)
                 d = dict()
                 d['classification'] = c[0]
+                ds = pd.Series(d)
+                ds.name = index
+                cls = cls.append(ds)
+        return cls
+
+    @staticmethod
+    def parse_subclassifications_with_delimiter(classifications, column_name, delimiter):
+        """
+        Parses the subclassification from a DF where the format is:
+        <CLASSIFICATION><DELIMITER><SUBCLASSIFICATION>
+
+        :param classifications:  The DataFrame containing classification info.
+        The DF must have the index as the file hash.
+        :param delimiter: the delimiter for the original classification info in
+        the DataFrame.
+        :param column_name: The column name containing the classification info.
+        :return: A DataFrame of classifications for hashes.
+        """
+        cls = pd.DataFrame(columns=['classification'])
+        for index, row in classifications.iterrows():
+            if isinstance(row[column_name], str):
+                cl = row[column_name]
+                c = cl.split(delimiter)
+                d = dict()
+                d['classification'] = c[1]
                 ds = pd.Series(d)
                 ds.name = index
                 cls = cls.append(ds)
