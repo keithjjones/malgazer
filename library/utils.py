@@ -361,6 +361,40 @@ class Utils(object):
         return cls
 
     @staticmethod
+    def parse_microsoft_classification(classification):
+        """
+        Parses the classification from a Microsoft VT string
+
+        :param classification:  The Microsoft VT string
+        :return: The classification, or None if it could not parse.
+        """
+        if isinstance(classification, str):
+            try:
+                c = classification.split(':')
+                return c[0]
+            except:
+                pass
+        return None
+
+    @staticmethod
+    def parse_microsoft_classifications(classifications):
+        """
+        Parses the Microsoft classifications from a Microsoft VT data set
+
+        :param classifications:  The VT data set as a DataFrame
+        :return: A DataFrame with the classifications.
+        """
+        cls = pd.DataFrame(columns=['classification'])
+        for index, row in classifications.iterrows():
+            c = Utils.parse_microsoft_classification(row['Microsoft'])
+            d = dict()
+            d['classification'] = c
+            ds = pd.Series(d)
+            ds.name = index
+            cls = cls.append(ds)
+        return cls
+
+    @staticmethod
     def parse_subclassifications_with_delimiter(classifications, column_name, delimiter):
         """
         Parses the subclassification from a DF where the format is:
