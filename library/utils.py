@@ -389,6 +389,8 @@ class Utils(object):
                 c = Utils.parse_fprot_classification(row['F-Prot'])
             elif column_name == "Avast":
                 c = Utils.parse_avast_classification(row['Avast'])
+            elif column_name == "Ikarus":
+                c = Utils.parse_ikarus_classification(row['Ikarus'])
             else:
                 # This is an error, so return None
                 return None
@@ -574,6 +576,24 @@ class Utils(object):
                 c = classification.split('/')
                 c = c[1].split('.')
                 c = c[0].split('!')
+                return c[0]
+            except:
+                pass
+        return None
+
+    @staticmethod
+    def parse_ikarus_classification(classification):
+        """
+        Parses the classification from an Ikarus VT string
+
+        :param classification:  The VT string
+        :return: The classification, or None if it could not parse.
+        """
+        if isinstance(classification, str):
+            if classification == 'scan_error':
+                return None
+            try:
+                c = classification.split('.')
                 return c[0]
             except:
                 pass
