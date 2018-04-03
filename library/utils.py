@@ -361,6 +361,40 @@ class Utils(object):
         return cls
 
     @staticmethod
+    def parse_vt_classifications_from_csv(filename):
+        """
+        Reads a CSV containing VT classifications and attempts to estimate
+        the accurate classification from several AV vendors.
+
+        :param filename:  The file name of the CSV containing the VT data.
+        :return:  A DataFrame with the classification for each hash.
+        """
+        df = pd.read_csv(filename, index_col=0)
+        products = ['Microsoft', 'Symantec', 'Kaspersky',
+                    'Sophos', 'TrendMicro', 'ClamAV']
+
+        classifications = dict()
+
+        for product in products:
+            classifications[product] = Utils.parse_vt_classifications(df, product)
+
+        out_df = pd.DataFrame(columns=['classification'])
+
+        for index, row in df.iterrows():
+            current_classification = None
+            for product in products:
+                if (classifications[product].loc(index).lower() != 'none'
+                        and classifications[product].loc(index).strip() != ''
+                        and current_classification is None):
+                    current_classification = classifications[product].loc(index)
+            d = dict()
+            d['classification'] = current_classification
+            ds = pd.Series(d)
+            ds.name = index
+            out_df = out_df.append(ds)
+        return out_df
+
+    @staticmethod
     def parse_vt_classifications(classifications, column_name):
         """
         Parses the classifications from a VT data set
