@@ -407,6 +407,20 @@ class Utils(object):
                 c = Utils.parse_generic_classification(row['ALYac'])
             elif column_name == "AVG":
                 c = Utils.parse_avg_classification(row['AVG'])
+            elif column_name == "ZoneAlarm":
+                c = Utils.parse_generic_classification(row['ZoneAlarm'])
+            elif column_name == "Zillya":
+                c = Utils.parse_generic_classification(row['Zillya'])
+            elif column_name == "Yandex":
+                c = Utils.parse_generic_classification(row['Yandex'])
+            elif column_name == "ViRobot":
+                c = Utils.parse_generic_classification(row['ViRobot'])
+            elif column_name == "VIPRE":
+                c = Utils.parse_generic_classification(row['VIPRE'])
+            elif column_name == "VBA32":
+                c = Utils.parse_generic_classification(row['VBA32'])
+            elif column_name == "Webroot":
+                c = Utils.parse_webroot_classification(row['Webroot'])
             else:
                 # This is an error, so return None
                 return None
@@ -629,6 +643,24 @@ class Utils(object):
             try:
                 c = classification.split('.')
                 return c[0]
+            except:
+                pass
+        return None
+
+    @staticmethod
+    def parse_webroot_classification(classification):
+        """
+        Parses the classification from a Webroot VT string
+
+        :param classification:  The VT string
+        :return: The classification, or None if it could not parse.
+        """
+        if isinstance(classification, str):
+            if classification == 'scan_error':
+                return None
+            try:
+                c = classification.split('.')
+                return c[1]
             except:
                 pass
         return None
