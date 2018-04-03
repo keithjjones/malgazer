@@ -361,17 +361,21 @@ class Utils(object):
         return cls
 
     @staticmethod
-    def parse_vt_classifications_from_csv(filename):
+    def parse_vt_classifications_from_csv(filename, products=None):
         """
         Reads a CSV containing VT classifications and attempts to estimate
         the accurate classification from several AV vendors.
 
         :param filename:  The file name of the CSV containing the VT data.
+        :param products:  The list of products (columns) to use in the classification.
+        The order is important.  Products earlier in the list take precedence over
+        products later in the list.
         :return:  A DataFrame with the classification for each hash.
         """
         df = pd.read_csv(filename, index_col=0)
-        products = ['Microsoft', 'Symantec', 'Kaspersky',
-                    'Sophos', 'TrendMicro', 'ClamAV']
+        if products is None:
+            products = ['Microsoft', 'Symantec', 'Kaspersky',
+                        'Sophos', 'TrendMicro', 'ClamAV']
 
         classifications = dict()
 
@@ -383,15 +387,20 @@ class Utils(object):
         for index, row in df.iterrows():
             current_classification = None
             for product in products:
-                if (classifications[product].loc(index).lower() != 'none'
-                        and classifications[product].loc(index).strip() != ''
+                class_df = classifications[product]
+                c = class_df.loc[index]
+                c = c['classification']
+                if (c is not None
+                        and c.lower() != 'none'
+                        and c.strip() != ''
                         and current_classification is None):
-                    current_classification = classifications[product].loc(index)
-            d = dict()
-            d['classification'] = current_classification
-            ds = pd.Series(d)
-            ds.name = index
-            out_df = out_df.append(ds)
+                    current_classification = c
+            if current_classification is not None:
+                d = dict()
+                d['classification'] = current_classification
+                ds = pd.Series(d)
+                ds.name = index
+                out_df = out_df.append(ds)
         return out_df
 
     @staticmethod
@@ -405,64 +414,65 @@ class Utils(object):
         """
         cls = pd.DataFrame(columns=['classification'])
         for index, row in classifications.iterrows():
-            if column_name == 'Microsoft':
-                c = Utils.parse_microsoft_classification(row['Microsoft'])
-            elif column_name == "Symantec":
-                c = Utils.parse_symantec_classification(row['Symantec'])
-            elif column_name == "Kaspersky":
-                c = Utils.parse_kaspersky_classification(row['Kaspersky'])
-            elif column_name == "Sophos":
-                c = Utils.parse_sophos_classification(row['Sophos'])
-            elif column_name == "TrendMicro":
-                c = Utils.parse_trendmicro_classification(row['TrendMicro'])
-            elif column_name == "K7AntiVirus":
-                c = Utils.parse_k7antivirus_classification(row['K7AntiVirus'])
-            elif column_name == "ClamAV":
-                c = Utils.parse_clamav_classification(row['ClamAV'])
-            elif column_name == "F-Prot":
-                c = Utils.parse_fprot_classification(row['F-Prot'])
-            elif column_name == "Avast":
-                c = Utils.parse_avast_classification(row['Avast'])
-            elif column_name == "Ikarus":
-                c = Utils.parse_ikarus_classification(row['Ikarus'])
-            elif column_name == "Jiangmin":
-                c = Utils.parse_jiangmin_classification(row['Jiangmin'])
-            elif column_name == "Emsisoft":
-                c = Utils.parse_generic_classification(row['Emsisoft'])
-            elif column_name == "BitDefender":
-                c = Utils.parse_generic_classification(row['BitDefender'])
-            elif column_name == "Arcabit":
-                c = Utils.parse_generic_classification(row['Arcabit'])
-            elif column_name == "Ad-Aware":
-                c = Utils.parse_generic_classification(row['Ad-Aware'])
-            elif column_name == "AVware":
-                c = Utils.parse_generic_classification(row['AVware'])
-            elif column_name == "ALYac":
-                c = Utils.parse_generic_classification(row['ALYac'])
-            elif column_name == "AVG":
-                c = Utils.parse_avg_classification(row['AVG'])
-            elif column_name == "ZoneAlarm":
-                c = Utils.parse_generic_classification(row['ZoneAlarm'])
-            elif column_name == "Zillya":
-                c = Utils.parse_generic_classification(row['Zillya'])
-            elif column_name == "Yandex":
-                c = Utils.parse_generic_classification(row['Yandex'])
-            elif column_name == "ViRobot":
-                c = Utils.parse_generic_classification(row['ViRobot'])
-            elif column_name == "VIPRE":
-                c = Utils.parse_generic_classification(row['VIPRE'])
-            elif column_name == "VBA32":
-                c = Utils.parse_generic_classification(row['VBA32'])
-            elif column_name == "Webroot":
-                c = Utils.parse_webroot_classification(row['Webroot'])
-            else:
-                # This is an error, so return None
-                return None
-            d = dict()
-            d['classification'] = c
-            ds = pd.Series(d)
-            ds.name = index
-            cls = cls.append(ds)
+            if index not in cls.index:
+                if column_name == 'Microsoft':
+                    c = Utils.parse_microsoft_classification(row['Microsoft'])
+                elif column_name == "Symantec":
+                    c = Utils.parse_symantec_classification(row['Symantec'])
+                elif column_name == "Kaspersky":
+                    c = Utils.parse_kaspersky_classification(row['Kaspersky'])
+                elif column_name == "Sophos":
+                    c = Utils.parse_sophos_classification(row['Sophos'])
+                elif column_name == "TrendMicro":
+                    c = Utils.parse_trendmicro_classification(row['TrendMicro'])
+                elif column_name == "K7AntiVirus":
+                    c = Utils.parse_k7antivirus_classification(row['K7AntiVirus'])
+                elif column_name == "ClamAV":
+                    c = Utils.parse_clamav_classification(row['ClamAV'])
+                elif column_name == "F-Prot":
+                    c = Utils.parse_fprot_classification(row['F-Prot'])
+                elif column_name == "Avast":
+                    c = Utils.parse_avast_classification(row['Avast'])
+                elif column_name == "Ikarus":
+                    c = Utils.parse_ikarus_classification(row['Ikarus'])
+                elif column_name == "Jiangmin":
+                    c = Utils.parse_jiangmin_classification(row['Jiangmin'])
+                elif column_name == "Emsisoft":
+                    c = Utils.parse_generic_classification(row['Emsisoft'])
+                elif column_name == "BitDefender":
+                    c = Utils.parse_generic_classification(row['BitDefender'])
+                elif column_name == "Arcabit":
+                    c = Utils.parse_generic_classification(row['Arcabit'])
+                elif column_name == "Ad-Aware":
+                    c = Utils.parse_generic_classification(row['Ad-Aware'])
+                elif column_name == "AVware":
+                    c = Utils.parse_generic_classification(row['AVware'])
+                elif column_name == "ALYac":
+                    c = Utils.parse_generic_classification(row['ALYac'])
+                elif column_name == "AVG":
+                    c = Utils.parse_avg_classification(row['AVG'])
+                elif column_name == "ZoneAlarm":
+                    c = Utils.parse_generic_classification(row['ZoneAlarm'])
+                elif column_name == "Zillya":
+                    c = Utils.parse_generic_classification(row['Zillya'])
+                elif column_name == "Yandex":
+                    c = Utils.parse_generic_classification(row['Yandex'])
+                elif column_name == "ViRobot":
+                    c = Utils.parse_generic_classification(row['ViRobot'])
+                elif column_name == "VIPRE":
+                    c = Utils.parse_generic_classification(row['VIPRE'])
+                elif column_name == "VBA32":
+                    c = Utils.parse_generic_classification(row['VBA32'])
+                elif column_name == "Webroot":
+                    c = Utils.parse_webroot_classification(row['Webroot'])
+                else:
+                    # This is an error, so return None
+                    return None
+                d = dict()
+                d['classification'] = c
+                ds = pd.Series(d)
+                ds.name = index
+                cls = cls.append(ds)
         return cls
 
     @staticmethod
