@@ -711,8 +711,8 @@ class Utils(object):
                     c = c[1]
                 elif c[0].lower() == 'application':
                     c = c[1]
-                # elif c[0].lower() == 'generic':
-                #     c = c[1]
+                elif c[0].lower() == 'win32':
+                    c = c[1]
                 else:
                     c = c[0]
                 c = c.split(' ')[0]
