@@ -391,6 +391,22 @@ class Utils(object):
                 c = Utils.parse_avast_classification(row['Avast'])
             elif column_name == "Ikarus":
                 c = Utils.parse_ikarus_classification(row['Ikarus'])
+            elif column_name == "Jiangmin":
+                c = Utils.parse_jiangmin_classification(row['Jiangmin'])
+            elif column_name == "Emsisoft":
+                c = Utils.parse_generic_classification(row['Emsisoft'])
+            elif column_name == "BitDefender":
+                c = Utils.parse_generic_classification(row['BitDefender'])
+            elif column_name == "Arcabit":
+                c = Utils.parse_generic_classification(row['Arcabit'])
+            elif column_name == "Ad-Aware":
+                c = Utils.parse_generic_classification(row['Ad-Aware'])
+            elif column_name == "AVware":
+                c = Utils.parse_generic_classification(row['AVware'])
+            elif column_name == "ALYac":
+                c = Utils.parse_generic_classification(row['ALYac'])
+            elif column_name == "AVG":
+                c = Utils.parse_avg_classification(row['AVG'])
             else:
                 # This is an error, so return None
                 return None
@@ -595,6 +611,82 @@ class Utils(object):
             try:
                 c = classification.split('.')
                 return c[0]
+            except:
+                pass
+        return None
+
+    @staticmethod
+    def parse_jiangmin_classification(classification):
+        """
+        Parses the classification from a Jiangmin VT string
+
+        :param classification:  The VT string
+        :return: The classification, or None if it could not parse.
+        """
+        if isinstance(classification, str):
+            if classification == 'scan_error':
+                return None
+            try:
+                c = classification.split('.')
+                return c[0]
+            except:
+                pass
+        return None
+
+    @staticmethod
+    def parse_avg_classification(classification):
+        """
+        Parses the classification from an AVG VT string
+
+        :param classification:  The VT string
+        :return: The classification, or None if it could not parse.
+        """
+        if isinstance(classification, str):
+            if classification == 'scan_error':
+                return None
+            try:
+                class_re = re.compile('.*\[(.*)\].*',
+                                       flags=re.IGNORECASE)
+                m = class_re.match(classification)
+                if m:
+                    c = m.group(1)
+                    return c
+                else:
+                    c = classification.split(':')
+                    c = c[1]
+                    c = c.split(' ')
+                    return c[0]
+            except:
+                pass
+        return None
+
+    @staticmethod
+    def parse_generic_classification(classification):
+        """
+        Parses the classification from a generic VT string
+
+        :param classification:  The VT string
+        :return: The classification, or None if it could not parse.
+        """
+        if isinstance(classification, str):
+            if classification == 'scan_error':
+                return None
+            try:
+                c = classification.split('.')
+                if c[0].lower() == 'gen:variant':
+                    c = c[1]
+                elif c[0].lower() == 'gen:win32':
+                    c = c[1]
+                elif c[0].lower() == 'application':
+                    c = c[1]
+                # elif c[0].lower() == 'generic':
+                #     c = c[1]
+                else:
+                    c = c[0]
+                c = c.split(' ')[0]
+                if ':' in c:
+                    c = c.split(':')[1]
+                return c
             except:
                 pass
         return None
