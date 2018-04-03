@@ -379,6 +379,10 @@ class Utils(object):
                 c = Utils.parse_kaspersky_classification(row['Kaspersky'])
             elif column_name == "Sophos":
                 c = Utils.parse_sophos_classification(row['Sophos'])
+            elif column_name == "TrendMicro":
+                c = Utils.parse_trendmicro_classification(row['TrendMicro'])
+            elif column_name == "K7AntiVirus":
+                c = Utils.parse_k7antivirus_classification(row['K7AntiVirus'])
             else:
                 # This is an error, so return None
                 return None
@@ -472,6 +476,42 @@ class Utils(object):
                 else:
                     c = classification.split('/')
                     return c[1]
+            except:
+                pass
+        return None
+
+    @staticmethod
+    def parse_trendmicro_classification(classification):
+        """
+        Parses the classification from a TrendMicro VT string
+
+        :param classification:  The VT string
+        :return: The classification, or None if it could not parse.
+        """
+        if isinstance(classification, str):
+            if classification == 'scan_error':
+                return None
+            try:
+                c = classification.split('_')
+                return c[0]
+            except:
+                pass
+        return None
+
+    @staticmethod
+    def parse_k7antivirus_classification(classification):
+        """
+        Parses the classification from a K7AntiVirus VT string
+
+        :param classification:  The VT string
+        :return: The classification, or None if it could not parse.
+        """
+        if isinstance(classification, str):
+            if classification == 'scan_error':
+                return None
+            try:
+                c = classification.split(' ')
+                return c[0]
             except:
                 pass
         return None
