@@ -385,6 +385,8 @@ class Utils(object):
                 c = Utils.parse_k7antivirus_classification(row['K7AntiVirus'])
             elif column_name == "ClamAV":
                 c = Utils.parse_clamav_classification(row['ClamAV'])
+            elif column_name == "Avast":
+                c = Utils.parse_avast_classification(row['Avast'])
             else:
                 # This is an error, so return None
                 return None
@@ -532,6 +534,25 @@ class Utils(object):
             try:
                 c = classification.split('.')
                 return c[1]
+            except:
+                pass
+        return None
+
+    @staticmethod
+    def parse_avast_classification(classification):
+        """
+        Parses the classification from a Avast VT string
+
+        :param classification:  The VT string
+        :return: The classification, or None if it could not parse.
+        """
+        if isinstance(classification, str):
+            if classification == 'scan_error':
+                return None
+            try:
+                c = classification.split(':')
+                c = c[1].split(' ')
+                return c[0]
             except:
                 pass
         return None
