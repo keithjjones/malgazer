@@ -73,7 +73,9 @@ class Utils(object):
                     except:
                         os.makedirs(datadir)
 
-                    if os.path.exists(picklefile) and not skipcalculated:
+                    if os.path.exists(picklefile) \
+                            and os.path.isfile(picklefile) \
+                            and not skipcalculated:
                         # Create the malware file name...
                         malwarepath = os.path.join(root, file)
                         m = FileObject.read(picklefile)
@@ -129,6 +131,8 @@ class Utils(object):
 
                             # Write the running entropy...
                             m.write(picklefile)
+                    else:
+                        print("\t\tSkipping calculation...")
 
                     print("\tElapsed time {0:.6f} seconds".format(round(time.time() - start_load_time, 6)))
 
