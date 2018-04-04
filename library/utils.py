@@ -73,7 +73,33 @@ class Utils(object):
                     except:
                         os.makedirs(datadir)
 
-                    if not (os.path.exists(picklefile) and skipcalculated):
+                    if os.path.exists(picklefile) and not skipcalculated:
+                        # Create the malware file name...
+                        malwarepath = os.path.join(root, file)
+                        m = FileObject.read(picklefile)
+
+                        print("\tCalculating: {0} Type: {1}".format(m.malware.filename, m.malware.filetype))
+                        print("\tSaving data to {0}".format(picklefile))
+
+                        # Calculate the entropy of the file...
+                        fileentropy = m.entropy(normalize)
+
+                        # Calculate the window entropy for malware samples...
+                        if window_sizes is not None:
+                            # Iterate through the window sizes...
+                            for w in window_sizes:
+                                if w < m.malware.file_size:
+                                    if w not in m.malware.runningentropy.entropy_data:
+                                        print("\t\tCalculating window size {0:,}".format(w))
+
+                                        # Calculate running entropy...
+                                        rwe = m.running_entropy(w, normalize)
+                                    else:
+                                        print("\t\tWindow already exists!")
+
+                            # Write the running entropy...
+                            m.write(picklefile)
+                    elif not (os.path.exists(picklefile) and skipcalculated):
                         # Create the malware file name...
                         malwarepath = os.path.join(root, file)
                         try:
