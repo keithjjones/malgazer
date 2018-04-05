@@ -8,6 +8,7 @@ from library.ml import ML
 import pandas as pd
 import numpy as np
 import time
+import os
 
 # Calculate features
 source_dir = '/Dirty/malgazer/Test_Set/'
@@ -18,6 +19,8 @@ batch_size = 100
 epochs = 100
 
 #classifications = Utils.get_classifications_from_path(source_dir)
+classifications = Utils.estimate_vt_classifications_from_csv('/Dirty/Samples/all_vt_data.csv')
+classifications.to_csv(os.path.join(subdir, 'classifications.csv'))
 
 # Uncomment to process data
 #batch_preprocess_entropy.main(arguments)
