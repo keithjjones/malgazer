@@ -22,6 +22,7 @@ class Utils(object):
         'Adw': 'Adware',
         'Drp': 'Dropper',
         'Wrm': 'Worm',
+        'Bkdr': 'Backdoor',
         'Cryp': 'Ransom',
         'PUA': 'PUA',
         'RiskTool': 'PUA',
