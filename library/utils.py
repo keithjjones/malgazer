@@ -22,9 +22,22 @@ class Utils(object):
         'Adw': 'Adware',
         'Drp': 'Dropper',
         'Wrm': 'Worm',
-        'Cryp': 'Ransomware',
+        'Cryp': 'Ransom',
         'PUA': 'PUA',
         'RiskTool': 'PUA',
+        'Generic': 'Generic',
+        'VirTool': 'Virus',
+        'VirLock': 'Ransom',
+        # 'HackTool': 'PUA',
+        # 'RemoteAdmin': 'PUA',
+        'Trojan': 'Trojan',
+        'Mal': 'Generic',
+        'Malware': 'Generic',
+        'Worm': 'Worm',
+        'Troj': 'Trojan',
+        'FakeAV': 'FakeAV',
+        'DwnLdr': 'Downloader',
+        'TrojanDownloader': 'Downloader',
     }
 
     def __init__(self):
@@ -507,6 +520,9 @@ class Utils(object):
                 else:
                     # This is an error, so return None
                     return None
+                if c is not None and c.lower() == 'misleading':
+                    # This takes care of not so good signatures, such as Microsoft
+                    c = None
                 d = dict()
                 d['classification'] = c
                 ds = pd.Series(d)
@@ -601,7 +617,10 @@ class Utils(object):
                     return classification
                 else:
                     c = classification.split('/')
-                    return c[1]
+                    if len(c) > 1 and 'behav' in c[1].lower():
+                        return c[0]
+                    else:
+                        return c[1]
             except:
                 pass
         return None
@@ -619,6 +638,9 @@ class Utils(object):
                 return None
             try:
                 c = classification.split('_')
+                if c[0].lower() == 'pe' and len(c) > 1:
+                    c = c[1]
+                    c = c.split('.')
                 return c[0]
             except:
                 pass
