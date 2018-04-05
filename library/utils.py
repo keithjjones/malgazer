@@ -851,7 +851,7 @@ class Utils(object):
                                              delimiter,
                                              split_index=1):
         """
-        Parses the classification from a DF where the format is:
+        Parses the classification from a DataFrame where the format is:
         <CLASSIFICATION><DELIMITER><SUBCLASSIFICATION>...
 
         :param classifications:  The DataFrame containing classification info.
