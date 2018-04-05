@@ -391,7 +391,7 @@ class Utils(object):
         return cls
 
     @staticmethod
-    def parse_vt_classifications_from_csv(filename, products=None):
+    def estimate_vt_classifications_from_csv(filename, products=None):
         """
         Reads a CSV containing VT classifications and attempts to estimate
         the accurate classification from several AV vendors.
@@ -403,21 +403,36 @@ class Utils(object):
         :return:  A DataFrame with the classification for each hash.
         """
         df = pd.read_csv(filename, index_col=0)
+        return Utils.estimate_vt_classifications_from_DataFrame(df, products)
+
+    @staticmethod
+    def estimate_vt_classifications_from_DataFrame(classifications, products=None):
+        """
+        Reads a DataFrame containing VT classifications and attempts to estimate
+        the accurate classification from several AV vendors.
+
+        :param classifications:  The file name of the CSV containing the VT data.
+        :param products:  The list of products (columns) to use in the classification.
+        The order is important.  Products earlier in the list take precedence over
+        products later in the list.
+        :return:  A DataFrame with the classification for each hash.
+        """
         if products is None:
             products = ['Microsoft', 'Symantec', 'Kaspersky',
                         'Sophos', 'TrendMicro', 'ClamAV']
 
-        classifications = dict()
+        classifications_prods = dict()
 
         for product in products:
-            classifications[product] = Utils.parse_vt_classifications(df, product)
+            classifications_prods[product] = Utils.parse_vt_classifications(classifications,
+                                                                         product)
 
         out_df = pd.DataFrame(columns=['classification'])
 
-        for index, row in df.iterrows():
+        for index, row in classifications.iterrows():
             current_classification = None
             for product in products:
-                class_df = classifications[product]
+                class_df = classifications_prods[product]
                 c = class_df.loc[index]
                 c = c['classification']
                 if (c is not None
