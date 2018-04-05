@@ -428,11 +428,12 @@ class Utils(object):
                         and c.lower() != 'none'
                         and c.strip() != ''
                         and current_classification is None):
-                    if c.lower() in translate_classifications:
-                        current_classification = translate_classifications[c.lower()]
-                    else:
-                        current_classification = c
+                    current_classification = c
             if current_classification is not None:
+                for string in translate_classifications:
+                    if string in c.lower():
+                        current_classification = translate_classifications[string]
+                        break
                 d = dict()
                 d['classification'] = current_classification
                 ds = pd.Series(d)
