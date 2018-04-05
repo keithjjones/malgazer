@@ -400,7 +400,7 @@ class Utils(object):
 
         for product in products:
             classifications_prods[product] = Utils.parse_vt_classifications(classifications,
-                                                                         product)
+                                                                            product)
 
         out_df = pd.DataFrame(columns=['classification'])
 
