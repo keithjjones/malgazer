@@ -15,6 +15,16 @@ from tsfresh.feature_extraction import EfficientFCParameters
 
 
 class Utils(object):
+
+    translate_classifications = {
+        'Trj': 'Trojans',
+        'PUP': 'PUA',
+        'Adw': 'Adware',
+        'Drp': 'Dropper',
+        'Wrm': 'Worm',
+        'Cryp': 'Ransomware',
+    }
+
     def __init__(self):
         super(Utils, self).__init__()
 
@@ -404,6 +414,9 @@ class Utils(object):
 
         out_df = pd.DataFrame(columns=['classification'])
 
+        translate_classifications = dict((k.lower(), v) for k, v
+                                         in Utils.translate_classifications.iteritems())
+
         for index, row in classifications.iterrows():
             current_classification = None
             for product in products:
@@ -414,7 +427,10 @@ class Utils(object):
                         and c.lower() != 'none'
                         and c.strip() != ''
                         and current_classification is None):
-                    current_classification = c
+                    if c.lower() in translate_classifications:
+                        current_classification = translate_classifications[c.lower()]
+                    else:
+                        current_classification = c
             if current_classification is not None:
                 d = dict()
                 d['classification'] = current_classification
