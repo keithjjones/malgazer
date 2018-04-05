@@ -561,15 +561,24 @@ class Utils(object):
                 return None
             try:
                 c = classification.split('.')
-                if c[0] != 'W32':
-                    c = c[0].split(' ')
-                    c = c[0].split('!')
-                    c = c[0].split('@')
-                    return c[0]
+                if c is not None and c[0].lower() != 'smg':
+                    if c[0] != 'W32':
+                        c = c[0].split(' ')
+                        c = c[0].split('!')
+                        c = c[0].split('@')
+                        return c[0]
+                    else:
+                        c = c[1].split('!')
+                        c = c[0].split('@')
+                        return c[0]
                 else:
-                    c = c[1].split('!')
-                    c = c[0].split('@')
-                    return c[0]
+                    # This is Symantec Messaging Gateway string...
+                    c = c[1]
+                    c = c.split('!')
+                    if c[1].lower() == 'gen':
+                        return 'Generic'
+                    else:
+                        return c[1]
             except:
                 pass
         return None
