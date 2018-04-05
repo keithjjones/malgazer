@@ -24,6 +24,7 @@ class Utils(object):
         'Wrm': 'Worm',
         'Cryp': 'Ransomware',
         'PUA': 'PUA',
+        'RiskTool': 'PUA',
     }
 
     def __init__(self):
