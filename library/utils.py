@@ -23,6 +23,7 @@ class Utils(object):
         'Drp': 'Dropper',
         'Wrm': 'Worm',
         'Cryp': 'Ransomware',
+        'PUA': 'PUA',
     }
 
     def __init__(self):
@@ -414,8 +415,8 @@ class Utils(object):
 
         out_df = pd.DataFrame(columns=['classification'])
 
-        translate_classifications = dict((k.lower(), v) for k, v
-                                         in Utils.translate_classifications.iteritems())
+        translate_classifications = {k.lower(): v for k, v
+                                         in Utils.translate_classifications.items()}
 
         for index, row in classifications.iterrows():
             current_classification = None
