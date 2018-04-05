@@ -572,7 +572,12 @@ class Utils(object):
                 c = classification.split('.')
                 c = c[0].split(':')
                 if len(c) > 1:
-                    return c[1]
+                    if len(c) > 2 and c[1].lower() == 'heur':
+                        c = c[2]
+                        c = c.split('.')
+                        return c[0]
+                    else:
+                        return c[1]
                 else:
                     return c[0]
             except:
