@@ -17,7 +17,7 @@ from tsfresh.feature_extraction import EfficientFCParameters
 class Utils(object):
 
     translate_classifications = {
-        'Trj': 'Trojans',
+        'Trj': 'Trojan',
         'PUP': 'PUA',
         'Adw': 'Adware',
         'Drp': 'Dropper',
