@@ -10,6 +10,8 @@ import numpy as np
 import time
 import os
 
+pd.set_option('max_colwidth', 64)
+
 # Calculate features
 source_dir = '/Dirty/malgazer/Test_Set/'
 datapoints = 1024
