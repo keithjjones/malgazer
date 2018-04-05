@@ -972,7 +972,16 @@ class Utils(object):
             pass
         if classifications is None:
             try:
-                classifications = pd.read_csv(os.path.join(datadir, 'classifications.csv'), index_col=0)
+                classifications = pd.read_csv(
+                    os.path.join(datadir, 'classifications.csv'),
+                    index_col=0)
+            except:
+                pass
+        if classifications is None:
+            try:
+                classifications = pd.read_csv(
+                    os.path.join(datadir, 'classifications.csv.gz'),
+                    index_col=0, compression='gzip')
             except:
                 pass
         return df, classifications
