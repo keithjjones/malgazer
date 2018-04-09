@@ -1021,7 +1021,8 @@ class Utils(object):
     @staticmethod
     def sanity_check_classifications(raw_data, classifications):
         """
-        Verify that all raw data has a classification.
+        Verify that all raw data has a classification and all classifications
+        have a raw data point.
 
         :param raw_data:  A DataFrame containing the raw data, with the hash
         as the index.
@@ -1035,7 +1036,6 @@ class Utils(object):
 
         if classifications is not None and raw_data is not None:
             # Make sure there is a classification for each raw data point.
-            to_drop = list()
             for index, row in raw_data.iterrows():
                 if index in classifications.index:
                     raw_data_out = raw_data_out.append(raw_data.loc[index])
