@@ -1016,12 +1016,25 @@ class Utils(object):
                     index_col=0, compression='gzip')
             except:
                 pass
-        # Clean up raw data from classified samples.
-        if classifications is not None and df is not None:
+        return df, classifications
+
+    @staticmethod
+    def sanity_check_classifications(raw_data, classifications):
+        """
+        Verify that all raw data has a classification.
+
+        :param raw_data:  A DataFrame containing the raw data, with the hash
+        as the index.
+        :param classifications:  A dataframe containing the classifications,
+        with the hash as the index.
+        :return:  raw_data, classification.  The raw data will match
+        the classifications.
+        """
+        if classifications is not None and raw_data is not None:
             to_drop = list()
-            for index, row in df.iterrows():
+            for index, row in raw_data.iterrows():
                 if index not in classifications.index:
                     to_drop.append(index)
             if len(to_drop) > 0:
-                df = df.drop(to_drop)
-        return df, classifications
+                raw_data = raw_data.drop(to_drop)
+        return raw_data, classifications
