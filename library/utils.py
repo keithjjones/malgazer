@@ -1035,7 +1035,6 @@ class Utils(object):
 
         if classifications is not None and raw_data is not None:
             # Make sure there is a classification for each raw data point.
-            to_drop = list()
             for index, row in raw_data.iterrows():
                 if index in classifications.index:
                     raw_data_out = raw_data_out.append(raw_data.loc[index])
