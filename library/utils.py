@@ -1031,10 +1031,18 @@ class Utils(object):
         the classifications.
         """
         if classifications is not None and raw_data is not None:
+            # Make sure there is a classification for each raw data point.
             to_drop = list()
             for index, row in raw_data.iterrows():
                 if index not in classifications.index:
                     to_drop.append(index)
             if len(to_drop) > 0:
                 raw_data = raw_data.drop(to_drop)
+            # Make sure there is a raw data point for each classification.
+            to_drop = list()
+            for index, row in classifications.iterrows():
+                if index not in raw_data.index:
+                    to_drop.append(index)
+            if len(to_drop) > 0:
+                classifications = classifications.drop(to_drop)
         return raw_data, classifications
