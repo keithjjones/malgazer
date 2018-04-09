@@ -870,7 +870,7 @@ class Utils(object):
                 d = dict()
                 d['classification'] = c[split_index]
                 ds = pd.Series(d)
-                ds.name = index
+                ds.name = index.upper()
                 cls = cls.append(ds)
         return cls
 
