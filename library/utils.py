@@ -1021,7 +1021,8 @@ class Utils(object):
     @staticmethod
     def sanity_check_classifications(raw_data, classifications):
         """
-        Verify that all raw data has a classification.
+        Verify that all raw data has a classification and all classifications
+        have a raw data point.
 
         :param raw_data:  A DataFrame containing the raw data, with the hash
         as the index.
