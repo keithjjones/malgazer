@@ -1030,19 +1030,14 @@ class Utils(object):
         :return:  raw_data, classification.  The raw data will match
         the classifications.
         """
+        classifications_out = pd.DataFrame()
+        raw_data_out = pd.DataFrame()
+
         if classifications is not None and raw_data is not None:
             # Make sure there is a classification for each raw data point.
             to_drop = list()
             for index, row in raw_data.iterrows():
-                if index not in classifications.index:
-                    to_drop.append(index)
-            if len(to_drop) > 0:
-                raw_data = raw_data.drop(to_drop)
-            # Make sure there is a raw data point for each classification.
-            to_drop = list()
-            for index, row in classifications.iterrows():
-                if index not in raw_data.index:
-                    to_drop.append(index)
-            if len(to_drop) > 0:
-                classifications = classifications.drop(to_drop)
-        return raw_data, classifications
+                if index in classifications.index:
+                    raw_data_out.append(raw_data.loc(index))
+                    classifications_out.append(classifications.loc(index))
+        return raw_data_out, classifications_out
