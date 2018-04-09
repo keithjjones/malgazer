@@ -1020,5 +1020,5 @@ class Utils(object):
         if classifications is not None and df is not None:
             for index,row in classifications.iterrows():
                 if index not in df.index:
-                    df.drop(index)
+                    df.drop([index])
         return df, classifications
