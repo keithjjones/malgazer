@@ -1018,7 +1018,7 @@ class Utils(object):
                 pass
         # Clean up raw data from classified samples.
         if classifications is not None and df is not None:
-            for index,row in classifications.iterrows():
-                if index not in df.index:
+            for index, row in df.iterrows():
+                if index not in classifications.index:
                     df.drop([index])
         return df, classifications
