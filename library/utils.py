@@ -1023,5 +1023,5 @@ class Utils(object):
                 if index not in classifications.index:
                     to_drop.append(index)
             if len(to_drop) > 0:
-                df = df.drop([index])
+                df = df.drop(to_drop)
         return df, classifications
