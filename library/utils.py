@@ -29,8 +29,8 @@ class Utils(object):
         'Generic': 'Generic',
         'VirTool': 'Virus',
         'VirLock': 'Ransom',
-        # 'HackTool': 'PUA',
-        # 'RemoteAdmin': 'PUA',
+        'HackTool': 'PUA',
+        'RemoteAdmin': 'PUA',
         'Trojan': 'Trojan',
         'Mal': 'Generic',
         'Malware': 'Generic',
@@ -1016,4 +1016,9 @@ class Utils(object):
                     index_col=0, compression='gzip')
             except:
                 pass
+        # Clean up raw data from classified samples.
+        if classifications is not None and df is not None:
+            for index,row in classifications.iterrows():
+                if index not in df.index:
+                    df.drop(index)
         return df, classifications
