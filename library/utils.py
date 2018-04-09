@@ -1038,6 +1038,6 @@ class Utils(object):
             to_drop = list()
             for index, row in raw_data.iterrows():
                 if index in classifications.index:
-                    raw_data_out = raw_data_out.append(raw_data.loc(index))
-                    classifications_out = classifications_out.append(classifications.loc(index))
+                    raw_data_out = raw_data_out.append(raw_data.loc[index])
+                    classifications_out = classifications_out.append(classifications.loc[index])
         return raw_data_out, classifications_out
