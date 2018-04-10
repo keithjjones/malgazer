@@ -452,7 +452,7 @@ class Utils(object):
                 d = dict()
                 d['classification'] = current_classification
                 ds = pd.Series(d)
-                ds.name = index
+                ds.name = index.upper()
                 out_df = out_df.append(ds)
         return out_df
 
