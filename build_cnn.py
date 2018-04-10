@@ -28,7 +28,9 @@ epochs = 100
 #batch_preprocess_entropy.main(arguments)
 
 # Load data
-raw_data, classifications = Utils.load_preprocessed_data(subdir)
+raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(subdir)
+raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
+classifications = classifications[~classifications.index.duplicated(keep='first')]
 
 # Wrangle classifications
 #cls = Utils.parse_classifications_from_path(classifications)
