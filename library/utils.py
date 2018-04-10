@@ -437,7 +437,7 @@ class Utils(object):
             current_classification = None
             for product in products:
                 class_df = classifications_prods[product]
-                c = class_df.loc[index]
+                c = class_df.loc[index.upper()]
                 c = c['classification']
                 if (c is not None
                         and c.lower() != 'none'
