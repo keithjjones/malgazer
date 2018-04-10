@@ -467,7 +467,7 @@ class Utils(object):
         """
         cls = pd.DataFrame(columns=['classification'])
         for index, row in classifications.iterrows():
-            if index not in cls.index:
+            if index.upper() not in cls.index:
                 if column_name == 'Microsoft':
                     c = Utils.parse_microsoft_classification(row['Microsoft'])
                 elif column_name == "Symantec":
