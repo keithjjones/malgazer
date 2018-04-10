@@ -1025,7 +1025,7 @@ class Utils(object):
         have a raw data point.
 
         :param raw_data:  A DataFrame containing the raw data, with the hash
-        as the index.
+        as the index.  The hash must be upper case.
         :param classifications:  A dataframe containing the classifications,
         with the hash as the index.
         :return:  raw_data, classification.  The raw data will match
