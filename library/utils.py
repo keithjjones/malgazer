@@ -387,7 +387,7 @@ class Utils(object):
             # d['classification'] = cl
             d['classification'] = c[1]
             ds = pd.Series(d)
-            ds.name = index
+            ds.name = index.upper()
             cls = cls.append(ds)
         return cls
 
@@ -527,7 +527,7 @@ class Utils(object):
                 d = dict()
                 d['classification'] = c
                 ds = pd.Series(d)
-                ds.name = index
+                ds.name = index.upper()
                 cls = cls.append(ds)
         return cls
 
