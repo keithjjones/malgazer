@@ -14,7 +14,7 @@ pd.set_option('max_colwidth', 64)
 
 # Calculate features
 source_dir = '/Dirty/malgazer/Test_Set/'
-datapoints = 1024
+datapoints = 2048
 subdir = 'data_vt_{0}'.format(datapoints)
 arguments = ['-w', '256', '-d', str(datapoints), source_dir, subdir]
 batch_size = 100
@@ -33,9 +33,11 @@ raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, cla
 classifications = classifications[~classifications.index.duplicated(keep='first')]
 
 # Wrangle classifications
-cls = Utils.parse_classifications_from_path(classifications)
+#cls = Utils.parse_classifications_from_path(classifications)
+#X = raw_data.as_matrix().copy()
+#y = cls.as_matrix().copy()
 X = raw_data.as_matrix().copy()
-y = cls.as_matrix().copy()
+y = classifications.as_matrix().copy()
 
 # Preprocess the data
 ml = ML()
