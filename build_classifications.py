@@ -16,9 +16,10 @@ pd.set_option('max_colwidth', 64)
 # This will process a specific directories into master files in each directory
 #
 
-subdir = '/Dirty/Samples/VT_20180507.1/'
-
-subdirs = [subdir]
+subdirs = [
+        '/Dirty/Samples/VT_20180508.1/',
+        '/Dirty/Samples/VT_20180508.2/'        
+        ]
 
 for s in subdirs:
     classifications = Utils.estimate_vt_classifications_from_csv(os.path.join(s, 'all_vt_data.csv'))
@@ -38,7 +39,9 @@ subdirs = [
         '/Dirty/Samples/VT_20180504.1/', 
         '/Dirty/Samples/VT_20180505.1/', 
         '/Dirty/Samples/VT_20180506.1/', 
-        '/Dirty/Samples/VT_20180507.1/'
+        '/Dirty/Samples/VT_20180507.1/',
+        '/Dirty/Samples/VT_20180508.1/',
+        '/Dirty/Samples/VT_20180508.2/'
         ]
 output_csv = '/Dirty/Samples/vt_focused_classifications.csv'
 outputs = []
@@ -47,5 +50,6 @@ for s in subdirs:
   outputs.append(pd.read_csv(os.path.join(s, 'classifications_trimmed.csv'), index_col=0))    
   
 output_df = pd.concat(outputs)
+output_df = output_df[~output_df.index.duplicated(keep='first')]
 output_df['classification'].value_counts()
 output_df.to_csv(output_csv)
