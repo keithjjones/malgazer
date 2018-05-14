@@ -59,3 +59,8 @@ output_df['classification'].value_counts()
 output_df.to_csv(output_csv)
 output_df_trimmed = output_df.groupby('classification').head(11000)
 output_df_trimmed.to_csv(output_csv_trimmed)
+
+hashes_csv = '/Dirty/Samples/vt_focused_hashes_trimmed.csv'
+hashes = pd.read_csv(output_csv_trimmed)
+hashes.columns([0])
+hashes.to_csv(hashes_csv)
