@@ -46,8 +46,9 @@ subdirs = [
         '/Dirty/Samples/VT_20180512.1/',
         '/Dirty/Samples/VT_20180514.1/'
         ]
-output_csv = '/Dirty/Samples/vt_focused_classifications.csv'
-output_csv_trimmed = '/Dirty/Samples/vt_focused_classifications_trimmed.csv'
+output_dir = '/Dirty/Samples'
+output_csv = os.path.join(output_dir, 'vt_focused_classifications.csv')
+output_csv_trimmed = os.path.join(output_dir, 'vt_focused_classifications_trimmed.csv')
 outputs = []
 
 for s in subdirs:
@@ -57,9 +58,22 @@ output_df = pd.concat(outputs)
 output_df = output_df[~output_df.index.duplicated(keep='first')]
 output_df['classification'].value_counts()
 output_df.to_csv(output_csv)
-output_df_trimmed = output_df.groupby('classification').head(11000)
+output_df_trimmed = output_df.groupby(['classification']).head(11000)
 output_df_trimmed.to_csv(output_csv_trimmed)
 
-hashes_csv = '/Dirty/Samples/vt_focused_hashes_trimmed.csv'
+hashes_csv = os.path.join(output_dir, 'vt_focused_hashes_trimmed.csv')
 hashes = pd.DataFrame(output_df_trimmed.index.values)
 hashes.to_csv(hashes_csv)
+
+worm = output_df_trimmed[output_df_trimmed['classification'] == 'Worm']
+worm.to_csv(os.path.join(output_dir, 'worm.csv'))
+trojan = output_df_trimmed[output_df_trimmed['classification'] == 'Trojan']
+trojan.to_csv(os.path.join(output_dir, 'trojan.csv'))
+backdoor = output_df_trimmed[output_df_trimmed['classification'] == 'Backdoor']
+backdoor.to_csv(os.path.join(output_dir, 'backdoor.csv'))
+virus = output_df_trimmed[output_df_trimmed['classification'] == 'Virus']
+virus.to_csv(os.path.join(output_dir, 'virus.csv'))
+pua = output_df_trimmed[output_df_trimmed['classification'] == 'PUA']
+pua.to_csv(os.path.join(output_dir, 'pua.csv'))
+ransom = output_df_trimmed[output_df_trimmed['classification'] == 'Ransom']
+ransom.to_csv(os.path.join(output_dir, 'ransom.csv'))
