@@ -46,7 +46,7 @@ subdirs = [
         '/Dirty/Samples/VT_20180512.1/',
         '/Dirty/Samples/VT_20180514.1/'
         ]
-output_dir = '/Dirty/Samples'
+output_dir = '/Dirty/Samples/CSV'
 output_csv = os.path.join(output_dir, 'vt_focused_classifications.csv')
 output_csv_trimmed = os.path.join(output_dir, 'vt_focused_classifications_trimmed.csv')
 outputs = []
