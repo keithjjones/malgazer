@@ -27,11 +27,17 @@ def main(arguments=None):
     parser.add_argument("-m", "--maxsamples", type=int, default=0,
                         help="Maximum number of samples to process, zero for all."
                              "", required=False)
-
+    parser.add_argument("-j", "--jobs", type=int, default=1,
+                        help="The number of jobs to do the work, but be 1 or greater."
+                             "", required=False)
     if isinstance(arguments, list):
         args = parser.parse_args(arguments)
     else:
         args = parser.parse_args()
+        
+    if args.jobs < 1:
+        print("Jobs must be 1 or greater.")
+        exit()
 
     # Normalize setup...
     if args.nonormalize:

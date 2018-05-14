@@ -124,7 +124,7 @@ class Utils(object):
                                      out_directory=None,
                                      window_sizes=[256],
                                      normalize=True,
-                                     njobs=0):
+                                     njobs=1):
         """
         Calculates the running window entropy of a directory containing
         malware samples that is named from their SHA256 value.  It will
@@ -141,6 +141,8 @@ class Utils(object):
             raise ValueError('Input and output directories must be real.')
         if not isinstance(window_sizes, list):
             raise ValueError('Specify a window size in a list.')
+        if njobs < 1:
+            raise ValueError('The number of jobs needs to be >= 1')
 
         print("Starting running window entropy batch processing for malware samples...")
 
@@ -155,12 +157,10 @@ class Utils(object):
         malware_files_re = re.compile('[a-z0-9]{64}',
                                       flags=re.IGNORECASE)
         samples_processed = 0
+        jobs = []
         for root, dirs, files in os.walk(in_directory):
             for file in files:
                 if malware_files_re.match(file):
-                    # Start the timer
-                    start_load_time = time.time()
-
                     print("Input file: {0}".format(file))
                     subdir = root[len(in_directory):]
 
@@ -174,15 +174,25 @@ class Utils(object):
                     except:
                         os.makedirs(datadir)
 
+                    if len(jobs) > njobs:
+                        for j in jobs:
+                            j.join()
+                        jobs = []
+
                     if os.path.exists(picklefile) and os.path.isfile(picklefile):
-                        Utils._calculate_new_rwe(root, file, picklefile, window_sizes, normalize)
+                        job = threading.Thread(name='_calculate_new_rwe', target=Utils._calculate_new_rwe, args=(root, file, picklefile, window_sizes, normalize))
+                        job.setDaemon(True)
+                        job.start()
+                        jobs.append(job)
+                        # Utils._calculate_new_rwe(root, file, picklefile, window_sizes, normalize)
                     elif not os.path.exists(picklefile):
-                        Utils._calculate_existing_rwe(picklefile, window_sizes, normalize)
+                        job = threading.Thread(name='_calculate_new_rwe', target=Utils._calculate_existing_rwe, args=(picklefile, window_sizes, normalize))
+                        job.setDaemon(True)
+                        job.start()
+                        jobs.append(job)
+                        # Utils._calculate_existing_rwe(picklefile, window_sizes, normalize)
                     else:
                         print("\t\tSkipping calculation...")
-
-                    print("\tElapsed time {0:.6f} seconds".format(round(time.time() - start_load_time, 6)))
-
                     samples_processed += 1
                     print("{0:,} samples processed...".format(samples_processed))
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
