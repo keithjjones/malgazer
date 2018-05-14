@@ -114,6 +114,7 @@ class Utils(object):
                     rwe = m.running_entropy(w, normalize)
                     changed = True
                 else:
+                    pass
                     # print("\t\tWindow already exists!")
         # Write the running entropy...
         if changed:
