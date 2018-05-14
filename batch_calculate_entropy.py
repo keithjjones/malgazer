@@ -23,10 +23,6 @@ def main(arguments=None):
     parser.add_argument("-n", "--nonormalize", action='store_true',
                         help="Disables entropy normalization."
                              "", required=False)
-    parser.add_argument("-s", "--skipcalculated", action='store_true',
-                        help="Skip already computed samples.  "
-                             "This will not calculate any windows if ANY data exists."
-                             "", required=False)
     parser.add_argument("-m", "--maxsamples", type=int, default=0,
                         help="Maximum number of samples to process, zero for all."
                              "", required=False)
@@ -71,8 +67,7 @@ def main(arguments=None):
     Utils.batch_running_window_entropy(args.MalwareDirectory,
                                        args.DataDirectory,
                                        window_sizes=windows,
-                                       normalize=normalize,
-                                       skipcalculated=args.skipcalculated)
+                                       normalize=normalize)
 
 
 if __name__ == "__main__":

@@ -48,8 +48,7 @@ class Utils(object):
     def batch_running_window_entropy(in_directory=None,
                                      out_directory=None,
                                      window_sizes=[256],
-                                     normalize=True,
-                                     skipcalculated=False):
+                                     normalize=True):
         """
         Calculates the running window entropy of a directory containing
         malware samples that is named from their SHA256 value.  It will
@@ -59,7 +58,6 @@ class Utils(object):
         :param out_directory: The output directory for calculated data.
         :param window_sizes: A list of window sizes to calculate.
         :param normalize: Set to False to not normalize.
-        :param skipcalculated: Set to True to skip already calculated samples.
         :return: Nothing
         """
         if in_directory is None or out_directory is None:
@@ -99,9 +97,7 @@ class Utils(object):
                     except:
                         os.makedirs(datadir)
 
-                    if os.path.exists(picklefile) \
-                            and os.path.isfile(picklefile) \
-                            and not skipcalculated:
+                    if os.path.exists(picklefile) and os.path.isfile(picklefile):
                         # Create the malware file name...
                         malwarepath = os.path.join(root, file)
                         m = FileObject.read(picklefile)
@@ -109,25 +105,22 @@ class Utils(object):
                         print("\tCalculating: {0} Type: {1}".format(m.malware.filename, m.malware.filetype))
                         print("\tSaving data to {0}".format(picklefile))
 
-                        # Calculate the entropy of the file...
-                        fileentropy = m.entropy(normalize)
-
                         # Calculate the window entropy for malware samples...
-                        if window_sizes is not None:
-                            # Iterate through the window sizes...
-                            for w in window_sizes:
-                                if w < m.malware.file_size:
-                                    if w not in m.malware.runningentropy.entropy_data:
-                                        print("\t\tCalculating window size {0:,}".format(w))
-
-                                        # Calculate running entropy...
-                                        rwe = m.running_entropy(w, normalize)
-                                    else:
-                                        print("\t\tWindow already exists!")
-
-                            # Write the running entropy...
+                        # Iterate through the window sizes...
+                        changed = False
+                        for w in window_sizes:
+                            if w < m.malware.file_size:
+                                if w not in m.malware.runningentropy.entropy_data:
+                                    print("\t\tCalculating window size {0:,}".format(w))
+                                    # Calculate running entropy...
+                                    rwe = m.running_entropy(w, normalize)
+                                    changed = True
+                                else:
+                                    print("\t\tWindow already exists!")
+                        # Write the running entropy...
+                        if changed:
                             m.write(picklefile)
-                    elif not (os.path.exists(picklefile) and skipcalculated):
+                    elif not os.path.exists(picklefile):
                         # Create the malware file name...
                         malwarepath = os.path.join(root, file)
                         try:
@@ -146,17 +139,14 @@ class Utils(object):
                         fileentropy = m.entropy(normalize)
 
                         # Calculate the window entropy for malware samples...
-                        if window_sizes is not None:
-                            # Iterate through the window sizes...
-                            for w in window_sizes:
-                                if w < m.malware.file_size:
-                                    print("\t\tCalculating window size {0:,}".format(w))
-
-                                    # Calculate running entropy...
-                                    rwe = m.running_entropy(w, normalize)
-
-                            # Write the running entropy...
-                            m.write(picklefile)
+                        # Iterate through the window sizes...
+                        for w in window_sizes:
+                            if w < m.malware.file_size:
+                                print("\t\tCalculating window size {0:,}".format(w))
+                                # Calculate running entropy...
+                                rwe = m.running_entropy(w, normalize)
+                        # Write the running entropy...
+                        m.write(picklefile)
                     else:
                         print("\t\tSkipping calculation...")
 
