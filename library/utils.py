@@ -13,6 +13,7 @@ from tsfresh import extract_features, select_features, extract_relevant_features
 from tsfresh.utilities.dataframe_functions import impute
 from tsfresh.feature_extraction import EfficientFCParameters
 import threading
+from time import sleep
 
 
 class Utils(object):
@@ -174,10 +175,9 @@ class Utils(object):
                     except:
                         os.makedirs(datadir)
 
-                    if len(jobs) > njobs:
-                        for j in jobs:
-                            j.join()
-                        jobs = []
+                    while len(jobs) > njobs:
+                        jobs = [j for j in jobs if j.isAlive()]
+                        sleep(.1)
 
                     if os.path.exists(picklefile) and os.path.isfile(picklefile):
                         job = threading.Thread(name='_calculate_new_rwe', target=Utils._calculate_new_rwe, args=(root, file, picklefile, window_sizes, normalize))
