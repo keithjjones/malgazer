@@ -61,5 +61,5 @@ output_df_trimmed = output_df.groupby('classification').head(11000)
 output_df_trimmed.to_csv(output_csv_trimmed)
 
 hashes_csv = '/Dirty/Samples/vt_focused_hashes_trimmed.csv'
-hashes = pd.DataFrame(output_df.index.values)
+hashes = pd.DataFrame(output_df_trimmed.index.values)
 hashes.to_csv(hashes_csv)
