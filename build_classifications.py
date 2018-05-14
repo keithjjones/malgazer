@@ -57,5 +57,5 @@ output_df = pd.concat(outputs)
 output_df = output_df[~output_df.index.duplicated(keep='first')]
 output_df['classification'].value_counts()
 output_df.to_csv(output_csv)
-output_df_trimmed = output_df.groupby('classification').head(10000)
+output_df_trimmed = output_df.groupby('classification').head(11000)
 output_df_trimmed.to_csv(output_csv_trimmed)
