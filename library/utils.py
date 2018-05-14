@@ -175,7 +175,7 @@ class Utils(object):
                     except:
                         os.makedirs(datadir)
 
-                    while len(jobs) > njobs:
+                    while len(jobs) >= njobs:
                         jobs = [j for j in jobs if j.isAlive()]
                         sleep(.1)
 
