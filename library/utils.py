@@ -64,7 +64,7 @@ class Utils(object):
         """
         if in_directory is None or out_directory is None:
             raise ValueError('Input and output directories must be real.')
-        if len(window_sizes) < 1:
+        if not isinstance(window_sizes, list):
             raise ValueError('Specify a window size in a list.')
 
         print("Starting running window entropy batch processing for malware samples...")
