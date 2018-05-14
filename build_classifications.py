@@ -47,6 +47,7 @@ subdirs = [
         '/Dirty/Samples/VT_20180514.1/'
         ]
 output_csv = '/Dirty/Samples/vt_focused_classifications.csv'
+output_csv_10000 = '/Dirty/Samples/vt_focused_classifications_10000.csv'
 outputs = []
 
 for s in subdirs:
@@ -56,3 +57,5 @@ output_df = pd.concat(outputs)
 output_df = output_df[~output_df.index.duplicated(keep='first')]
 output_df['classification'].value_counts()
 output_df.to_csv(output_csv)
+output_df_10000 = output_df.groupby('classification').head(10000)
+output_df_10000.to_csv(output_csv_10000)
