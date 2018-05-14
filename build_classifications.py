@@ -17,8 +17,7 @@ pd.set_option('max_colwidth', 64)
 #
 
 subdirs = [
-        '/Dirty/Samples/VT_20180508.1/',
-        '/Dirty/Samples/VT_20180508.2/'        
+        '/Dirty/Samples/VT_20180514.1/'       
         ]
 
 for s in subdirs:
@@ -41,7 +40,11 @@ subdirs = [
         '/Dirty/Samples/VT_20180506.1/', 
         '/Dirty/Samples/VT_20180507.1/',
         '/Dirty/Samples/VT_20180508.1/',
-        '/Dirty/Samples/VT_20180508.2/'
+        '/Dirty/Samples/VT_20180508.2/',
+        '/Dirty/Samples/VT_20180509.1/',
+        '/Dirty/Samples/VT_20180510.1/',
+        '/Dirty/Samples/VT_20180512.1/',
+        '/Dirty/Samples/VT_20180514.1/'
         ]
 output_csv = '/Dirty/Samples/vt_focused_classifications.csv'
 outputs = []
