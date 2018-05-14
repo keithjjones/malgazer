@@ -1,5 +1,6 @@
 import argparse
 from library.utils import Utils
+import sys
 
 
 def main(arguments=None):
@@ -36,4 +37,5 @@ def main(arguments=None):
 
 
 if __name__ == "__main__":
-    main()
+    args = sys.argv[1:]
+    main(args)

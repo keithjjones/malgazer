@@ -17,7 +17,7 @@ pd.set_option('max_colwidth', 64)
 #
 
 subdirs = [
-        '/Dirty/Samples/VT_20180514.1/'       
+#        '/Dirty/Samples/VT_20180514.1/'       
         ]
 
 for s in subdirs:

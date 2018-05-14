@@ -5,6 +5,7 @@ import numpy
 import os
 import time
 import shutil
+import sys
 
 
 def main(arguments=None):
@@ -71,4 +72,5 @@ def main(arguments=None):
 
 
 if __name__ == "__main__":
-    main()
+    args = sys.argv[1:]
+    main(args)
