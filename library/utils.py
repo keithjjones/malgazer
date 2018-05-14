@@ -186,7 +186,7 @@ class Utils(object):
                         jobs.append(job)
                         # Utils._calculate_new_rwe(root, file, picklefile, window_sizes, normalize)
                     elif not os.path.exists(picklefile):
-                        job = threading.Thread(name='_calculate_new_rwe', target=Utils._calculate_existing_rwe, args=(picklefile, window_sizes, normalize))
+                        job = threading.Thread(name='_calculate_existing_rwe', target=Utils._calculate_existing_rwe, args=(picklefile, window_sizes, normalize))
                         job.setDaemon(True)
                         job.start()
                         jobs.append(job)
