@@ -67,13 +67,30 @@ hashes.to_csv(hashes_csv)
 
 worm = output_df_trimmed[output_df_trimmed['classification'] == 'Worm']
 worm.to_csv(os.path.join(output_dir, 'worm.csv'))
+worm_hashes = pd.DataFrame(worm.index.values)
+worm_hashes.to_csv(os.path.join(output_dir, 'worm_hashes.csv'))
+
 trojan = output_df_trimmed[output_df_trimmed['classification'] == 'Trojan']
 trojan.to_csv(os.path.join(output_dir, 'trojan.csv'))
+trojan_hashes = pd.DataFrame(trojan.index.values)
+trojan_hashes.to_csv(os.path.join(output_dir, 'trojan_hashes.csv'))
+
 backdoor = output_df_trimmed[output_df_trimmed['classification'] == 'Backdoor']
 backdoor.to_csv(os.path.join(output_dir, 'backdoor.csv'))
+backdoor_hashes = pd.DataFrame(backdoor.index.values)
+backdoor_hashes.to_csv(os.path.join(output_dir, 'backdoor_hashes.csv'))
+
 virus = output_df_trimmed[output_df_trimmed['classification'] == 'Virus']
 virus.to_csv(os.path.join(output_dir, 'virus.csv'))
+virus_hashes = pd.DataFrame(virus.index.values)
+virus_hashes.to_csv(os.path.join(output_dir, 'virus_hashes.csv'))
+
 pua = output_df_trimmed[output_df_trimmed['classification'] == 'PUA']
 pua.to_csv(os.path.join(output_dir, 'pua.csv'))
+pua_hashes = pd.DataFrame(pua.index.values)
+pua_hashes.to_csv(os.path.join(output_dir, 'pua_hashes.csv'))
+
 ransom = output_df_trimmed[output_df_trimmed['classification'] == 'Ransom']
 ransom.to_csv(os.path.join(output_dir, 'ransom.csv'))
+ransom_hashes = pd.DataFrame(ransom.index.values)
+ransom_hashes.to_csv(os.path.join(output_dir, 'ransom_hashes.csv'))
