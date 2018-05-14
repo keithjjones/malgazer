@@ -195,6 +195,7 @@ class Utils(object):
                         print("\t\tSkipping calculation...")
                     samples_processed += 1
                     print("{0:,} samples processed...".format(samples_processed))
+                    print("Current elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
 
