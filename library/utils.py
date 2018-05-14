@@ -12,6 +12,7 @@ from .files import FileObject
 from tsfresh import extract_features, select_features, extract_relevant_features
 from tsfresh.utilities.dataframe_functions import impute
 from tsfresh.feature_extraction import EfficientFCParameters
+import threading
 
 
 class Utils(object):
@@ -45,10 +46,85 @@ class Utils(object):
         super(Utils, self).__init__()
 
     @staticmethod
+    def _calculate_new_rwe(root, file, picklefile, window_sizes=[256], normalize=True):
+        """
+        Internal method to calculate a new RWE pickle file.
+
+        :param root: The directory of the malware file
+        :param file: The file name, without a directory, of the malware file.
+        :param picklefile:  The pickle file for the malware RWE data
+        :param window_sizes: A list of window sizes to calculate.
+        :param normalize: Set to False to not normalize.
+        :returns: True if success, False otherwise
+        """
+        # Create the malware file name...
+        malwarepath = os.path.join(root, file)
+        try:
+            m = FileObject(malwarepath)
+        except:
+            return False
+
+        print("\tCalculating: {0} Type: {1}".format(m.malware.filename,
+                                                    m.malware.filetype))
+        print("\tSaving data to {0}".format(picklefile))
+
+        # Remove old pickle files...
+        if os.path.exists(picklefile):
+            os.remove(picklefile)
+
+        # Calculate the entropy of the file...
+        fileentropy = m.entropy(normalize)
+
+        # Calculate the window entropy for malware samples...
+        # Iterate through the window sizes...
+        for w in window_sizes:
+            if w < m.malware.file_size:
+                print("\t\tCalculating window size {0:,}".format(w))
+                # Calculate running entropy...
+                rwe = m.running_entropy(w, normalize)
+        # Write the running entropy...
+        m.write(picklefile)
+        return True
+
+    @staticmethod
+    def _calculate_existing_rwe(picklefile, window_sizes=[256], normalize=True):
+        """
+        Internal method to calculate an existing RWE pickle file.
+
+        :param picklefile:  The pickle file for the malware RWE data
+        :param window_sizes: A list of window sizes to calculate.
+        :param normalize: Set to False to not normalize.
+        """
+        # Create the malware file name...
+        m = FileObject.read(picklefile)
+
+        print("\tCalculating: {0} Type: {1}".format(m.malware.filename,
+                                                    m.malware.filetype))
+        print("\tSaving data to {0}".format(picklefile))
+
+        # Calculate the window entropy for malware samples...
+        # Iterate through the window sizes...
+        changed = False
+        for w in window_sizes:
+            if w < m.malware.file_size:
+                if w not in m.malware.runningentropy.entropy_data:
+                    print("\t\tCalculating window size {0:,}".format(w))
+                    # Calculate running entropy...
+                    rwe = m.running_entropy(w, normalize)
+                    changed = True
+                else:
+                    print("\t\tWindow already exists!")
+        # Write the running entropy...
+        if changed:
+            m.write(picklefile)
+        return True
+
+    @staticmethod
     def batch_running_window_entropy(in_directory=None,
                                      out_directory=None,
                                      window_sizes=[256],
-                                     normalize=True):
+                                     normalize=True,
+                                     njobs=0):
         """
         Calculates the running window entropy of a directory containing
         malware samples that is named from their SHA256 value.  It will
@@ -58,6 +134,7 @@ class Utils(object):
         :param out_directory: The output directory for calculated data.
         :param window_sizes: A list of window sizes to calculate.
         :param normalize: Set to False to not normalize.
+        :param njobs: The number of threads to use
         :return: Nothing
         """
         if in_directory is None or out_directory is None:
@@ -98,55 +175,9 @@ class Utils(object):
                         os.makedirs(datadir)
 
                     if os.path.exists(picklefile) and os.path.isfile(picklefile):
-                        # Create the malware file name...
-                        malwarepath = os.path.join(root, file)
-                        m = FileObject.read(picklefile)
-
-                        print("\tCalculating: {0} Type: {1}".format(m.malware.filename, m.malware.filetype))
-                        print("\tSaving data to {0}".format(picklefile))
-
-                        # Calculate the window entropy for malware samples...
-                        # Iterate through the window sizes...
-                        changed = False
-                        for w in window_sizes:
-                            if w < m.malware.file_size:
-                                if w not in m.malware.runningentropy.entropy_data:
-                                    print("\t\tCalculating window size {0:,}".format(w))
-                                    # Calculate running entropy...
-                                    rwe = m.running_entropy(w, normalize)
-                                    changed = True
-                                else:
-                                    print("\t\tWindow already exists!")
-                        # Write the running entropy...
-                        if changed:
-                            m.write(picklefile)
+                        Utils._calculate_new_rwe(root, file, picklefile, window_sizes, normalize)
                     elif not os.path.exists(picklefile):
-                        # Create the malware file name...
-                        malwarepath = os.path.join(root, file)
-                        try:
-                            m = FileObject(malwarepath)
-                        except:
-                            continue
-
-                        print("\tCalculating: {0} Type: {1}".format(m.malware.filename, m.malware.filetype))
-                        print("\tSaving data to {0}".format(picklefile))
-
-                        # Remove old pickle files...
-                        if os.path.exists(picklefile):
-                            os.remove(picklefile)
-
-                        # Calculate the entropy of the file...
-                        fileentropy = m.entropy(normalize)
-
-                        # Calculate the window entropy for malware samples...
-                        # Iterate through the window sizes...
-                        for w in window_sizes:
-                            if w < m.malware.file_size:
-                                print("\t\tCalculating window size {0:,}".format(w))
-                                # Calculate running entropy...
-                                rwe = m.running_entropy(w, normalize)
-                        # Write the running entropy...
-                        m.write(picklefile)
+                        Utils._calculate_existing_rwe(picklefile, window_sizes, normalize)
                     else:
                         print("\t\tSkipping calculation...")
 
