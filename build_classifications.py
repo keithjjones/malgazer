@@ -47,8 +47,8 @@ subdirs = [
 #        '/Dirty/Samples/VT_20180514.1/'
         ]
 output_dir = '/Dirty/Samples/CSV'
-output_csv = os.path.join(output_dir, 'vt_focused_classifications.csv')
-output_csv_trimmed = os.path.join(output_dir, 'vt_focused_classifications_trimmed.csv')
+output_csv = os.path.join(output_dir, 'classifications_all.csv')
+output_csv_trimmed = os.path.join(output_dir, 'classifications.csv')
 outputs = []
 
 for s in subdirs:
@@ -61,7 +61,7 @@ output_df.to_csv(output_csv)
 output_df_trimmed = output_df.groupby(['classification']).head(11000)
 output_df_trimmed.to_csv(output_csv_trimmed)
 
-hashes_csv = os.path.join(output_dir, 'vt_focused_hashes_trimmed.csv')
+hashes_csv = os.path.join(output_dir, 'hashes.csv')
 hashes = pd.DataFrame(output_df_trimmed.index.values)
 hashes.columns = ['index']
 hashes.to_csv(hashes_csv, index=False, header=False)
