@@ -64,9 +64,9 @@ class Utils(object):
         except:
             return False
 
-        print("\tCalculating: {0} Type: {1}".format(m.malware.filename,
-                                                    m.malware.filetype))
-        print("\tSaving data to {0}".format(picklefile))
+        # print("\tCalculating: {0} Type: {1}".format(m.malware.filename,
+        #                                             m.malware.filetype))
+        # print("\tSaving data to {0}".format(picklefile))
 
         # Remove old pickle files...
         if os.path.exists(picklefile):
@@ -79,7 +79,7 @@ class Utils(object):
         # Iterate through the window sizes...
         for w in window_sizes:
             if w < m.malware.file_size:
-                print("\t\tCalculating window size {0:,}".format(w))
+                # print("\t\tCalculating window size {0:,}".format(w))
                 # Calculate running entropy...
                 rwe = m.running_entropy(w, normalize)
         # Write the running entropy...
@@ -98,9 +98,9 @@ class Utils(object):
         # Create the malware file name...
         m = FileObject.read(picklefile)
 
-        print("\tCalculating: {0} Type: {1}".format(m.malware.filename,
-                                                    m.malware.filetype))
-        print("\tSaving data to {0}".format(picklefile))
+        # print("\tCalculating: {0} Type: {1}".format(m.malware.filename,
+        #                                             m.malware.filetype))
+        # print("\tSaving data to {0}".format(picklefile))
 
         # Calculate the window entropy for malware samples...
         # Iterate through the window sizes...
@@ -108,12 +108,12 @@ class Utils(object):
         for w in window_sizes:
             if w < m.malware.file_size:
                 if w not in m.malware.runningentropy.entropy_data:
-                    print("\t\tCalculating window size {0:,}".format(w))
+                    # print("\t\tCalculating window size {0:,}".format(w))
                     # Calculate running entropy...
                     rwe = m.running_entropy(w, normalize)
                     changed = True
                 else:
-                    print("\t\tWindow already exists!")
+                    # print("\t\tWindow already exists!")
         # Write the running entropy...
         if changed:
             m.write(picklefile)
