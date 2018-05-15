@@ -74,7 +74,8 @@ def main(arguments=None):
     Utils.batch_running_window_entropy(args.MalwareDirectory,
                                        args.DataDirectory,
                                        window_sizes=windows,
-                                       normalize=normalize)
+                                       normalize=normalize,
+                                       njobs=args.jobs)
 
 
 if __name__ == "__main__":

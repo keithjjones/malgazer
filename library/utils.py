@@ -181,13 +181,13 @@ class Utils(object):
                         sleep(.1)
 
                     if os.path.exists(picklefile) and os.path.isfile(picklefile):
-                        job = threading.Thread(name='_calculate_new_rwe', target=Utils._calculate_new_rwe, args=(root, file, picklefile, window_sizes, normalize))
+                        job = threading.Thread(name='_calculate_existing_rwe', target=Utils._calculate_existing_rwe, args=(picklefile, window_sizes, normalize))
                         job.setDaemon(True)
                         job.start()
                         jobs.append(job)
                         # Utils._calculate_new_rwe(root, file, picklefile, window_sizes, normalize)
                     elif not os.path.exists(picklefile):
-                        job = threading.Thread(name='_calculate_existing_rwe', target=Utils._calculate_existing_rwe, args=(picklefile, window_sizes, normalize))
+                        job = threading.Thread(name='_calculate_new_rwe', target=Utils._calculate_new_rwe, args=(root, file, picklefile, window_sizes, normalize))
                         job.setDaemon(True)
                         job.start()
                         jobs.append(job)
@@ -197,6 +197,8 @@ class Utils(object):
                     samples_processed += 1
                     print("{0:,} samples processed...".format(samples_processed))
                     print("Current elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+        for j in jobs:
+            j.join()
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
 
