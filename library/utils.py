@@ -126,7 +126,8 @@ class Utils(object):
                                      out_directory=None,
                                      window_sizes=[256],
                                      normalize=True,
-                                     njobs=1):
+                                     njobs=1,
+                                     process_existing=True):
         """
         Calculates the running window entropy of a directory containing
         malware samples that is named from their SHA256 value.  It will
@@ -137,6 +138,7 @@ class Utils(object):
         :param window_sizes: A list of window sizes to calculate.
         :param normalize: Set to False to not normalize.
         :param njobs: The number of threads to use
+        :param process_existing: Set to True to process existing pickle files
         :return: Nothing
         """
         if in_directory is None or out_directory is None:
@@ -180,7 +182,7 @@ class Utils(object):
                         jobs = [j for j in jobs if j.isAlive()]
                         sleep(.1)
 
-                    if os.path.exists(picklefile) and os.path.isfile(picklefile):
+                    if os.path.exists(picklefile) and os.path.isfile(picklefile) and process_existing:
                         job = threading.Thread(name='_calculate_existing_rwe', target=Utils._calculate_existing_rwe, args=(picklefile, window_sizes, normalize))
                         job.setDaemon(True)
                         job.start()
