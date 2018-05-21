@@ -15,20 +15,20 @@ pd.set_option('max_colwidth', 64)
 # Calculate features
 source_dir = '/Volumes/MALWARE 1/Focused Set May 2018/RWE'
 datapoints = 1024
-subdir = os.path.join('focused', 'data_vt_{0}'.format(datapoints))
-arguments = ['-w', '256', '-d', str(datapoints), '-j', '50', source_dir, subdir]
+datadir = os.path.join('/Volumes/MALWARE 1/Focused Set May 2018', 'data_vt_{0}'.format(datapoints))
+arguments = ['-w', '256', '-d', str(datapoints), '-j', '50', source_dir, datadir]
 batch_size = 100
 epochs = 100
 
 #classifications = Utils.get_classifications_from_path(source_dir)
 #classifications = Utils.estimate_vt_classifications_from_csv('/Dirty/Samples/all_vt_data.csv')
-#classifications.to_csv(os.path.join(subdir, 'classifications.csv'))
+#classifications.to_csv(os.path.join(datadir, 'classifications.csv'))
 
 # Uncomment to process data
 batch_preprocess_entropy.main(arguments)
 
 # Load data
-raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(subdir)
+raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
 all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
 #X = raw_data.as_matrix().copy()
 #y = classifications.as_matrix().copy()
