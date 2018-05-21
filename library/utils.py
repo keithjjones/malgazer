@@ -211,8 +211,8 @@ class Utils(object):
 
         :param root: The directory for the pickle file
         :param filename: The pickle file name
-        :param dataframe: The data frame
-        :param df_lock: The data frame lock
+        :param results: The results dict
+        :param results_lock: A list containing the results lock as the first item
         :param datapoints: The number of datapoints to resample RWE.
         :param window_size:  The window size of the RWE, that must be already
         calculated.
@@ -228,7 +228,7 @@ class Utils(object):
                 number_of_data_points=datapoints)
             s = pd.Series(ynew)
             s.name = f.malware.sha256.upper()
-            with results_lock:
+            with results_lock[0]:
                 results[os.path.join(root, filename)] = s
         else:
             print(
@@ -286,21 +286,22 @@ class Utils(object):
                         print("Reading file: {0}".format(file))
                         job = threading.Thread(name='_preprocess_rwe_pickle',
                                                target=Utils._preprocess_rwe_pickle,
-                                               args=(root, file, results, results_lock, datapoints, window_size))
+                                               args=(root, file, results, [results_lock], datapoints, window_size))
                         job.setDaemon(True)
                         job.start()
                         jobs.append(job)
                         processed_sha256.append(m.group(1).upper())
                         samples_processed += 1
+                        print("\t{0:,} samples processed...".format(samples_processed))
         for j in jobs:
             j.join()
-            with results_lock:
-                to_delete = []
-                for result in results:
-                    df = df.append(results[result])
-                    to_delete.append(result)
-                for d in to_delete:
-                    del results[d]
+        with results_lock:
+            to_delete = []
+            for result in results:
+                df = df.append(results[result])
+                to_delete.append(result)
+            for d in to_delete:
+                del results[d]
 
         print("{0:,} total samples processed...".format(samples_processed))
         return df
