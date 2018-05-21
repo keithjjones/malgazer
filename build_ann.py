@@ -39,7 +39,7 @@ y = all_data['classification'].values
 # Preprocess the data
 ml = ML()
 y, y_encoder = ml.encode_classifications(y)
-X, X_scaler = ml.scale_features_preprocessed_data(X)
+X, X_scaler = ml.scale_features(X)
 X_train, X_test, y_train, y_test = ml.train_test_split(X, y)
 outputs = y_train.shape[1]
 

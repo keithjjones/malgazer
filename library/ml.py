@@ -158,7 +158,7 @@ class ML(object):
         accuracy = accuracy/cm.sum()
         return accuracy, cm
 
-    def scale_features_preprocessed_data(self, X):
+    def scale_features(self, X):
         """
         Scales features in the X data.
 
