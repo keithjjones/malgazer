@@ -178,7 +178,7 @@ class ML(object):
         return X_scaled, self.X_sc
 
     @staticmethod
-    def encode_preprocessed_data(y):
+    def encode_classifications(y):
         """
         Encodes the classifications.
 
@@ -190,6 +190,18 @@ class ML(object):
         y[:, 0] = labelencoder_y.fit_transform(y[:, 0])
         y = to_categorical(y)
         return y, labelencoder_y
+
+    @staticmethod
+    def decode_classifications(y, labelencoder):
+        """
+        Decodes the classifications.
+
+        :param y:  The preprocessed data as a DataFrame.
+        :return:  The decoded data y.
+        """
+        y = np.argmax(y, axis=1)
+        y_out = labelencoder.inverse_transform(y)
+        return y_out
 
     @staticmethod
     def train_test_split(X, y, test_size=0.2, random_state=0):
