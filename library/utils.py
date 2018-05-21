@@ -1121,4 +1121,6 @@ class Utils(object):
                 if index in classifications.index:
                     raw_data_out = raw_data_out.append(raw_data.loc[index])
                     classifications_out = classifications_out.append(classifications.loc[index])
+            classifications_out = classifications_out[~classifications_out.index.duplicated(keep='first')]
+            raw_data_out = raw_data_out[~raw_data_out.index.duplicated(keep='first')]
         return raw_data_out, classifications_out

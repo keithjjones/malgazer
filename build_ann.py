@@ -30,14 +30,12 @@ epochs = 100
 # Load data
 raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(subdir)
 raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
-classifications = classifications[~classifications.index.duplicated(keep='first')]
-
-# Wrangle classifications
-#cls = Utils.parse_classifications_from_path(classifications)
+raw = raw_data.concat(classifications, axis=1)
 #X = raw_data.as_matrix().copy()
-#y = cls.as_matrix().copy()
-X = raw_data.as_matrix().copy()
-y = classifications.as_matrix().copy()
+#y = classifications.as_matrix().copy()
+X = raw.drop('classification', axis=1).values
+y = raw['classification'].values
+
 
 # Preprocess the data
 ml = ML()
