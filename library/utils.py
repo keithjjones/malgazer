@@ -205,9 +205,42 @@ class Utils(object):
         print("{0:,} total samples processed...".format(samples_processed))
 
     @staticmethod
-    def batch_preprocess_rwe_data(in_directory = None,
-                                  datapoints = 512,
-                                  window_size = 256):
+    def _preprocess_rwe_pickle(root, filename, results, results_lock, datapoints=512, window_size=256):
+        """
+        Internal function to pull RWE from a pickle file and insert it into a data frame.
+
+        :param root: The directory for the pickle file
+        :param filename: The pickle file name
+        :param dataframe: The data frame
+        :param df_lock: The data frame lock
+        :param datapoints: The number of datapoints to resample RWE.
+        :param window_size:  The window size of the RWE, that must be already
+        calculated.
+        """
+        print("Reading file: {0}".format(filename))
+        f = FileObject.read(os.path.join(root, filename))
+
+        running_entropy = f.malware.runningentropy
+
+        if window_size in running_entropy.entropy_data:
+            # Reduce RWE data points
+            xnew, ynew = running_entropy.resample_rwe(
+                window_size=window_size,
+                number_of_data_points=datapoints)
+            s = pd.Series(ynew)
+            s.name = f.malware.sha256.upper()
+            with results_lock:
+                results[os.path.join(root, filename)] = s
+        else:
+            print(
+                "ERROR: Window size {0} not in this pickle file: {1}".format(
+                    window_size, filename))
+
+    @staticmethod
+    def batch_preprocess_rwe_data(in_directory=None,
+                                  datapoints=512,
+                                  window_size=256,
+                                  njobs=1):
         """
         Return rwe of malware in a dataframe.
 
@@ -216,49 +249,62 @@ class Utils(object):
         :param datapoints: The number of datapoints to resample RWE.
         :param window_size:  The window size of the RWE, that must be already
         calculated.
+        :param njobs: The number of threads to use
         :return:  A Pandas dataframe containing the rwe.
         """
         print("Starting batch processing of running window entropy for malware samples...")
         # Keep track so we don't duplicate work
         processed_sha256 = []
 
-        # Start the timer
-        start_time = time.time()
+        jobs = []
+        results_lock = threading.Lock()
+
         # Check to see that the input directory exists, this will throw an
         # exception if it does not exist.
         os.stat(in_directory)
         # Only find pickle malware files created by the batch function above.
-        malware_files_re = re.compile('[a-z0-9]{64}.pickle.gz',
+        malware_files_re = re.compile('([a-z0-9]{64}).pickle.gz',
                                       flags=re.IGNORECASE)
         df = pd.DataFrame()
         samples_processed = 0
+        count = 0
+        results = {}
         for root, dirs, files in os.walk(in_directory):
             for file in files:
-                if malware_files_re.match(file):
-                    start_load_time = time.time()
-                    print("Reading file: {0}".format(file))
-                    f = FileObject.read(os.path.join(root, file))
-                    if f.malware.sha256.upper() not in processed_sha256:
-                        running_entropy = f.malware.runningentropy
+                m = malware_files_re.match(file)
+                if m:
+                    while len(jobs) >= njobs:
+                        jobs = [j for j in jobs if j.isAlive()]
+                        with results_lock:
+                            to_delete = []
+                            for result in results:
+                                df = df.append(results[result])
+                                to_delete.append(result)
+                            for d in to_delete:
+                                del results[d]
+                        sleep(.1)
 
-                        if window_size in running_entropy.entropy_data:
-                            # Reduce RWE data points
-                            xnew, ynew = running_entropy.resample_rwe(window_size=window_size,
-                                                                      number_of_data_points=datapoints)
-                            s = pd.Series(ynew)
-                            s.name = f.malware.sha256.upper()
-                            df = df.append(s)
-                            processed_sha256.append(f.malware.sha256.upper())
-                            print("\tElapsed time {0:.6f} seconds".format(
-                                 round(time.time() - start_load_time, 6)))
+                    if m.group(1).upper() not in processed_sha256:
+                        if count < 3:
+                            job = threading.Thread(name='_preprocess_rwe_pickle',
+                                                   target=Utils._preprocess_rwe_pickle,
+                                                   args=(root, file, results, results_lock, datapoints, window_size))
+                            job.setDaemon(True)
+                            job.start()
+                            jobs.append(job)
+                            processed_sha256.append(m.group(1).upper())
                             samples_processed += 1
-                            print("{0:,} samples processed...".format(
-                                 samples_processed))
-                        else:
-                            print(
-                                "ERROR: Window size {0} not in this pickle file!".format(window_size))
-        print("Total elapsed time {0:.6f} seconds".format(
-              round(time.time() - start_time, 6)))
+                            count += 1
+        for j in jobs:
+            j.join()
+            with results_lock:
+                to_delete = []
+                for result in results:
+                    df = df.append(results[result])
+                    to_delete.append(result)
+                for d in to_delete:
+                    del results[d]
+
         print("{0:,} total samples processed...".format(samples_processed))
         return df
 

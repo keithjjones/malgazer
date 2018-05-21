@@ -17,16 +17,23 @@ def main(arguments=None):
     parser.add_argument("-d", "--datapoints",
                         help="The number of data points to sample running window entropy."
                              "", type=int, default=512, required=False)
+    parser.add_argument("-j", "--jobs", type=int, default=1,
+                        help="The number of jobs to do the work, but be 1 or greater."
+                             "", required=False)
 
     if isinstance(arguments, list):
         args = parser.parse_args(arguments)
     else:
         args = parser.parse_args()
 
+    if args.jobs < 1:
+        print("Jobs must be 1 or greater.")
+        exit()
 
     df = Utils.batch_preprocess_rwe_data(args.DataDirectory,
                                          args.datapoints,
-                                         args.window)
+                                         args.window,
+                                         njobs=args.jobs)
 
     # classifications = Utils.get_classifications_from_path(args.DataDirectory)
 
@@ -34,7 +41,6 @@ def main(arguments=None):
 
     Utils.save_preprocessed_data(df, None,
                                  args.OutputDirectory)
-
 
 if __name__ == "__main__":
     args = sys.argv[1:]

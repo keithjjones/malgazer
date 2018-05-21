@@ -13,10 +13,10 @@ import os
 pd.set_option('max_colwidth', 64)
 
 # Calculate features
-source_dir = '/Dirty/malgazer/Test_Set/'
+source_dir = '/Volumes/MALWARE 1/Focused Set May 2018/RWE'
 datapoints = 1024
-subdir = 'data_vt_{0}'.format(datapoints)
-arguments = ['-w', '256', '-d', str(datapoints), source_dir, subdir]
+subdir = os.path.join('focused', 'data_vt_{0}'.format(datapoints))
+arguments = ['-w', '256', '-d', str(datapoints), '-j', '50', source_dir, subdir]
 batch_size = 100
 epochs = 100
 
@@ -25,7 +25,7 @@ epochs = 100
 #classifications.to_csv(os.path.join(subdir, 'classifications.csv'))
 
 # Uncomment to process data
-#batch_preprocess_entropy.main(arguments)
+batch_preprocess_entropy.main(arguments)
 
 # Load data
 raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(subdir)
