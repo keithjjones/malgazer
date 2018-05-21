@@ -1109,8 +1109,10 @@ class Utils(object):
         as the index.  The hash must be upper case.
         :param classifications:  A dataframe containing the classifications,
         with the hash as the index.
-        :return:  raw_data, classification.  The raw data will match
-        the classifications.
+        :return:  all_data, raw_data, classification.  all_data will have
+        the classifications and raw data in the DataFrame, raw_data will only
+        have the raw data, and classifications will have the classifications.
+        all_data is created from raw_data and classifications.
         """
         classifications_out = pd.DataFrame()
         raw_data_out = pd.DataFrame()
@@ -1123,4 +1125,5 @@ class Utils(object):
                     classifications_out = classifications_out.append(classifications.loc[index])
             classifications_out = classifications_out[~classifications_out.index.duplicated(keep='first')]
             raw_data_out = raw_data_out[~raw_data_out.index.duplicated(keep='first')]
-        return raw_data_out, classifications_out
+            all_data_out = raw_data_out.concat(classifications_out, axis=1)
+        return all_data_out, raw_data_out, classifications_out

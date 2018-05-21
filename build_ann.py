@@ -29,12 +29,11 @@ epochs = 100
 
 # Load data
 raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(subdir)
-raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
-raw = raw_data.concat(classifications, axis=1)
+all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
 #X = raw_data.as_matrix().copy()
 #y = classifications.as_matrix().copy()
-X = raw.drop('classification', axis=1).values
-y = raw['classification'].values
+X = all_data.drop('classification', axis=1).values
+y = all_data['classification'].values
 
 
 # Preprocess the data
