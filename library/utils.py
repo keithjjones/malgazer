@@ -217,7 +217,6 @@ class Utils(object):
         :param window_size:  The window size of the RWE, that must be already
         calculated.
         """
-        print("Reading file: {0}".format(filename))
         f = FileObject.read(os.path.join(root, filename))
 
         running_entropy = f.malware.runningentropy
@@ -284,6 +283,7 @@ class Utils(object):
                         sleep(.1)
 
                     if m.group(1).upper() not in processed_sha256:
+                        print("Reading file: {0}".format(file))
                         job = threading.Thread(name='_preprocess_rwe_pickle',
                                                target=Utils._preprocess_rwe_pickle,
                                                args=(root, file, results, results_lock, datapoints, window_size))
