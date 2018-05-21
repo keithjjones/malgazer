@@ -267,7 +267,6 @@ class Utils(object):
                                       flags=re.IGNORECASE)
         df = pd.DataFrame()
         samples_processed = 0
-        count = 0
         results = {}
         for root, dirs, files in os.walk(in_directory):
             for file in files:
@@ -285,16 +284,14 @@ class Utils(object):
                         sleep(.1)
 
                     if m.group(1).upper() not in processed_sha256:
-                        if count < 3:
-                            job = threading.Thread(name='_preprocess_rwe_pickle',
-                                                   target=Utils._preprocess_rwe_pickle,
-                                                   args=(root, file, results, results_lock, datapoints, window_size))
-                            job.setDaemon(True)
-                            job.start()
-                            jobs.append(job)
-                            processed_sha256.append(m.group(1).upper())
-                            samples_processed += 1
-                            count += 1
+                        job = threading.Thread(name='_preprocess_rwe_pickle',
+                                               target=Utils._preprocess_rwe_pickle,
+                                               args=(root, file, results, results_lock, datapoints, window_size))
+                        job.setDaemon(True)
+                        job.start()
+                        jobs.append(job)
+                        processed_sha256.append(m.group(1).upper())
+                        samples_processed += 1
         for j in jobs:
             j.join()
             with results_lock:
