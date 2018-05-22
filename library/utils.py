@@ -1116,6 +1116,7 @@ class Utils(object):
         """
         classifications_out = pd.DataFrame()
         raw_data_out = pd.DataFrame()
+        all_data_out = pd.DataFrame()
 
         if classifications is not None and raw_data is not None:
             # Make sure there is a classification for each raw data point.
