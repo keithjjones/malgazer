@@ -1128,3 +1128,14 @@ class Utils(object):
             raw_data = raw_data[~raw_data.index.duplicated(keep='first')]
             all_data = pd.concat([raw_data, classifications], axis=1)
         return all_data, raw_data, classifications
+
+    @staticmethod
+    def filter_hashes(data, hashes):
+        """
+        Filters the data so that only hashes in the hashes list are included.
+
+        :param data: A DataFrame where the index is hashes.
+        :param hashes: A list of hashes to include for the filter.
+        :return: A DataFrame of the filtered data.
+        """
+        return data.loc[data.index.isin(hashes)]
