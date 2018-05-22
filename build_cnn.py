@@ -14,7 +14,7 @@ pd.set_option('max_colwidth', 64)
 
 # Calculate features
 source_dir = '/Volumes/MALWARE 1/Focused Set May 2018/RWE'
-datapoints = 2048
+datapoints = 1024
 datadir = os.path.join('/Volumes/MALWARE 1/Focused Set May 2018', 'data_vt_{0}'.format(datapoints))
 arguments = ['-w', '256', '-d', str(datapoints), '-j', '100', source_dir, datadir]
 batch_size = 100
@@ -25,7 +25,7 @@ epochs = 100
 #classifications.to_csv(os.path.join(datadir, 'classifications.csv'))
 
 # Uncomment to process data
-batch_preprocess_entropy.main(arguments)
+#batch_preprocess_entropy.main(arguments)
 
 # Load data
 raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
@@ -33,12 +33,14 @@ raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
 # Make sure data lines up
 all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
 
-# Pick 60k samples, 10k from each classification
-trimmed_data = all_data.groupby('classification').head(10000)
-trimmed_data.to_csv(os.path.join(datadir, 'data.csv'))
+# Pull the hashes we care about
+hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:,0]
+all_data = all_data.loc[all_data.index.isin(hashes)]
 
-# Save the hashes
-pd.DataFrame(trimmed_data.index).to_csv(os.path.join(datadir, 'hashes.txt'), header=False, index=False)
+# Pick 60k samples, 10k from each classification
+#trimmed_data = all_data.groupby('classification').head(10000)
+#trimmed_data.to_csv(os.path.join(datadir, 'data.csv'))
+#pd.DataFrame(trimmed_data.index).to_csv(os.path.join(datadir, 'hashes_60k.txt'), header=False, index=False)
 
 # Read in the final training data
 data = pd.read_csv(os.path.join(datadir, 'data.csv'), index_col=0)
