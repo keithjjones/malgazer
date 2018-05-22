@@ -29,11 +29,21 @@ epochs = 100
 
 # Load data
 raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
+
+# Make sure data lines up
 all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
-#X = raw_data.as_matrix().copy()
-#y = classifications.as_matrix().copy()
-X = all_data.drop('classification', axis=1).as_matrix().copy()
-y = pd.DataFrame(all_data['classification']).as_matrix().copy()
+
+# Pick 60k samples, 10k from each classification
+trimmed_data = all_data.groupby('classification').head(10000)
+trimmed_data.to_csv(os.path.join(datadir, 'data.csv'))
+
+# Save the hashes
+pd.DataFrame(trimmed_data.index).to_csv(os.path.join(datadir, 'hashes.txt'), header=False, index=False)
+
+# Read in the final training data
+data = pd.read_csv(os.path.join(datadir, 'data.csv'), index_col=0)
+X = data.drop('classification', axis=1).as_matrix().copy()
+y = pd.DataFrame(data['classification']).as_matrix().copy()
 
 
 # Preprocess the data
