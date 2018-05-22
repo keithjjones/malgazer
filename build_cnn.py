@@ -20,10 +20,6 @@ arguments = ['-w', '256', '-d', str(datapoints), '-j', '100', source_dir, datadi
 batch_size = 100
 epochs = 100
 
-#classifications = Utils.get_classifications_from_path(source_dir)
-#classifications = Utils.estimate_vt_classifications_from_csv('/Dirty/Samples/all_vt_data.csv')
-#classifications.to_csv(os.path.join(datadir, 'classifications.csv'))
-
 # Uncomment to process data
 #batch_preprocess_entropy.main(arguments)
 

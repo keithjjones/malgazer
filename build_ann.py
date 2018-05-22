@@ -20,10 +20,6 @@ arguments = ['-w', '256', '-d', str(datapoints), '-j', '100', source_dir, datadi
 batch_size = 100
 epochs = 100
 
-#classifications = Utils.get_classifications_from_path(source_dir)
-#classifications = Utils.estimate_vt_classifications_from_csv('/Dirty/Samples/all_vt_data.csv')
-#classifications.to_csv(os.path.join(datadir, 'classifications.csv'))
-
 # Uncomment to process data
 #batch_preprocess_entropy.main(arguments)
 
@@ -34,13 +30,14 @@ raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
 all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
 
 # Pull the hashes we care about
-hashes = pd.read_csv(os.path.join(datadir, 'hashes.txt'), header=None).values[:,0]
+hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:,0]
 all_data = all_data.loc[all_data.index.isin(hashes)]
 
 # Pick 60k samples, 10k from each classification
-trimmed_data = all_data.groupby('classification').head(10000)
-trimmed_data.to_csv(os.path.join(datadir, 'data.csv'))
-pd.DataFrame(trimmed_data.index).to_csv(os.path.join(datadir, 'hashes.txt'), header=False, index=False)
+#trimmed_data = all_data.groupby('classification').head(10000)
+#trimmed_data.to_csv(os.path.join(datadir, 'data.csv'))
+#pd.DataFrame(trimmed_data.index).to_csv(os.path.join(datadir, 'hashes_60k.txt'), header=False, index=False)
+
 
 # Read in the final training data
 data = pd.read_csv(os.path.join(datadir, 'data.csv'), index_col=0)
