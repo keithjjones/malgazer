@@ -1118,7 +1118,7 @@ class Utils(object):
         raw_data_out = pd.DataFrame()
         all_data_out = pd.DataFrame()
 
-        if classifications is not None and raw_data is not None:
+        if isinstance(classifications, pd.DataFrame) and isinstance(raw_data, pd.DataFrame):
             # Make sure there is a classification for each raw data point.
             for index, row in raw_data.iterrows():
                 if index in classifications.index:
