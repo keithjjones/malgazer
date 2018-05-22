@@ -1114,19 +1114,11 @@ class Utils(object):
         have the raw data, and classifications will have the classifications.
         all_data is created from raw_data and classifications.
         """
-        all_data = pd.DataFrame()
-
-        if isinstance(classifications, pd.DataFrame) and isinstance(raw_data, pd.DataFrame):
-            # Make sure there is a classification for each raw data point.
-            for index, row in raw_data.iterrows():
-                if index not in classifications.index:
-                    raw_data.drop(index, inplace=True)
-            for index, row in classifications.iterrows():
-                if index not in raw_data.index:
-                    classifications.drop(index, inplace=True)
-            classifications = classifications[~classifications.index.duplicated(keep='first')]
-            raw_data = raw_data[~raw_data.index.duplicated(keep='first')]
-            all_data = pd.concat([raw_data, classifications], axis=1)
+        classifications = classifications[~classifications.index.duplicated(keep='first')]
+        raw_data = raw_data[~raw_data.index.duplicated(keep='first')]
+        classifications = classifications.loc[classifications.index.isin(raw_data.index)]
+        raw_data = raw_data.loc[raw_data.index.isin(classifications.index)]
+        all_data = pd.concat([raw_data, classifications], axis=1)
         return all_data, raw_data, classifications
 
     @staticmethod
