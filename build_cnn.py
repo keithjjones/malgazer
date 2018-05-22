@@ -14,9 +14,9 @@ pd.set_option('max_colwidth', 64)
 
 # Calculate features
 source_dir = '/Volumes/MALWARE 1/Focused Set May 2018/RWE'
-datapoints = 1024
+datapoints = 2048
 datadir = os.path.join('/Volumes/MALWARE 1/Focused Set May 2018', 'data_vt_{0}'.format(datapoints))
-arguments = ['-w', '256', '-d', str(datapoints), '-j', '50', source_dir, datadir]
+arguments = ['-w', '256', '-d', str(datapoints), '-j', '500', source_dir, datadir]
 batch_size = 100
 epochs = 100
 
@@ -32,8 +32,8 @@ raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
 all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
 #X = raw_data.as_matrix().copy()
 #y = classifications.as_matrix().copy()
-X = all_data.drop('classification', axis=1).values
-y = all_data['classification'].values
+X = all_data.drop('classification', axis=1).as_matrix().copy()
+y = pd.DataFrame(all_data['classification']).as_matrix().copy()
 
 
 # Preprocess the data

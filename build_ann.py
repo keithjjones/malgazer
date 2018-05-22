@@ -32,8 +32,8 @@ raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
 all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
 #X = raw_data.as_matrix().copy()
 #y = classifications.as_matrix().copy()
-X = all_data.drop('classification', axis=1).values
-y = all_data['classification'].values
+X = all_data.drop('classification', axis=1).as_matrix().copy()
+y = pd.DataFrame(all_data['classification']).as_matrix().copy()
 
 
 # Preprocess the data
