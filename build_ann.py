@@ -15,8 +15,9 @@ pd.set_option('max_colwidth', 64)
 # Calculate features
 source_dir = '/Volumes/MALWARE 1/Focused Set May 2018/RWE'
 datapoints = 1024
+windowsize = 256
 datadir = os.path.join('/Volumes/MALWARE 1/Focused Set May 2018', 'data_vt_{0}'.format(datapoints))
-arguments = ['-w', '256', '-d', str(datapoints), '-j', '100', source_dir, datadir]
+arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', '100', source_dir, datadir]
 batch_size = 100
 epochs = 100
 
