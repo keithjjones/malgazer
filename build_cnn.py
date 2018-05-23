@@ -16,13 +16,13 @@ pd.set_option('max_colwidth', 64)
 source_dir = '/Volumes/MALWARE 1/Focused Set May 2018/RWE'
 datapoints = 1024
 windowsize = 256
-datadir = os.path.join('/Volumes/MALWARE 1/Focused Set May 2018', 'data_vt_{0}'.format(datapoints))
+datadir = os.path.join('/Volumes/MALWARE 1/Focused Set May 2018', 'data_vt_window_{0}_samples_{1}'.format(windowsize, datapoints))
 arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', '100', source_dir, datadir]
 batch_size = 100
 epochs = 100
 
 # Uncomment to process data
-#batch_preprocess_entropy.main(arguments)
+batch_preprocess_entropy.main(arguments)
 
 # Load data
 raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
