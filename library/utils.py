@@ -79,7 +79,11 @@ class Utils(object):
                 # Calculate running entropy...
                 rwe = m.running_entropy(w, normalize)
         # Write the running entropy...
-        m.write(picklefile)
+        try:
+            m.write(picklefile)
+        except KeyboardInterrupt:
+            if os.path.exists(picklefile):
+                os.remove(picklefile)
         return True
 
     @staticmethod
@@ -105,7 +109,14 @@ class Utils(object):
                     pass
         # Write the running entropy...
         if changed:
-            m.write(picklefile)
+            try:
+                os.rename(picklefile, picklefile+".tmp")
+                m.write(picklefile)
+                os.remove(picklefile+".tmp")
+            except KeyboardInterrupt:
+                if os.path.exists(picklefile) and os.path.exists(picklefile+".tmp"):
+                    os.remove(picklefile)
+                    os.rename(picklefile + ".tmp", picklefile)
         return True
 
     @staticmethod
