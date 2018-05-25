@@ -117,7 +117,7 @@ class Utils(object):
                                      process_existing=True):
         """
         Calculates the running window entropy of a directory containing
-        malware samples that is named from their SHA256 value.  It will
+        malware samples that are named from their SHA256 value.  It will
         skip all other files.
 
         :param in_directory:  The input directory for malware.
