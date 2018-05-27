@@ -21,7 +21,7 @@ preprocess_data = False
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'ann'
+classifier_type = 'cnn'
 
 #
 # Calculate features
