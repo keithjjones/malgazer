@@ -27,7 +27,7 @@ classifier_type = 'cnn'
 # Calculate features
 #
 source_dir = '/Volumes/MALWARE 1/Focused Set May 2018/RWE'
-datapoints = 4096
+datapoints = 1024
 windowsize = 256
 datadir = os.path.join('/Volumes/MALWARE 1/Focused Set May 2018', 'data_vt_window_{0}_samples_{1}'.format(windowsize, datapoints))
 arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', '100', source_dir, datadir]
