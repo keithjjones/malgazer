@@ -20,7 +20,10 @@ class ML(object):
     def __init__(self):
         super(ML, self).__init__()
         self.classifer = None
+        # X scaler
         self.X_sc = None
+        # y label encoder
+        self.y_labelencoder = None
 
     @staticmethod
     def build_ann_static(datapoints=1024, outputs=9):
@@ -174,11 +177,9 @@ class ML(object):
         # y = onehotencoder.fit_transform(y).toarray()
         # inverted = labelencoder_y.inverse_transform([argmax(y)])
         # y = y[:, 1:]
-
         return X_scaled, self.X_sc
 
-    @staticmethod
-    def encode_classifications(y):
+    def encode_classifications(self, y):
         """
         Encodes the classifications.
 
@@ -186,22 +187,27 @@ class ML(object):
         :return:  A tuple of the encoded data y and the encoder (for inverting)
         as y,encoder.
         """
-        labelencoder_y = LabelEncoder()
-        y[:, 0] = labelencoder_y.fit_transform(y[:, 0])
+        if self.y_labelencoder is None:
+            self.y_labelencoder = LabelEncoder()
+            y[:, 0] = self.y_labelencoder.fit_transform(y[:, 0])
+        else:
+            y[:, 0] = self.y_labelencoder.transform(y[:, 0])
         y = to_categorical(y)
-        return y, labelencoder_y
+        return y, self.y_labelencoder
 
-    @staticmethod
-    def decode_classifications(y, labelencoder):
+    def decode_classifications(self, y):
         """
         Decodes the classifications.
 
         :param y:  The preprocessed data as a DataFrame.
         :return:  The decoded data y.
         """
-        y = np.argmax(y, axis=1)
-        y_out = labelencoder.inverse_transform(y)
-        return y_out
+        if self.y_labelencoder is not None:
+            y = np.argmax(y, axis=1)
+            y_out = self.y_labelencoder.inverse_transform(y)
+            return y_out
+        else:
+            return None
 
     @staticmethod
     def train_test_split(X, y, test_size=0.2, random_state=0):
