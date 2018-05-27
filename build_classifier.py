@@ -115,6 +115,7 @@ if build_classifier:
         #print("CFV Mean: {0}".format(mean))
         #print("CFV Var: {0}".format(variance))
     elif classifier_type.lower() == 'ann':
+        outputs = y_train.shape[1]
         # Create the ANN
         classifier = ml.build_ann(datapoints, outputs)
         # Train the NN
