@@ -12,7 +12,20 @@ import os
 
 pd.set_option('max_colwidth', 64)
 
+#
+# Script actions
+#
+# Preprocess the data into one DataFrame
+preprocess_data = False
+# Assemble the preprocessed data
+assemble_preprocessed_data = False
+# Build a classifier
+build_classifier = True
+classifier_type = 'cnn'
+
+#
 # Calculate features
+#
 source_dir = '/Volumes/MALWARE 1/Focused Set May 2018/RWE'
 datapoints = 4096
 windowsize = 256
@@ -21,15 +34,12 @@ arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', '100', source_d
 batch_size = 100
 epochs = 100
 
-# Script actions
-preprocess_data = False
-build_classifier = True
-classifier = 'cnn'
-
+# Preprocess data
 if preprocess_data:
     batch_preprocess_entropy.main(arguments)
 
-if build_classifier:
+# Put the data together and save hashes used for training
+if assemble_preprocessed_data:
     # Load data
     raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
     
@@ -37,21 +47,34 @@ if build_classifier:
     all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
     
     # Pick 60k samples, 10k from each classification
-    #trimmed_data = all_data.groupby('classification').head(10000)
-    #trimmed_data.to_csv(os.path.join(datadir, 'data.csv'))
-    #pd.DataFrame(trimmed_data.index).to_csv(os.path.join(datadir, 'hashes_60k.txt'), header=False, index=False)
+    trimmed_data = all_data.groupby('classification').head(10000)
+    trimmed_data.to_csv(os.path.join(datadir, 'data.csv'))
+    pd.DataFrame(trimmed_data.index).to_csv(os.path.join(datadir, 'hashes_60k.txt'), header=False, index=False)
     
     # Pull the hashes we care about
     hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:,0]
     data = Utils.filter_hashes(all_data, hashes)
-    #data.to_csv(os.path.join(datadir, 'data.csv'))
+    data.to_csv(os.path.join(datadir, 'data.csv'))
+
+# Build a classifier
+if build_classifier:
+    # Load data
+    raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
+    
+    # Make sure data lines up
+    all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
+    
+    # Pull the hashes we care about
+    hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:,0]
+    data = Utils.filter_hashes(all_data, hashes)
+    data.to_csv(os.path.join(datadir, 'data.csv'))
     
     # Read in the final training data
     #data = pd.read_csv(os.path.join(datadir, 'data.csv'), index_col=0)
     X = data.drop('classification', axis=1).as_matrix().copy()
     y = pd.DataFrame(data['classification']).as_matrix().copy()
     
-    # Preprocess the data
+    # Make the classifier
     ml = ML()
     y, y_encoder = ml.encode_classifications(y)
     X, X_scaler = ml.scale_features(X)
@@ -60,10 +83,10 @@ if build_classifier:
     yt = y_train
     outputs = yt.shape[1]
 
-    if classifier.lower() == 'cnn':    
+    if classifier_type.lower() == 'cnn':    
         # Create the CNN
         classifier = ml.build_cnn(Xt, outputs)        
-    elif classifier.lower() == 'ann':
+    elif classifier_type.lower() == 'ann':
         # Create the ANN
         classifier = ml.build_ann(datapoints, outputs)
         
