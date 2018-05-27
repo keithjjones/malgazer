@@ -21,7 +21,7 @@ preprocess_data = False
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'cnn'
+classifier_type = 'ann'
 
 #
 # Calculate features
@@ -79,42 +79,68 @@ if build_classifier:
     y, y_encoder = ml.encode_classifications(y)
     X, X_scaler = ml.scale_features(X)
     X_train, X_test, y_train, y_test = ml.train_test_split(X, y)
-    Xt = np.expand_dims(X_train, axis=2)
-    yt = y_train
-    outputs = yt.shape[1]
 
     if classifier_type.lower() == 'cnn':    
+        Xt = np.expand_dims(X_train, axis=2)
+        yt = y_train
+        outputs = yt.shape[1]
         # Create the CNN
-        classifier = ml.build_cnn(Xt, outputs)        
+        classifier = ml.build_cnn(Xt, outputs)
+        # Train the CNN
+        start_time = time.time()
+        classifier = ml.train_nn(Xt, yt, batch_size=batch_size, epochs=epochs)
+        print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+        
+        # Predict the results
+        Xtest = np.expand_dims(X_test, axis=2)
+        y_pred = ml.predict_nn(Xtest)
+        
+        # Making the Confusion Matrix
+        accuracy, cm = ml.confusion_matrix(y_test, y_pred)
+        
+        print("Confusion Matrix:")
+        print(cm)
+        print("Accuracy:")
+        print(accuracy)
+        
+        ## Cross Fold Validation
+        #def model():
+        #    return ML.build_cnn_static(Xt, outputs)
+        #accuracies, mean, variance = ml.cross_fold_validation(model,
+        #                                                      Xt, yt, 
+        #                                                      batch_size=batch_size, 
+        #                                                      epochs=epochs, 
+        #                                                      cv=10, 
+        #                                                      n_jobs=2)
+        #print("CFV Mean: {0}".format(mean))
+        #print("CFV Var: {0}".format(variance))
     elif classifier_type.lower() == 'ann':
         # Create the ANN
         classifier = ml.build_ann(datapoints, outputs)
+        # Train the NN
+        start_time = time.time()
+        classifier = ml.train_nn(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=False)
+        print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))                
+        # Predict the results
+        Xtest = np.expand_dims(X_test, axis=2)
+        y_pred = ml.predict_nn(X_test)
         
-    # Train the NN
-    start_time = time.time()
-    classifier = ml.train_nn(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=False)
-    print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+        # Making the Confusion Matrix
+        accuracy, cm = ml.confusion_matrix(y_test, y_pred)
         
-    # Predict the results
-    Xtest = np.expand_dims(X_test, axis=2)
-    y_pred = ml.predict_nn(X_test)
-    
-    # Making the Confusion Matrix
-    accuracy, cm = ml.confusion_matrix(y_test, y_pred)
-    
-    print("Confusion Matrix:")
-    print(cm)
-    print("Accuracy:")
-    print(accuracy)
-    
-    # Cross Fold Validation
-    #def model():
-    #    return ML.build_ann_static(datapoints, outputs)
-    #accuracies, mean, variance = ML.cross_fold_validation(model,
-    #                                                      X_train, y_train, 
-    #                                                      batch_size=batch_size, 
-    #                                                      epochs=epochs, 
-    #                                                      cv=10, 
-    #                                                      n_jobs=2)
-    #print("CFV Mean: {0}".format(mean))
-    #print("CFV Var: {0}".format(variance))
+        print("Confusion Matrix:")
+        print(cm)
+        print("Accuracy:")
+        print(accuracy)
+        
+        # Cross Fold Validation
+        #def model():
+        #    return ML.build_ann_static(datapoints, outputs)
+        #accuracies, mean, variance = ML.cross_fold_validation(model,
+        #                                                      X_train, y_train, 
+        #                                                      batch_size=batch_size, 
+        #                                                      epochs=epochs, 
+        #                                                      cv=10, 
+        #                                                      n_jobs=2)
+        #print("CFV Mean: {0}".format(mean))
+        #print("CFV Var: {0}".format(variance))
