@@ -16,21 +16,22 @@ pd.set_option('max_colwidth', 64)
 # Script actions
 #
 # Preprocess the data into one DataFrame
-preprocess_data = False
+preprocess_data = True
 # Assemble the preprocessed data
 assemble_preprocessed_data = False
 # Build a classifier
-build_classifier = True
+build_classifier = False
 classifier_type = 'cnn'
 
 #
 # Calculate features
 #
 source_dir = '/Volumes/MALWARE 1/Focused Set May 2018/RWE'
-datapoints = 1024
-windowsize = 256
+datapoints = 2048
+windowsize = 1024
+number_of_jobs = 200
 datadir = os.path.join('/Volumes/MALWARE 1/Focused Set May 2018', 'data_vt_window_{0}_samples_{1}'.format(windowsize, datapoints))
-arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', '100', source_dir, datadir]
+arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', str(number_of_jobs), source_dir, datadir]
 batch_size = 100
 epochs = 100
 
