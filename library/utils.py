@@ -151,7 +151,7 @@ class Utils(object):
         samples_processed = 0
         saved_futures = {}
         try:
-            with ThreadPoolExecutor(max_workers=njobs) as executor:
+            with ProcessPoolExecutor(max_workers=njobs) as executor:
                 for root, dirs, files in os.walk(in_directory):
                     for file in files:
                         if malware_files_re.match(file):
@@ -203,17 +203,16 @@ class Utils(object):
         print("{0:,} total samples processed...".format(samples_processed))
 
     @staticmethod
-    def _preprocess_rwe_pickle(root, filename, results, results_lock, datapoints=512, window_size=256):
+    def _preprocess_rwe_pickle(root, filename, datapoints=512, window_size=256):
         """
         Internal function to pull RWE from a pickle file and insert it into a data frame.
 
         :param root: The directory for the pickle file
         :param filename: The pickle file name
-        :param results: The results dict
-        :param results_lock: A list containing the results lock as the first item
         :param datapoints: The number of datapoints to resample RWE.
         :param window_size:  The window size of the RWE, that must be already
         calculated.
+        :returns: A data series of the computation, None otherwise.
         """
         f = FileObject.read(os.path.join(root, filename))
 
@@ -225,12 +224,12 @@ class Utils(object):
                                                       number_of_data_points=datapoints)
             s = pd.Series(ynew)
             s.name = f.malware.sha256.upper()
-            with results_lock[0]:
-                results[os.path.join(root, filename)] = s
+            return s
         else:
             print(
                 "ERROR: Window size {0} not in this pickle file: {1}".format(
                     window_size, filename))
+            return None
 
     @staticmethod
     def batch_preprocess_rwe_data(in_directory=None,
@@ -263,7 +262,6 @@ class Utils(object):
         df = pd.DataFrame()
         saved_futures = {}
         samples_processed = 0
-        results = {}
         with ThreadPoolExecutor(max_workers=njobs) as executor:
             for root, dirs, files in os.walk(in_directory):
                 for file in files:
@@ -271,12 +269,12 @@ class Utils(object):
                     if m:
                         if m.group(1).upper() not in processed_sha256:
                             future = executor.submit(Utils._preprocess_rwe_pickle,
-                                                     root, file, results,
-                                                     [results_lock],
+                                                     root, file,
                                                      datapoints, window_size)
                             saved_futures[future] = file
                             processed_sha256.append(m.group(1).upper())
             for future in as_completed(saved_futures):
+                df = df.append(future.result())
                 samples_processed += 1
                 print("Processed file: {0}".format(saved_futures[future]))
                 print("\t{0:,} samples processed...".format(samples_processed))

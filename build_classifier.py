@@ -27,9 +27,9 @@ classifier_type = 'cnn'
 # Calculate features
 #
 source_dir = '/Volumes/MALWARE 1/Focused Set May 2018/RWE'
-datapoints = 2048
+datapoints = 4096
 windowsize = 1024
-number_of_jobs = 200
+number_of_jobs = 20
 datadir = os.path.join('/Volumes/MALWARE 1/Focused Set May 2018', 'data_vt_window_{0}_samples_{1}'.format(windowsize, datapoints))
 arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', str(number_of_jobs), source_dir, datadir]
 batch_size = 100
