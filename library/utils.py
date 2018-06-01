@@ -14,6 +14,7 @@ from tsfresh.utilities.dataframe_functions import impute
 from tsfresh.feature_extraction import EfficientFCParameters
 import threading
 from time import sleep
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 
 
 class Utils(object):
@@ -148,49 +149,56 @@ class Utils(object):
         malware_files_re = re.compile('[a-z0-9]{64}',
                                       flags=re.IGNORECASE)
         samples_processed = 0
-        jobs = []
+        saved_futures = {}
         try:
-            for root, dirs, files in os.walk(in_directory):
-                for file in files:
-                    if malware_files_re.match(file):
-                        print("Input file: {0}".format(file))
-                        subdir = root[len(in_directory):]
+            with ThreadPoolExecutor(max_workers=njobs) as executor:
+                for root, dirs, files in os.walk(in_directory):
+                    for file in files:
+                        if malware_files_re.match(file):
+                            print("Input file: {0}".format(file))
+                            subdir = root[len(in_directory):]
 
-                        # Create the DB file name...
-                        datadir = os.path.join(out_directory, subdir)
-                        picklefile = os.path.join(datadir, file) + ".pickle.gz"
+                            # Create the pickle file name...
+                            datadir = os.path.join(out_directory, subdir)
+                            picklefile = os.path.join(datadir, file) + ".pickle.gz"
 
-                        # Create the directory if needed...
-                        try:
-                            os.stat(datadir)
-                        except:
-                            os.makedirs(datadir)
+                            # Create the directory if needed...
+                            try:
+                                os.stat(datadir)
+                            except:
+                                os.makedirs(datadir)
 
-                        while len(jobs) >= njobs:
-                            jobs = [j for j in jobs if j.isAlive()]
-                            sleep(.1)
+                            # Old style of checking threads...
+                            # while len(jobs) >= njobs:
+                            #     jobs = [j for j in jobs if j.isAlive()]
+                            #     sleep(.1)
 
-                        if os.path.exists(picklefile) and os.path.isfile(picklefile) and process_existing:
-                            job = threading.Thread(name='_calculate_existing_rwe', target=Utils._calculate_existing_rwe, args=(picklefile, window_sizes, normalize))
-                            job.setDaemon(True)
-                            job.start()
-                            jobs.append(job)
-                            # Utils._calculate_new_rwe(root, file, picklefile, window_sizes, normalize)
-                        elif not os.path.exists(picklefile):
-                            job = threading.Thread(name='_calculate_new_rwe', target=Utils._calculate_new_rwe, args=(root, file, picklefile, window_sizes, normalize))
-                            job.setDaemon(True)
-                            job.start()
-                            jobs.append(job)
-                            # Utils._calculate_existing_rwe(picklefile, window_sizes, normalize)
-                        else:
-                            print("\t\tSkipping calculation...")
-                        samples_processed += 1
-                        print("{0:,} samples processed...".format(samples_processed))
-                        print("Current elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+                            if os.path.exists(picklefile) and os.path.isfile(picklefile) and process_existing:
+                                future = executor.submit(Utils._calculate_existing_rwe, picklefile, window_sizes, normalize)
+                                saved_futures[future] = file
+                                # Utils._calculate_new_rwe(root, file, picklefile, window_sizes, normalize)
+                            elif not os.path.exists(picklefile):
+                                future = executor.submit(Utils._calculate_new_rwe, root, file, picklefile, window_sizes, normalize)
+                                saved_futures[future] = file
+                                # Utils._calculate_existing_rwe(picklefile, window_sizes, normalize)
+                            else:
+                                print("\t\tSkipping calculation...")
+                for future in as_completed(saved_futures):
+                    samples_processed += 1
+                    print("Processed file: {0}".format(saved_futures[future]))
+                    print("\t{0:,} samples processed...".format(samples_processed))
         except KeyboardInterrupt:
-            pass
-        for j in jobs:
-            j.join()
+            print("Shutting down gracefully....")
+            futures_to_delete = []
+            for future in saved_futures:
+                if future.cancel() is True:
+                    futures_to_delete.append(future)
+            for future in futures_to_delete:
+                del saved_futures[future]
+            for future in as_completed(saved_futures):
+                samples_processed += 1
+                print("Processed file: {0}".format(saved_futures[future]))
+                print("\t{0:,} samples processed...".format(samples_processed))
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
 
@@ -213,9 +221,8 @@ class Utils(object):
 
         if window_size in running_entropy.entropy_data:
             # Reduce RWE data points
-            xnew, ynew = running_entropy.resample_rwe(
-                window_size=window_size,
-                number_of_data_points=datapoints)
+            xnew, ynew = running_entropy.resample_rwe(window_size=window_size,
+                                                      number_of_data_points=datapoints)
             s = pd.Series(ynew)
             s.name = f.malware.sha256.upper()
             with results_lock[0]:
@@ -245,7 +252,6 @@ class Utils(object):
         # Keep track so we don't duplicate work
         processed_sha256 = []
 
-        jobs = []
         results_lock = threading.Lock()
 
         # Check to see that the input directory exists, this will throw an
@@ -255,43 +261,25 @@ class Utils(object):
         malware_files_re = re.compile('([a-z0-9]{64}).pickle.gz',
                                       flags=re.IGNORECASE)
         df = pd.DataFrame()
+        saved_futures = {}
         samples_processed = 0
         results = {}
-        for root, dirs, files in os.walk(in_directory):
-            for file in files:
-                m = malware_files_re.match(file)
-                if m:
-                    while len(jobs) >= njobs:
-                        jobs = [j for j in jobs if j.isAlive()]
-                        with results_lock:
-                            to_delete = []
-                            for result in results:
-                                df = df.append(results[result])
-                                to_delete.append(result)
-                            for d in to_delete:
-                                del results[d]
-                        sleep(.1)
-
-                    if m.group(1).upper() not in processed_sha256:
-                        print("Reading file: {0}".format(file))
-                        job = threading.Thread(name='_preprocess_rwe_pickle',
-                                               target=Utils._preprocess_rwe_pickle,
-                                               args=(root, file, results, [results_lock], datapoints, window_size))
-                        job.setDaemon(True)
-                        job.start()
-                        jobs.append(job)
-                        processed_sha256.append(m.group(1).upper())
-                        samples_processed += 1
-                        print("\t{0:,} samples processed...".format(samples_processed))
-        for j in jobs:
-            j.join()
-        with results_lock:
-            to_delete = []
-            for result in results:
-                df = df.append(results[result])
-                to_delete.append(result)
-            for d in to_delete:
-                del results[d]
+        with ThreadPoolExecutor(max_workers=njobs) as executor:
+            for root, dirs, files in os.walk(in_directory):
+                for file in files:
+                    m = malware_files_re.match(file)
+                    if m:
+                        if m.group(1).upper() not in processed_sha256:
+                            future = executor.submit(Utils._preprocess_rwe_pickle,
+                                                     root, file, results,
+                                                     [results_lock],
+                                                     datapoints, window_size)
+                            saved_futures[future] = file
+                            processed_sha256.append(m.group(1).upper())
+            for future in as_completed(saved_futures):
+                samples_processed += 1
+                print("Processed file: {0}".format(saved_futures[future]))
+                print("\t{0:,} samples processed...".format(samples_processed))
 
         print("{0:,} total samples processed...".format(samples_processed))
         return df
