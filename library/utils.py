@@ -175,11 +175,11 @@ class Utils(object):
 
                             if os.path.exists(picklefile) and os.path.isfile(picklefile) and process_existing:
                                 future = executor.submit(Utils._calculate_existing_rwe, picklefile, window_sizes, normalize)
-                                saved_futures[future] = file
+                                saved_futures[future] = picklefile
                                 # Utils._calculate_new_rwe(root, file, picklefile, window_sizes, normalize)
                             elif not os.path.exists(picklefile):
                                 future = executor.submit(Utils._calculate_new_rwe, root, file, picklefile, window_sizes, normalize)
-                                saved_futures[future] = file
+                                saved_futures[future] = picklefile
                                 # Utils._calculate_existing_rwe(picklefile, window_sizes, normalize)
                             else:
                                 print("\t\tSkipping calculation...")
@@ -271,7 +271,7 @@ class Utils(object):
                             future = executor.submit(Utils._preprocess_rwe_pickle,
                                                      root, file,
                                                      datapoints, window_size)
-                            saved_futures[future] = file
+                            saved_futures[future] = os.path.join(root, file)
                             processed_sha256.append(m.group(1).upper())
             for future in as_completed(saved_futures):
                 df = df.append(future.result())
