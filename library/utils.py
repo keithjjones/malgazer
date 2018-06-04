@@ -252,8 +252,6 @@ class Utils(object):
         # Keep track so we don't duplicate work
         processed_sha256 = []
 
-        results_lock = threading.Lock()
-
         # Check to see that the input directory exists, this will throw an
         # exception if it does not exist.
         os.stat(in_directory)
