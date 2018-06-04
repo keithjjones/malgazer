@@ -114,7 +114,7 @@ class Utils(object):
                                      out_directory=None,
                                      window_sizes=[256],
                                      normalize=True,
-                                     njobs=1,
+                                     njobs=os.cpu_count(),
                                      process_existing=True):
         """
         Calculates the running window entropy of a directory containing
@@ -188,7 +188,8 @@ class Utils(object):
                     print("Processed file: {0}".format(saved_futures[future]))
                     print("\t{0:,} samples processed...".format(samples_processed))
         except KeyboardInterrupt:
-            print("Shutting down gracefully....")
+            print("Shutting down gracefully...")
+            executor.shutdown(wait=False)
             futures_to_delete = []
             for future in saved_futures:
                 if future.cancel() is True:
@@ -235,7 +236,7 @@ class Utils(object):
     def batch_preprocess_rwe_data(in_directory=None,
                                   datapoints=512,
                                   window_size=256,
-                                  njobs=1):
+                                  njobs=os.cpu_count()):
         """
         Return rwe of malware in a dataframe.
 
@@ -262,25 +263,31 @@ class Utils(object):
         df = pd.DataFrame()
         saved_futures = {}
         samples_processed = 0
-        with ThreadPoolExecutor(max_workers=njobs) as executor:
-            for root, dirs, files in os.walk(in_directory):
-                for file in files:
-                    m = malware_files_re.match(file)
-                    if m:
-                        if m.group(1).upper() not in processed_sha256:
-                            future = executor.submit(Utils._preprocess_rwe_pickle,
-                                                     root, file,
-                                                     datapoints, window_size)
-                            saved_futures[future] = os.path.join(root, file)
-                            processed_sha256.append(m.group(1).upper())
-            for future in as_completed(saved_futures):
-                df = df.append(future.result())
-                samples_processed += 1
-                print("Processed file: {0}".format(saved_futures[future]))
-                print("\t{0:,} samples processed...".format(samples_processed))
-
-        print("{0:,} total samples processed...".format(samples_processed))
-        return df
+        with ProcessPoolExecutor(max_workers=njobs) as executor:
+            try:
+                for root, dirs, files in os.walk(in_directory):
+                    for file in files:
+                        m = malware_files_re.match(file)
+                        if m:
+                            if m.group(1).upper() not in processed_sha256:
+                                future = executor.submit(Utils._preprocess_rwe_pickle,
+                                                         root, file,
+                                                         datapoints, window_size)
+                                saved_futures[future] = os.path.join(root, file)
+                                processed_sha256.append(m.group(1).upper())
+                for future in as_completed(saved_futures):
+                    df = df.append(future.result())
+                    samples_processed += 1
+                    print("Processed file: {0}".format(saved_futures[future]))
+                    print("\t{0:,} samples processed...".format(samples_processed))
+                print("{0:,} total samples processed...".format(samples_processed))
+                return df
+            except KeyboardInterrupt:
+                print("Shutting down gracefully...")
+                executor.shutdown(wait=False)
+                for future in saved_futures:
+                    future.cancel()
+                return None
 
     @staticmethod
     def batch_tsfresh_rwe_data(in_directory=None,
