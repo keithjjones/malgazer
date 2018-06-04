@@ -281,10 +281,9 @@ class Utils(object):
                     samples_processed += 1
                     print("Processed file: {0}".format(saved_futures[future]))
                     print("\t{0:,} samples processed...".format(samples_processed))
-                print("Creating dataframe...")
-                df = df.append(rows_to_add)
                 print("{0:,} total samples processed...".format(samples_processed))
-                return df
+                print("Creating dataframe...")
+                return df.append(rows_to_add)
             except KeyboardInterrupt:
                 print("Shutting down gracefully...")
                 executor.shutdown(wait=False)
