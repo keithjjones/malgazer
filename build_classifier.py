@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import time
 import os
+import pickle
 
 pd.set_option('max_colwidth', 64)
 
@@ -27,7 +28,7 @@ classifier_type = 'cnn'
 # Calculate features
 #
 source_dir = '/Volumes/MALWARE 1/Focused Set May 2018/RWE'
-datapoints = 2048
+datapoints = 4096
 windowsize = 1024
 number_of_jobs = 50
 datadir = os.path.join('/Volumes/MALWARE 1/Focused Set May 2018', 'data_vt_window_{0}_samples_{1}'.format(windowsize, datapoints))
@@ -146,3 +147,7 @@ if build_classifier:
         #                                                      n_jobs=2)
         #print("CFV Mean: {0}".format(mean))
         #print("CFV Var: {0}".format(variance))
+
+    # Save the classifier
+    print("Saving the classifier...")
+    pickle.dump(classifier, os.path.join(datadir, 'classifier.pickle'))
