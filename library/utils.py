@@ -150,8 +150,8 @@ class Utils(object):
                                       flags=re.IGNORECASE)
         samples_processed = 0
         saved_futures = {}
-        try:
-            with ProcessPoolExecutor(max_workers=njobs) as executor:
+        with ProcessPoolExecutor(max_workers=njobs) as executor:
+            try:
                 for root, dirs, files in os.walk(in_directory):
                     for file in files:
                         if malware_files_re.match(file):
@@ -187,19 +187,19 @@ class Utils(object):
                     samples_processed += 1
                     print("Processed file: {0}".format(saved_futures[future]))
                     print("\t{0:,} samples processed...".format(samples_processed))
-        except KeyboardInterrupt:
-            print("Shutting down gracefully...")
-            executor.shutdown(wait=False)
-            futures_to_delete = []
-            for future in saved_futures:
-                if future.cancel() is True:
-                    futures_to_delete.append(future)
-            for future in futures_to_delete:
-                del saved_futures[future]
-            for future in as_completed(saved_futures):
-                samples_processed += 1
-                print("Processed file: {0}".format(saved_futures[future]))
-                print("\t{0:,} samples processed...".format(samples_processed))
+            except KeyboardInterrupt:
+                print("Shutting down gracefully...")
+                executor.shutdown(wait=False)
+                futures_to_delete = []
+                for future in saved_futures:
+                    if future.cancel() is True:
+                        futures_to_delete.append(future)
+                for future in futures_to_delete:
+                    del saved_futures[future]
+                for future in as_completed(saved_futures):
+                    samples_processed += 1
+                    print("Processed file: {0}".format(saved_futures[future]))
+                    print("\t{0:,} samples processed...".format(samples_processed))
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
 
@@ -263,6 +263,7 @@ class Utils(object):
         df = pd.DataFrame()
         saved_futures = {}
         samples_processed = 0
+        rows_to_add = []
         with ProcessPoolExecutor(max_workers=njobs) as executor:
             try:
                 for root, dirs, files in os.walk(in_directory):
@@ -276,10 +277,12 @@ class Utils(object):
                                 saved_futures[future] = os.path.join(root, file)
                                 processed_sha256.append(m.group(1).upper())
                 for future in as_completed(saved_futures):
-                    df = df.append(future.result())
+                    rows_to_add.append(future.result())
                     samples_processed += 1
                     print("Processed file: {0}".format(saved_futures[future]))
                     print("\t{0:,} samples processed...".format(samples_processed))
+                print("Creating dataframe...")
+                df = df.append(rows_to_add)
                 print("{0:,} total samples processed...".format(samples_processed))
                 return df
             except KeyboardInterrupt:
@@ -287,7 +290,7 @@ class Utils(object):
                 executor.shutdown(wait=False)
                 for future in saved_futures:
                     future.cancel()
-                return None
+                return df
 
     @staticmethod
     def batch_tsfresh_rwe_data(in_directory=None,
