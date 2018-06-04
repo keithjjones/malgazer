@@ -125,7 +125,7 @@ class Utils(object):
         :param out_directory: The output directory for calculated data.
         :param window_sizes: A list of window sizes to calculate.
         :param normalize: Set to False to not normalize.
-        :param njobs: The number of threads to use
+        :param njobs: The number of processes to use
         :param process_existing: Set to True to process existing pickle files
         :return: Nothing
         """
