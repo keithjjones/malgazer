@@ -1,0 +1,10 @@
+version: '3'
+services:
+  classifier:
+#    image: python:3
+#    command: bash -c "pip install -r /malgazer/requirements.txt && python /malgazer/tornado/malgazer.py"
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/malgazer

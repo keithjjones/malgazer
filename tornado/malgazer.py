@@ -4,8 +4,9 @@ import tornado.web
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        # self.write("Hello, world")
+        self.write("Hello, world")
         self.write(self.request.body)
+        self.write("This is me!")
 
 
 def make_app():
