@@ -150,6 +150,4 @@ if build_classifier:
 
     # Save the classifier
     print("Saving the classifier...")
-    with open(os.path.join(datadir, 'classifier.json'), 'w') as file:
-        file.write(classifier.to_json())
-    classifier.save_weights(os.path.join(datadir, 'classifier.h5'))
+    ml.save_classifier(datadir, "classifier")
