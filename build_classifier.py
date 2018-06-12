@@ -22,7 +22,7 @@ preprocess_data = False
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'ann'
+classifier_type = 'cnn'
 
 #
 # Calculate features
@@ -34,7 +34,7 @@ number_of_jobs = 50
 datadir = os.path.join('/Volumes/JONES/Focused Set May 2018', 'data_vt_window_{0}_samples_{1}'.format(windowsize, datapoints))
 arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', str(number_of_jobs), source_dir, datadir]
 batch_size = 100
-epochs = 100
+epochs = 10
 
 # Preprocess data
 if preprocess_data:
@@ -150,4 +150,6 @@ if build_classifier:
 
     # Save the classifier
     print("Saving the classifier...")
-    ml.save_classifier(datadir, "classifier")
+    path = os.path.join(datadir, classifier_type.lower())
+    os.mkdir(path)
+    ml.save_classifier(path, "classifier")
