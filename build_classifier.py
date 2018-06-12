@@ -151,5 +151,8 @@ if build_classifier:
     # Save the classifier
     print("Saving the classifier...")
     path = os.path.join(datadir, classifier_type.lower())
-    os.mkdir(path)
+    try:
+        os.stat(path)
+    except:
+        os.mkdir(path)
     ml.save_classifier(path, "classifier")
