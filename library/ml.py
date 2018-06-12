@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from numpy import argmax
 from keras.wrappers.scikit_learn import KerasClassifier
+from keras.models import model_from_json
 from sklearn.model_selection import cross_val_score
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, MaxPooling1D, Conv1D, InputLayer
@@ -14,6 +15,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import keras.backend as K
 import keras.callbacks
+import os
 
 
 class ML(object):
@@ -24,6 +26,32 @@ class ML(object):
         self.X_sc = None
         # y label encoder
         self.y_labelencoder = None
+
+    def save_classifier(self, directory, filename):
+        """
+        Saves the classifier in directory with file name.
+
+        :param directory:  Directory to save the classifier
+        :param filename: Base file name of the classifier (without extensions)
+        :return: Nothing
+        """
+        if self.classifer:
+            with open(os.path.join(directory, filename+".json"), 'w') as file:
+                file.write(self.classifier.to_json())
+            self.classifier.save_weights(os.path.join(directory, filename+'.h5'))
+
+    def load_classifier(self, directory, filename):
+        """
+        Load a classifier from JSON and H5 files.
+
+        :param directory:  Directory containing the classifier.
+        :param filename:  Base file name of the classifier (without extensions)
+        :return:  The classifier
+        """
+        with open(os.path.join(directory, filename + ".json"), 'r') as file:
+            self.classifer = model_from_json(file.read())
+        self.classifer.load_weights(os.path.join(directory, filename + '.h5'))
+        return self.classifer
 
     @staticmethod
     def build_ann_static(datapoints=1024, outputs=9):
