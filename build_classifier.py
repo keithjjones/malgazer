@@ -150,4 +150,6 @@ if build_classifier:
 
     # Save the classifier
     print("Saving the classifier...")
-    pickle.dump(classifier, os.path.join(datadir, 'classifier.pickle'))
+    with open(os.path.join(datadir, 'classifier.json'), 'w') as file:
+        file.write(classifier.to_json())
+    classifier.save_weights(os.path.join(datadir, 'classifier.h5'))
