@@ -5,6 +5,7 @@
 import batch_preprocess_entropy
 from library.utils import Utils
 from library.ml import ML
+from sklearn.utils.validation import column_or_1d
 import pandas as pd
 import numpy as np
 import time
@@ -22,7 +23,7 @@ preprocess_data = False
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'cnn'
+classifier_type = 'svm'
 
 #
 # Calculate features
@@ -35,6 +36,10 @@ datadir = os.path.join('/Volumes/JONES/Focused Set May 2018', 'data_vt_window_{0
 arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', str(number_of_jobs), source_dir, datadir]
 batch_size = 100
 epochs = 10
+
+categorical = True
+if classifier_type.lower() == 'svm':
+    categorical = False
 
 # Preprocess data
 if preprocess_data:
@@ -78,7 +83,7 @@ if build_classifier:
     
     # Make the classifier
     ml = ML()
-    y, y_encoder = ml.encode_classifications(y)
+    y, y_encoder = ml.encode_classifications(y, categorical=categorical)
     X, X_scaler = ml.scale_features(X)
     X_train, X_test, y_train, y_test = ml.train_test_split(X, y)
 
@@ -147,6 +152,20 @@ if build_classifier:
         #                                                      n_jobs=2)
         #print("CFV Mean: {0}".format(mean))
         #print("CFV Var: {0}".format(variance))
+    elif classifier_type.lower() == 'svm':
+        classifier = ml.build_svm()
+        start_time = time.time()
+        classifier = ml.train_svm(X_train, y_train)
+        print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+        y_pred = ml.predict_svm(X_test)
+
+        # Making the Confusion Matrix
+        accuracy, cm = ml.confusion_matrix(y_test, y_pred)
+
+        print("Confusion Matrix:")
+        print(cm)
+        print("Accuracy:")
+        print(accuracy)
 
     # Save the classifier
     print("Saving the classifier...")

@@ -13,6 +13,8 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.utils.validation import column_or_1d
 import keras.backend as K
 import keras.callbacks
 import os
@@ -22,6 +24,7 @@ class ML(object):
     def __init__(self):
         super(ML, self).__init__()
         self.classifer = None
+        self.classifier_type = None
         # X scaler
         self.X_sc = None
         # y label encoder
@@ -35,12 +38,15 @@ class ML(object):
         :param filename: Base file name of the classifier (without extensions)
         :return: Nothing
         """
-        if self.classifer:
+        if self.classifer and (self.classifier_type == 'ann' or self.classifier_type == 'cnn'):
             with open(os.path.join(directory, filename+".json"), 'w') as file:
                 file.write(self.classifier.to_json())
             self.classifier.save_weights(os.path.join(directory, filename+'.h5'))
+        else:
+            with open(os.path.join(directory, filename+".pickle"), 'wb') as file:
+                pickle.dump(self.classifier, file)
 
-    def load_classifier(self, directory, filename):
+    def load_classifier(self, directory, filename, classifier_type):
         """
         Load a classifier from JSON and H5 files.
 
@@ -48,10 +54,54 @@ class ML(object):
         :param filename:  Base file name of the classifier (without extensions)
         :return:  The classifier
         """
-        with open(os.path.join(directory, filename + ".json"), 'r') as file:
-            self.classifer = model_from_json(file.read())
-        self.classifer.load_weights(os.path.join(directory, filename + '.h5'))
-        return self.classifer
+        if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
+            with open(os.path.join(directory, filename + ".json"), 'r') as file:
+                self.classifer = model_from_json(file.read())
+            self.classifer.load_weights(os.path.join(directory, filename + '.h5'))
+            return self.classifer
+        else:
+            with open(os.path.join(directory, filename+".pickle"), 'rb') as file:
+                return pickle.load(file)
+
+    @staticmethod
+    def build_svm_static():
+        """
+        Builds an SVM classifier.
+
+        :return:  The classifier
+        """
+        classifier = SVC(kernel='linear', random_state=0)
+        return classifier
+
+    def build_svm(self):
+        """
+        Builds an SVM classifier.
+
+        :return:  The classifier
+        """
+        self.classifier_type = 'svm'
+        self.classifier = ML.build_svm_static()
+        return self.classifier
+
+    def train_svm(self, X, y):
+        """
+        Trains an SVM classifier.
+
+        :param X:  The X input
+        :param y:  The y classifications
+        :return:  The classifier
+        """
+        self.classifier.fit(X, column_or_1d(y).tolist())
+        return self.classifier
+
+    def predict_svm(self, X):
+        """
+        Predict classifications using the classifier.
+
+        :param X:  The data to predict.
+        :return:  The predictions.
+        """
+        return self.classifier.predict(X)
 
     @staticmethod
     def build_ann_static(datapoints=1024, outputs=9):
@@ -85,6 +135,7 @@ class ML(object):
         :param datapoints:  The number of data points on the input.
         :return:  The classifier.
         """
+        self.classifier_type = 'ann'
         self.classifier = ML.build_ann_static(datapoints, outputs)
         self.classifier.summary()
         return self.classifier
@@ -121,6 +172,7 @@ class ML(object):
         :param input:  The input to the CNN, used to find input shape.
         :return:  The classifier.
         """
+        self.classifier_type = 'cnn'
         self.classifier = ML.build_cnn_static(input, outputs)
         self.classifier.summary()
         return self.classifier
@@ -207,11 +259,12 @@ class ML(object):
         # y = y[:, 1:]
         return X_scaled, self.X_sc
 
-    def encode_classifications(self, y):
+    def encode_classifications(self, y, categorical=True):
         """
         Encodes the classifications.
 
         :param y:  The preprocessed data as a DataFrame.
+        :param categorical:  Set to true to run to_categorical.
         :return:  A tuple of the encoded data y and the encoder (for inverting)
         as y,encoder.
         """
@@ -220,7 +273,8 @@ class ML(object):
             y[:, 0] = self.y_labelencoder.fit_transform(y[:, 0])
         else:
             y[:, 0] = self.y_labelencoder.transform(y[:, 0])
-        y = to_categorical(y)
+        if categorical:
+            y = to_categorical(y)
         return y, self.y_labelencoder
 
     def decode_classifications(self, y):
