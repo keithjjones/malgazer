@@ -18,6 +18,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import NearestCentroid
 from sklearn.utils.validation import column_or_1d
 import keras.backend as K
 import keras.callbacks
@@ -67,6 +68,26 @@ class ML(object):
         else:
             with open(os.path.join(directory, filename+".pickle"), 'rb') as file:
                 return pickle.load(file)
+
+    @staticmethod
+    def build_nc_static():
+        """
+        Builds a Nearest Centroid classifier.
+
+        :return:  The classifier
+        """
+        classifier = GaussianNB()
+        return classifier
+
+    def build_nc(self):
+        """
+        Builds a Nearest Centroid classifier.
+
+        :return:  The classifier
+        """
+        self.classifier_type = 'nc'
+        self.classifier = ML.build_nc_static()
+        return self.classifier
 
     @staticmethod
     def build_nb_static():
