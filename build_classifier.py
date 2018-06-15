@@ -36,8 +36,9 @@ datadir = os.path.join('/Volumes/JONES/Focused Set May 2018', 'data_vt_window_{0
 arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', str(number_of_jobs), source_dir, datadir]
 batch_size = 100
 epochs = 10
-test_size = 0.5
-class_size = 1000
+
+# Set this to the percentage for test size
+test_percent = 0.8
 
 categorical = True
 if classifier_type.lower() == 'svm':
@@ -77,11 +78,8 @@ if build_classifier:
     hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:,0]
     data = Utils.filter_hashes(all_data, hashes)
     data.to_csv(os.path.join(datadir, 'data.csv'))
-    
-    # Reduce the data set for experimentation if class_size is not None
-    if class_size:
-        data = data.groupby('classification').head(class_size)
-        print(data['classification'].value_counts())
+        
+    print("Test percent: {0}".format(test_percent))
     
     # Read in the final training data
     #data = pd.read_csv(os.path.join(datadir, 'data.csv'), index_col=0)
@@ -92,7 +90,10 @@ if build_classifier:
     ml = ML()
     y, y_encoder = ml.encode_classifications(y, categorical=categorical)
     X, X_scaler = ml.scale_features(X)
-    X_train, X_test, y_train, y_test = ml.train_test_split(X, y, test_size=test_size)
+    X_train, X_test, y_train, y_test = ml.train_test_split(X, y, test_percent=test_percent)
+
+    print("Training Class Count: \n{0}".format(pd.DataFrame(y_train)[0].value_counts()))
+    print("Testing Class Count: \n{0}".format(pd.DataFrame(y_test)[0].value_counts()))
 
     if classifier_type.lower() == 'cnn':    
         Xt = np.expand_dims(X_train, axis=2)

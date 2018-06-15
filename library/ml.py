@@ -309,18 +309,18 @@ class ML(object):
             return None
 
     @staticmethod
-    def train_test_split(X, y, test_size=0.2, random_state=0):
+    def train_test_split(X, y, test_percent=0.2, random_state=0):
         """
         Creates a training and testing data sets.
 
         :param X:  The X values as a DataFrame.
         :param y:  The y values as a DataFrame.
-        :param test_size: The percentage, as a decimal, of the test data set size.
+        :param test_percent: The percentage, as a decimal, of the test data set size.
         :param random_state:  The random seed.
         :return: A tuple of X_train, X_test, y_train, y_test
         """
         X_train, X_test, y_train, y_test = train_test_split(X, y,
-                                                            test_size=test_size,
+                                                            test_size=test_percent,
                                                             random_state=random_state,
                                                             stratify=y)
         return X_train, X_test, y_train, y_test
