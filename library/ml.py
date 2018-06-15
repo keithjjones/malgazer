@@ -76,7 +76,7 @@ class ML(object):
 
         :return:  The classifier
         """
-        classifier = GaussianNB()
+        classifier = NearestCentroid()
         return classifier
 
     def build_nc(self):
