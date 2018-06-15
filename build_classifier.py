@@ -25,13 +25,13 @@ preprocess_data = False
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'dt'
+classifier_type = 'nb'
 
 #
 # Calculate features
 #
 source_dir = '/Volumes/JONES/Focused Set May 2018/RWE'
-datapoints = 4096
+datapoints = 1024
 windowsize = 256
 number_of_jobs = 50
 datadir = os.path.join('/Volumes/JONES/Focused Set May 2018', 'data_vt_window_{0}_samples_{1}'.format(windowsize, datapoints))
@@ -52,9 +52,9 @@ if cross_fold_validation is True:
     test_precent = 0
 
 # We don't need categorial translation for some models
-categorical = True
-if classifier_type.lower() in ['svm', 'dt']:
-    categorical = False
+categorical = False
+if classifier_type.lower() in ['ann', 'cnn']:
+    categorical = True
 
 # Preprocess data
 if preprocess_data:
@@ -80,6 +80,8 @@ if assemble_preprocessed_data:
 
 # Build a classifier
 if build_classifier:
+    print("Loading data...")
+    
     # Load data
     raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
     
@@ -112,6 +114,8 @@ if build_classifier:
 
     print("Training Class Count: \n{0}".format(pd.DataFrame(y_train)[0].value_counts()))
     print("Testing Class Count: \n{0}".format(pd.DataFrame(y_test)[0].value_counts()))
+
+    print("Beginning training...")
 
     if classifier_type.lower() == 'cnn':    
         Xt = np.expand_dims(X_train, axis=2)
@@ -187,32 +191,15 @@ if build_classifier:
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
-    elif classifier_type.lower() == 'svm':
-        classifier = ml.build_svm(kernel='rbf')
-        start_time = time.time()
-        if cross_fold_validation is False:
-            classifier = ml.train_scikitlearn(X_train, y_train)
-            print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-            y_pred = ml.predict_scikitlearn(X_test)
-    
-            # Making the Confusion Matrix
-            accuracy, cm = ml.confusion_matrix_scikitlearn(y_test, y_pred)
-    
-            print("Confusion Matrix:")
-            print(cm)
-            print("Accuracy:")
-            print(accuracy)
-        else:
-            # Cross Fold Validation
-            accuracies, mean, variance = ML.cross_fold_validation_scikitlearn(classifier,
-                                                                              X_train, y_train, 
-                                                                              cv=cfv_groups, 
-                                                                              n_jobs=n_jobs)
-            print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-            print("CFV Mean: {0}".format(mean))
-            print("CFV Var: {0}".format(variance))
-    elif classifier_type.lower() == 'dt':
-        classifier = ml.build_dt(criterion='entropy')
+    else:
+        # This area is for scikit learn models
+        if classifier_type.lower() == 'svm':
+            classifier = ml.build_svm(kernel='rbf')
+        elif classifier_type.lower() == 'dt':
+            classifier = ml.build_dt(criterion='entropy')
+        elif classifier_type.lower() == 'nb':
+            classifier = ml.build_nb()
+
         start_time = time.time()
         if cross_fold_validation is False:
             classifier = ml.train_scikitlearn(X_train, y_train)

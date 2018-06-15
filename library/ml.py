@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import GaussianNB
 from sklearn.utils.validation import column_or_1d
 import keras.backend as K
 import keras.callbacks
@@ -64,6 +65,26 @@ class ML(object):
         else:
             with open(os.path.join(directory, filename+".pickle"), 'rb') as file:
                 return pickle.load(file)
+
+    @staticmethod
+    def build_nb_static():
+        """
+        Builds a Naive Bayes classifier.
+
+        :return:  The classifier
+        """
+        classifier = GaussianNB()
+        return classifier
+
+    def build_nb(self, criterion='entropy'):
+        """
+        Builds a Naive Bayes classifier.
+
+        :return:  The classifier
+        """
+        self.classifier_type = 'nb'
+        self.classifier = ML.build_nb_static()
+        return self.classifier
 
     @staticmethod
     def build_dt_static(criterion='entropy'):
