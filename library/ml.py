@@ -16,6 +16,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.utils.validation import column_or_1d
 import keras.backend as K
 import keras.callbacks
@@ -76,7 +78,7 @@ class ML(object):
         classifier = GaussianNB()
         return classifier
 
-    def build_nb(self, criterion='entropy'):
+    def build_nb(self):
         """
         Builds a Naive Bayes classifier.
 
@@ -84,6 +86,50 @@ class ML(object):
         """
         self.classifier_type = 'nb'
         self.classifier = ML.build_nb_static()
+        return self.classifier
+
+    @staticmethod
+    def build_knn_static(n_neighbors=6, n_jobs=10):
+        """
+        Builds a KNN classifier.
+
+        :return:  The classifier
+        """
+        classifier = KNeighborsClassifier(n_neighbors=n_neighbors, n_jobs=n_jobs)
+        return classifier
+
+    def build_knn(self, n_neighbors=6, n_jobs=10):
+        """
+        Builds a KNN classifier.
+
+        :return:  The classifier
+        """
+        self.classifier_type = 'knn'
+        self.classifier = ML.build_knn_static(n_neighbors=n_neighbors, n_jobs=n_jobs)
+        return self.classifier
+
+    @staticmethod
+    def build_rf_static(n_estimators=10, criterion='entropy', n_jobs=10):
+        """
+        Builds a Random Forest classifier.
+
+        :param n_estimators:  Number of estimators
+        :param criterion:  Criterion
+        :return:  The classifier
+        """
+        classifier = RandomForestClassifier(n_estimators=n_estimators, criterion=criterion, n_jobs=n_jobs)
+        return classifier
+
+    def build_rf(self, n_estimators=10, criterion='entropy', n_jobs=10):
+        """
+        Builds a Random Forest classifier.
+
+        :param n_estimators:  Number of estimators
+        :param criterion:  Criterion
+        :return:  The classifier
+        """
+        self.classifier_type = 'rf'
+        self.classifier = ML.build_rf_static(n_estimators=n_estimators, criterion=criterion, n_jobs=n_jobs)
         return self.classifier
 
     @staticmethod

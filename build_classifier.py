@@ -25,7 +25,7 @@ preprocess_data = False
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'nb'
+classifier_type = 'knn'
 
 #
 # Calculate features
@@ -199,7 +199,11 @@ if build_classifier:
             classifier = ml.build_dt(criterion='entropy')
         elif classifier_type.lower() == 'nb':
             classifier = ml.build_nb()
-
+        elif classifier_type.lower() == 'rf':
+            classifier = ml.build_rf(n_estimators=10, criterion='entropy')
+        elif classifier_type.lower() == 'knn':
+            classifier = ml.build_knn(n_neighbors=6, n_jobs=n_jobs)
+            
         start_time = time.time()
         if cross_fold_validation is False:
             classifier = ml.train_scikitlearn(X_train, y_train)
