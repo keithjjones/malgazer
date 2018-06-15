@@ -40,13 +40,16 @@ batch_size = 100
 epochs = 10
 
 # Cross fold validation variables
-cross_fold_validation = False
-cfv_groups = 10
+cross_fold_validation = True
+cfv_groups = 6
 n_jobs = 10
+
+# KNN params
+knn_neighbors = 20
 
 # Set this to the percentage for test size, 
 # 0 makes the train and test set be the whole data set
-test_percent = 0.7
+test_percent = 0.5
 # Make the whole data set for training if we are doing cross fold validation
 if cross_fold_validation is True:
     test_precent = 0
@@ -202,7 +205,7 @@ if build_classifier:
         elif classifier_type.lower() == 'rf':
             classifier = ml.build_rf(n_estimators=10, criterion='entropy')
         elif classifier_type.lower() == 'knn':
-            classifier = ml.build_knn(n_neighbors=6, n_jobs=n_jobs)
+            classifier = ml.build_knn(n_neighbors=knn_neighbors, n_jobs=n_jobs)
             
         start_time = time.time()
         if cross_fold_validation is False:
