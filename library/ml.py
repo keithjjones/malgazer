@@ -65,23 +65,25 @@ class ML(object):
                 return pickle.load(file)
 
     @staticmethod
-    def build_svm_static():
+    def build_svm_static(kernel='linear'):
         """
         Builds an SVM classifier.
 
+        :param kernel:  The SVM kernel to use.
         :return:  The classifier
         """
-        classifier = SVC(kernel='linear', random_state=0)
+        classifier = SVC(kernel=kernel, random_state=0)
         return classifier
 
-    def build_svm(self):
+    def build_svm(self, kernel='linear'):
         """
         Builds an SVM classifier.
 
+        :param kernel:  The SVM kernel to use.
         :return:  The classifier
         """
         self.classifier_type = 'svm'
-        self.classifier = ML.build_svm_static()
+        self.classifier = ML.build_svm_static(kernel=kernel)
         return self.classifier
 
     def train_svm(self, X, y):
@@ -326,11 +328,33 @@ class ML(object):
         return X_train, X_test, y_train, y_test
 
     @staticmethod
-    def cross_fold_validation(classifier_fn, X_train, y_train,
-                              batch_size = 10, epochs=100,
+    def cross_fold_validation(classifier, X_train, y_train,
                               cv=10, n_jobs=-1):
         """
-        Calculates the cross fold validation mean and variance.
+        Calculates the cross fold validation mean and variance of Keras models.
+
+        :param classifier:  The function that builds the classifier.
+        :param X_train:  The X training data.
+        :param y_train:  The y training data.
+        :param cv:  The number of cfv groups.
+        :param n_jobs:  The number of jobs.  Use -1 to use all CPU cores.
+        :return:  A tuple of accuracies, mean, and variance.
+        """
+        accuracies = cross_val_score(estimator=classifier,
+                                     X=X_train,
+                                     y=column_or_1d(y_train).tolist(),
+                                     cv=cv,
+                                     n_jobs=n_jobs)
+        mean = accuracies.mean()
+        variance = accuracies.std()
+        return accuracies, mean, variance
+
+    @staticmethod
+    def cross_fold_validation_keras(classifier_fn, X_train, y_train,
+                                    batch_size = 10, epochs=100,
+                                    cv=10, n_jobs=-1):
+        """
+        Calculates the cross fold validation mean and variance of Keras models.
 
         :param classifier_fn:  The function that builds the classifier.
         :param X_train:  The X training data.
