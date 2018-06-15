@@ -189,12 +189,12 @@ if build_classifier:
         classifier = ml.build_svm(kernel='rbf')
         start_time = time.time()
         if cross_fold_validation is False:
-            classifier = ml.train_svm(X_train, y_train)
+            classifier = ml.train_scikitlearn(X_train, y_train)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-            y_pred = ml.predict_svm(X_test)
+            y_pred = ml.predict_scikitlearn(X_test)
     
             # Making the Confusion Matrix
-            accuracy, cm = ml.confusion_matrix_standard(y_test, y_pred)
+            accuracy, cm = ml.confusion_matrix_scikitlearn(y_test, y_pred)
     
             print("Confusion Matrix:")
             print(cm)
@@ -202,10 +202,10 @@ if build_classifier:
             print(accuracy)
         else:
             # Cross Fold Validation
-            accuracies, mean, variance = ML.cross_fold_validation(classifier,
-                                                                  X_train, y_train, 
-                                                                  cv=cfv_groups, 
-                                                                  n_jobs=n_jobs)
+            accuracies, mean, variance = ML.cross_fold_validation_scikitlearn(classifier,
+                                                                              X_train, y_train, 
+                                                                              cv=cfv_groups, 
+                                                                              n_jobs=n_jobs)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))

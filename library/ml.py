@@ -109,9 +109,9 @@ class ML(object):
         self.classifier = ML.build_svm_static(kernel=kernel)
         return self.classifier
 
-    def train_svm(self, X, y):
+    def train_scikitlearn(self, X, y):
         """
-        Trains an SVM classifier.
+        Trains a Scikit Learn classifier.
 
         :param X:  The X input
         :param y:  The y classifications
@@ -120,7 +120,7 @@ class ML(object):
         self.classifier.fit(X, column_or_1d(y).tolist())
         return self.classifier
 
-    def predict_svm(self, X):
+    def predict_scikitlearn(self, X):
         """
         Predict classifications using the classifier.
 
@@ -128,22 +128,6 @@ class ML(object):
         :return:  The predictions.
         """
         return self.classifier.predict(X)
-
-    @staticmethod
-    def confusion_matrix_standard(y_test, y_pred):
-        """
-        Calculates the standard confusion matrix for predictions.
-
-        :param y_test:  The y testing data.
-        :param y_pred:  The y predicted data.
-        :return:  The accuracty,confusion_matrix, as a tuple.
-        """
-        cm = confusion_matrix(column_or_1d(y_test).tolist(), column_or_1d(y_pred).tolist())
-        accuracy = 0.
-        for i in range(0, len(cm)):
-            accuracy += cm[i, i]
-        accuracy = accuracy/cm.sum()
-        return accuracy, cm
 
     @staticmethod
     def build_ann_static(datapoints=1024, outputs=9):
@@ -283,6 +267,22 @@ class ML(object):
         accuracy = accuracy/cm.sum()
         return accuracy, cm
 
+    @staticmethod
+    def confusion_matrix_scikitlearn(y_test, y_pred):
+        """
+        Calculates the standard confusion matrix for predictions.
+
+        :param y_test:  The y testing data.
+        :param y_pred:  The y predicted data.
+        :return:  The accuracty,confusion_matrix, as a tuple.
+        """
+        cm = confusion_matrix(column_or_1d(y_test).tolist(), column_or_1d(y_pred).tolist())
+        accuracy = 0.
+        for i in range(0, len(cm)):
+            accuracy += cm[i, i]
+        accuracy = accuracy/cm.sum()
+        return accuracy, cm
+
     def scale_features(self, X):
         """
         Scales features in the X data.
@@ -351,10 +351,10 @@ class ML(object):
         return X_train, X_test, y_train, y_test
 
     @staticmethod
-    def cross_fold_validation(classifier, X_train, y_train,
-                              cv=10, n_jobs=-1):
+    def cross_fold_validation_scikitlearn(classifier, X_train, y_train,
+                                          cv=10, n_jobs=-1):
         """
-        Calculates the cross fold validation mean and variance of Keras models.
+        Calculates the cross fold validation mean and variance of Scikit Learn models.
 
         :param classifier:  The function that builds the classifier.
         :param X_train:  The X training data.
