@@ -47,6 +47,9 @@ n_jobs = 10
 # KNN params
 knn_neighbors = 20
 
+# Centroid params
+shrink_threshold = 0.2
+
 # Set this to the percentage for test size, 
 # 0 makes the train and test set be the whole data set
 test_percent = 0.5
@@ -207,7 +210,7 @@ if build_classifier:
         elif classifier_type.lower() == 'knn':
             classifier = ml.build_knn(n_neighbors=knn_neighbors, n_jobs=n_jobs)
         elif classifier_type.lower() == 'nc':
-            classifier = ml.build_nc()
+            classifier = ml.build_nc(shrink_threshold=shrink_threshold)
             
         start_time = time.time()
         if cross_fold_validation is False:

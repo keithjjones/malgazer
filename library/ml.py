@@ -69,123 +69,117 @@ class ML(object):
                 return pickle.load(file)
 
     @staticmethod
-    def build_nc_static():
+    def build_nc_static(*args, **kwargs):
         """
         Builds a Nearest Centroid classifier.
 
         :return:  The classifier
         """
-        classifier = NearestCentroid()
+        classifier = NearestCentroid(*args, **kwargs)
         return classifier
 
-    def build_nc(self):
+    def build_nc(self, *args, **kwargs):
         """
         Builds a Nearest Centroid classifier.
 
         :return:  The classifier
         """
         self.classifier_type = 'nc'
-        self.classifier = ML.build_nc_static()
+        self.classifier = ML.build_nc_static(*args, **kwargs)
         return self.classifier
 
     @staticmethod
-    def build_nb_static():
+    def build_nb_static(*args, **kwargs):
         """
         Builds a Naive Bayes classifier.
 
         :return:  The classifier
         """
-        classifier = GaussianNB()
+        classifier = GaussianNB(*args, **kwargs)
         return classifier
 
-    def build_nb(self):
+    def build_nb(self, *args, **kwargs):
         """
         Builds a Naive Bayes classifier.
 
         :return:  The classifier
         """
         self.classifier_type = 'nb'
-        self.classifier = ML.build_nb_static()
+        self.classifier = ML.build_nb_static(*args, **kwargs)
         return self.classifier
 
     @staticmethod
-    def build_knn_static(n_neighbors=6, n_jobs=10):
+    def build_knn_static(*args, **kwargs):
         """
         Builds a KNN classifier.
 
         :return:  The classifier
         """
-        classifier = KNeighborsClassifier(n_neighbors=n_neighbors, n_jobs=n_jobs)
+        classifier = KNeighborsClassifier(*args, **kwargs)
         return classifier
 
-    def build_knn(self, n_neighbors=6, n_jobs=10):
+    def build_knn(self, *args, **kwargs):
         """
         Builds a KNN classifier.
 
         :return:  The classifier
         """
         self.classifier_type = 'knn'
-        self.classifier = ML.build_knn_static(n_neighbors=n_neighbors, n_jobs=n_jobs)
+        self.classifier = ML.build_knn_static(*args, **kwargs)
         return self.classifier
 
     @staticmethod
-    def build_rf_static(n_estimators=10, criterion='entropy', n_jobs=10):
+    def build_rf_static(*args, **kwargs):
         """
         Builds a Random Forest classifier.
 
-        :param n_estimators:  Number of estimators
-        :param criterion:  Criterion
         :return:  The classifier
         """
-        classifier = RandomForestClassifier(n_estimators=n_estimators, criterion=criterion, n_jobs=n_jobs)
+        classifier = RandomForestClassifier(*args, **kwargs)
         return classifier
 
-    def build_rf(self, n_estimators=10, criterion='entropy', n_jobs=10):
+    def build_rf(self, *args, **kwargs):
         """
         Builds a Random Forest classifier.
 
-        :param n_estimators:  Number of estimators
-        :param criterion:  Criterion
         :return:  The classifier
         """
         self.classifier_type = 'rf'
-        self.classifier = ML.build_rf_static(n_estimators=n_estimators, criterion=criterion, n_jobs=n_jobs)
+        self.classifier = ML.build_rf_static(*args, **kwargs)
         return self.classifier
 
     @staticmethod
-    def build_dt_static(criterion='entropy'):
+    def build_dt_static(*args, **kwargs):
         """
         Builds a Decision Tree classifier.
 
-        :param criterion:  The DT criterion to use.
         :return:  The classifier
         """
-        classifier = DecisionTreeClassifier(criterion=criterion)
+        classifier = DecisionTreeClassifier(*args, **kwargs)
         return classifier
 
-    def build_dt(self, criterion='entropy'):
+    def build_dt(self, *args, **kwargs):
         """
         Builds a Decision Tree classifier.
 
-        :param criterion:  The DT criterion to use.
         :return:  The classifier
         """
         self.classifier_type = 'dt'
-        self.classifier = ML.build_dt_static(criterion=criterion)
+        self.classifier = ML.build_dt_static(*args, **kwargs)
         return self.classifier
 
     @staticmethod
-    def build_svm_static(kernel='rbf'):
+    def build_svm_static(*args, **kwargs):
         """
         Builds an SVM classifier.
 
         :param kernel:  The SVM kernel to use.
         :return:  The classifier
         """
-        classifier = SVC(kernel=kernel, random_state=0)
+        classifier = SVC(*args, **kwargs)
         return classifier
 
-    def build_svm(self, kernel='rbf'):
+    def build_svm(self, *args, **kwargs):
         """
         Builds an SVM classifier.
 
@@ -193,7 +187,7 @@ class ML(object):
         :return:  The classifier
         """
         self.classifier_type = 'svm'
-        self.classifier = ML.build_svm_static(kernel=kernel)
+        self.classifier = ML.build_svm_static(*args, **kwargs)
         return self.classifier
 
     def train_scikitlearn(self, X, y):
