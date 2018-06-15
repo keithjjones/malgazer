@@ -14,6 +14,7 @@ from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.utils.validation import column_or_1d
 import keras.backend as K
 import keras.callbacks
@@ -65,7 +66,29 @@ class ML(object):
                 return pickle.load(file)
 
     @staticmethod
-    def build_svm_static(kernel='linear'):
+    def build_dt_static(criterion='entropy'):
+        """
+        Builds a Decision Tree classifier.
+
+        :param criterion:  The DT criterion to use.
+        :return:  The classifier
+        """
+        classifier = DecisionTreeClassifier(criterion=criterion)
+        return classifier
+
+    def build_dt(self, criterion='entropy'):
+        """
+        Builds a Decision Tree classifier.
+
+        :param criterion:  The DT criterion to use.
+        :return:  The classifier
+        """
+        self.classifier_type = 'dt'
+        self.classifier = ML.build_dt_static(criterion=criterion)
+        return self.classifier
+
+    @staticmethod
+    def build_svm_static(kernel='rbf'):
         """
         Builds an SVM classifier.
 
@@ -75,7 +98,7 @@ class ML(object):
         classifier = SVC(kernel=kernel, random_state=0)
         return classifier
 
-    def build_svm(self, kernel='linear'):
+    def build_svm(self, kernel='rbf'):
         """
         Builds an SVM classifier.
 
