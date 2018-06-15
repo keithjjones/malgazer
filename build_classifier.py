@@ -52,7 +52,7 @@ knn_neighbors = 20
 test_percent = 0.5
 # Make the whole data set for training if we are doing cross fold validation
 if cross_fold_validation is True:
-    test_precent = 0
+    test_percent = 0
 
 # We don't need categorial translation for some models
 categorical = False
