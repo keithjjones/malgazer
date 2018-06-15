@@ -18,6 +18,7 @@ from sklearn.utils.validation import column_or_1d
 import keras.backend as K
 import keras.callbacks
 import os
+import pickle
 
 
 class ML(object):
@@ -102,6 +103,22 @@ class ML(object):
         :return:  The predictions.
         """
         return self.classifier.predict(X)
+
+    @staticmethod
+    def confusion_matrix_standard(y_test, y_pred):
+        """
+        Calculates the standard confusion matrix for predictions.
+
+        :param y_test:  The y testing data.
+        :param y_pred:  The y predicted data.
+        :return:  The accuracty,confusion_matrix, as a tuple.
+        """
+        cm = confusion_matrix(column_or_1d(y_test).tolist(), column_or_1d(y_pred).tolist())
+        accuracy = 0.
+        for i in range(0, len(cm)):
+            accuracy += cm[i, i]
+        accuracy = accuracy/cm.sum()
+        return accuracy, cm
 
     @staticmethod
     def build_ann_static(datapoints=1024, outputs=9):
@@ -226,9 +243,9 @@ class ML(object):
         return y_pred
 
     @staticmethod
-    def confusion_matrix(y_test, y_pred):
+    def confusion_matrix_nn(y_test, y_pred):
         """
-        Calculates the confusion matrix for predictions.
+        Calculates the confusion matrix for neural network predictions.
 
         :param y_test:  The y testing data.
         :param y_pred:  The y predicted data.

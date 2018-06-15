@@ -36,6 +36,8 @@ datadir = os.path.join('/Volumes/JONES/Focused Set May 2018', 'data_vt_window_{0
 arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', str(number_of_jobs), source_dir, datadir]
 batch_size = 100
 epochs = 10
+test_size = 0.5
+class_size = 1000
 
 categorical = True
 if classifier_type.lower() == 'svm':
@@ -76,6 +78,11 @@ if build_classifier:
     data = Utils.filter_hashes(all_data, hashes)
     data.to_csv(os.path.join(datadir, 'data.csv'))
     
+    # Reduce the data set for experimentation if class_size is not None
+    if class_size:
+        data = data.groupby('classification').head(class_size)
+        print(data['classification'].value_counts())
+    
     # Read in the final training data
     #data = pd.read_csv(os.path.join(datadir, 'data.csv'), index_col=0)
     X = data.drop('classification', axis=1).as_matrix().copy()
@@ -85,7 +92,7 @@ if build_classifier:
     ml = ML()
     y, y_encoder = ml.encode_classifications(y, categorical=categorical)
     X, X_scaler = ml.scale_features(X)
-    X_train, X_test, y_train, y_test = ml.train_test_split(X, y)
+    X_train, X_test, y_train, y_test = ml.train_test_split(X, y, test_size=test_size)
 
     if classifier_type.lower() == 'cnn':    
         Xt = np.expand_dims(X_train, axis=2)
@@ -103,7 +110,7 @@ if build_classifier:
         y_pred = ml.predict_nn(Xtest)
         
         # Making the Confusion Matrix
-        accuracy, cm = ml.confusion_matrix(y_test, y_pred)
+        accuracy, cm = ml.confusion_matrix_nn(y_test, y_pred)
         
         print("Confusion Matrix:")
         print(cm)
@@ -134,7 +141,7 @@ if build_classifier:
         y_pred = ml.predict_nn(X_test)
         
         # Making the Confusion Matrix
-        accuracy, cm = ml.confusion_matrix(y_test, y_pred)
+        accuracy, cm = ml.confusion_matrix_nn(y_test, y_pred)
         
         print("Confusion Matrix:")
         print(cm)
@@ -160,7 +167,7 @@ if build_classifier:
         y_pred = ml.predict_svm(X_test)
 
         # Making the Confusion Matrix
-        accuracy, cm = ml.confusion_matrix(y_test, y_pred)
+        accuracy, cm = ml.confusion_matrix_standard(y_test, y_pred)
 
         print("Confusion Matrix:")
         print(cm)
