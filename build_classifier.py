@@ -11,6 +11,8 @@ import numpy as np
 import time
 import os
 import pickle
+from sklearn import tree
+
 
 pd.set_option('max_colwidth', 64)
 
@@ -23,13 +25,13 @@ preprocess_data = False
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'svm'
+classifier_type = 'dt'
 
 #
 # Calculate features
 #
 source_dir = '/Volumes/JONES/Focused Set May 2018/RWE'
-datapoints = 1024
+datapoints = 4096
 windowsize = 256
 number_of_jobs = 50
 datadir = os.path.join('/Volumes/JONES/Focused Set May 2018', 'data_vt_window_{0}_samples_{1}'.format(windowsize, datapoints))
@@ -38,20 +40,20 @@ batch_size = 100
 epochs = 10
 
 # Cross fold validation variables
-cross_fold_validation = True
+cross_fold_validation = False
 cfv_groups = 10
 n_jobs = 10
 
 # Set this to the percentage for test size, 
 # 0 makes the train and test set be the whole data set
-test_percent = 0.8
+test_percent = 0.7
 # Make the whole data set for training if we are doing cross fold validation
 if cross_fold_validation is True:
     test_precent = 0
 
 # We don't need categorial translation for some models
 categorical = True
-if classifier_type.lower() == 'svm':
+if classifier_type.lower() in ['svm', 'dt']:
     categorical = False
 
 # Preprocess data
@@ -209,6 +211,30 @@ if build_classifier:
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
+    elif classifier_type.lower() == 'dt':
+        classifier = ml.build_dt(criterion='entropy')
+        start_time = time.time()
+        if cross_fold_validation is False:
+            classifier = ml.train_scikitlearn(X_train, y_train)
+            print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+            y_pred = ml.predict_scikitlearn(X_test)
+    
+            # Making the Confusion Matrix
+            accuracy, cm = ml.confusion_matrix_scikitlearn(y_test, y_pred)
+    
+            print("Confusion Matrix:")
+            print(cm)
+            print("Accuracy:")
+            print(accuracy)
+        else:
+            # Cross Fold Validation
+            accuracies, mean, variance = ML.cross_fold_validation_scikitlearn(classifier,
+                                                                              X_train, y_train, 
+                                                                              cv=cfv_groups, 
+                                                                              n_jobs=n_jobs)
+            print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+            print("CFV Mean: {0}".format(mean))
+            print("CFV Var: {0}".format(variance))
 
     # Save the classifier
     if cross_fold_validation is False:
@@ -219,3 +245,5 @@ if build_classifier:
         except:
             os.mkdir(path)
         ml.save_classifier(path, "classifier")
+        if classifier_type.lower() == 'dt':
+            tree.export_graphviz(classifier, out_file=os.path.join(path, 'tree.dot'))
