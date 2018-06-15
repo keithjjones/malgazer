@@ -49,6 +49,7 @@ test_percent = 0.8
 if cross_fold_validation is True:
     test_precent = 0
 
+# We don't need categorial translation for some models
 categorical = True
 if classifier_type.lower() == 'svm':
     categorical = False
