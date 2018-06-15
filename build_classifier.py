@@ -42,8 +42,12 @@ cross_fold_validation = True
 cfv_groups = 10
 n_jobs = 10
 
-# Set this to the percentage for test size
-test_percent = 0.7
+# Set this to the percentage for test size, 
+# 0 makes the train and test set be the whole data set
+test_percent = 0.8
+# Make the whole data set for training if we are doing cross fold validation
+if cross_fold_validation is True:
+    test_precent = 0
 
 categorical = True
 if classifier_type.lower() == 'svm':
@@ -95,7 +99,13 @@ if build_classifier:
     ml = ML()
     y, y_encoder = ml.encode_classifications(y, categorical=categorical)
     X, X_scaler = ml.scale_features(X)
-    X_train, X_test, y_train, y_test = ml.train_test_split(X, y, test_percent=test_percent)
+    if test_percent > 0:
+        X_train, X_test, y_train, y_test = ml.train_test_split(X, y, test_percent=test_percent)
+    else:
+        X_train = X
+        y_train = y
+        X_test = X
+        y_test = y
 
     print("Training Class Count: \n{0}".format(pd.DataFrame(y_train)[0].value_counts()))
     print("Testing Class Count: \n{0}".format(pd.DataFrame(y_test)[0].value_counts()))
@@ -200,10 +210,11 @@ if build_classifier:
             print("CFV Var: {0}".format(variance))
 
     # Save the classifier
-    print("Saving the classifier...")
-    path = os.path.join(datadir, classifier_type.lower())
-    try:
-        os.stat(path)
-    except:
-        os.mkdir(path)
-    ml.save_classifier(path, "classifier")
+    if cross_fold_validation is False:
+        print("Saving the classifier...")
+        path = os.path.join(datadir, classifier_type.lower())
+        try:
+            os.stat(path)
+        except:
+            os.mkdir(path)
+        ml.save_classifier(path, "classifier")
