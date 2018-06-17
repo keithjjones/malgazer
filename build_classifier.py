@@ -12,6 +12,8 @@ import time
 import os
 import pickle
 from sklearn import tree
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
 
 
 pd.set_option('max_colwidth', 64)
@@ -40,9 +42,12 @@ batch_size = 100
 epochs = 10
 
 # Cross fold validation variables
-cross_fold_validation = False
+cross_fold_validation = True
 cfv_groups = 4
 n_jobs = 10
+
+# ROC Curves
+generate_roc_curves=True
 
 # KNN params
 knn_neighbors = 100
@@ -55,7 +60,7 @@ n_estimators = 200
 base_estimator = ML.build_svm_static(kernel='rbf')
 
 # OneVRest params
-ovr_base_estimator = ML.build_dt_static()
+ovr_base_estimator = ML.build_svm_static(kernel='rbf')
 
 # Set this to the percentage for test size, 
 # 0 makes the train and test set be the whole data set
@@ -220,7 +225,7 @@ if build_classifier:
         elif classifier_type.lower() == 'nc':
             classifier = ml.build_nc(shrink_threshold=shrink_threshold)
         elif classifier_type.lower() == 'adaboost':
-            classifier = ml.build_adaboost(n_estimators=n_estimators, base_estimator=base_estimator)
+            classifier = ml.build_adaboost(n_estimators=n_estimators, base_estimator=base_estimator, algorithm='SAMME')
         elif classifier_type.lower() == 'ovr':
             classifier = ml.build_ovr(ovr_base_estimator)
             
@@ -258,3 +263,20 @@ if build_classifier:
         ml.save_classifier(path, "classifier")
         if classifier_type.lower() == 'dt':
             tree.export_graphviz(classifier, out_file=os.path.join(path, 'tree.dot'))
+
+    if generate_roc_curves:
+        # Compute micro-average ROC curve and ROC area
+        fpr, tpr, _ = roc_curve(y_test.ravel(), y_pred.ravel())
+        roc_auc = auc(fpr, tpr)
+        plt.figure()
+        lw = 2
+        plt.plot(fpr, tpr, color='darkorange',
+                 lw=lw, label='ROC curve (area = {0:2f})'.format(roc_auc))
+        plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver operating characteristic example')
+        plt.legend(loc="lower right")
+        plt.show()
