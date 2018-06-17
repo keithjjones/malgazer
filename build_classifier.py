@@ -25,7 +25,7 @@ preprocess_data = False
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'adaboost'
+classifier_type = 'ovr'
 
 #
 # Calculate features
@@ -52,14 +52,14 @@ shrink_threshold = 0.2
 
 # Adaboost params
 n_estimators = 200
-base_estimator = ML.build_dt_static()
+base_estimator = ML.build_svm_static(kernel='rbf')
 
 # OneVRest params
 ovr_base_estimator = ML.build_dt_static()
 
 # Set this to the percentage for test size, 
 # 0 makes the train and test set be the whole data set
-test_percent = 0.8
+test_percent = 0.7
 # Make the whole data set for training if we are doing cross fold validation
 if cross_fold_validation is True:
     test_percent = 0
