@@ -14,6 +14,7 @@ import pickle
 from sklearn import tree
 from sklearn.metrics import roc_curve, auc
 from sklearn.preprocessing import label_binarize
+from scipy import interp
 import matplotlib.pyplot as plt
 
 
@@ -268,19 +269,40 @@ if build_classifier:
             # Compute micro-average ROC curve and ROC area
             fpr["micro"], tpr["micro"], _ = roc_curve(yt.ravel(), yp.ravel())
             roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+            
+            all_fpr = np.unique(np.concatenate([fpr[i] for i in n_classes]))
+            mean_tpr = np.zeros_like(all_fpr)
+            print(fpr)
+            print("ALL FPR {0}".format(all_fpr))
+            for i in n_classes:
+                print("FPR {0}".format(fpr[i]))
+                print("TPR {0}".format(tpr[i]))
+                print("Interp {0}".format(interp(all_fpr, fpr[i], tpr[i])))
+                mean_tpr += interp(all_fpr, fpr[i], tpr[i])
+            
+            # Finally average it and compute AUC
+            mean_tpr /= len(n_classes)
+            
+            fpr["macro"] = all_fpr
+            tpr["macro"] = mean_tpr
+            roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
     
-            class_to_plot = 0
-            class_name = ml.decode_classifications([[class_to_plot]])
             plt.figure()
             lw = 2
-            plt.plot(fpr[class_to_plot], tpr[class_to_plot], color='darkorange',
-                     lw=lw, label='ROC curve (area = {0:2f})'.format(roc_auc[class_to_plot]))
+            for i, color in zip(n_classes, ['aqua', 'darkorange', 'cornflowerblue', 'red', 'green', 'yellow']):
+                class_name = ml.decode_classifications([[i]])[0][0]
+                plt.plot(fpr[i], tpr[i], color=color, lw=lw,
+                         label='ROC curve of class {0} (area = {1:0.2f})'.format(class_name, roc_auc[i]))
+            plt.plot(fpr["micro"], tpr["micro"], color='darkmagenta',
+                     lw=lw, label='Micro ROC curve (area = {0:2f})'.format(roc_auc["micro"]))
+            plt.plot(fpr["macro"], tpr["macro"], color='darkorange',
+                     lw=lw, label='Macro ROC curve (area = {0:2f})'.format(roc_auc["macro"]))
             plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
             plt.xlim([0.0, 1.0])
             plt.ylim([0.0, 1.05])
             plt.xlabel('False Positive Rate')
             plt.ylabel('True Positive Rate')
-            plt.title('Receiver operating characteristic for class {0}'.format(class_name))
+            plt.title('Receiver operating characteristic')
             plt.legend(loc="lower right")
             plt.show()
 
