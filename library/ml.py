@@ -567,7 +567,7 @@ class ML(object):
                              'green', 'yellow']):
             class_name = self.decode_classifications([i])[0]
             plt.plot(fpr[i], tpr[i], color=color, lw=lw,
-                     label='ROC curve of class {0} (area = {1:0.2f})'.format(class_name, roc_auc[i]))
+                     label='ROC curve for class {0} (area = {1:0.2f})'.format(class_name, roc_auc[i]))
         plt.plot(fpr["micro"], tpr["micro"], color='darkmagenta',
                  lw=lw, label='Micro ROC curve (area = {0:2f})'.format(roc_auc["micro"]))
         plt.plot(fpr["macro"], tpr["macro"], color='darkorange',
