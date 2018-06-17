@@ -254,7 +254,7 @@ if build_classifier:
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
 
-        if generate_roc_curves:
+        if generate_roc_curves and cross_fold_validation is False:
             ml.plot_roc_curves(y_test, y_pred, list(range(6)))
 
     # Save the classifier
