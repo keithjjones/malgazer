@@ -25,7 +25,7 @@ preprocess_data = False
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'nc'
+classifier_type = 'adaboost'
 
 #
 # Calculate features
@@ -41,26 +41,34 @@ epochs = 10
 
 # Cross fold validation variables
 cross_fold_validation = False
-cfv_groups = 6
+cfv_groups = 4
 n_jobs = 10
 
 # KNN params
-knn_neighbors = 20
+knn_neighbors = 100
 
 # Centroid params
 shrink_threshold = 0.2
 
+# Adaboost params
+n_estimators = 200
+base_estimator = ML.build_dt_static()
+
+# OneVRest params
+ovr_base_estimator = ML.build_dt_static()
+
 # Set this to the percentage for test size, 
 # 0 makes the train and test set be the whole data set
-test_percent = 0.5
+test_percent = 0.8
 # Make the whole data set for training if we are doing cross fold validation
 if cross_fold_validation is True:
     test_percent = 0
 
 # We don't need categorial translation for some models
-categorical = False
 if classifier_type.lower() in ['ann', 'cnn']:
     categorical = True
+else:
+    categorical = False
 
 # Preprocess data
 if preprocess_data:
@@ -103,8 +111,8 @@ if build_classifier:
     
     # Read in the final training data
     #data = pd.read_csv(os.path.join(datadir, 'data.csv'), index_col=0)
-    X = data.drop('classification', axis=1).as_matrix().copy()
-    y = pd.DataFrame(data['classification']).as_matrix().copy()
+    X = data.drop('classification', axis=1).values.copy()
+    y = pd.DataFrame(data['classification']).values.copy()
     
     # Make the classifier
     ml = ML()
@@ -211,6 +219,10 @@ if build_classifier:
             classifier = ml.build_knn(n_neighbors=knn_neighbors, n_jobs=n_jobs)
         elif classifier_type.lower() == 'nc':
             classifier = ml.build_nc(shrink_threshold=shrink_threshold)
+        elif classifier_type.lower() == 'adaboost':
+            classifier = ml.build_adaboost(n_estimators=n_estimators, base_estimator=base_estimator)
+        elif classifier_type.lower() == 'ovr':
+            classifier = ml.build_ovr(ovr_base_estimator)
             
         start_time = time.time()
         if cross_fold_validation is False:

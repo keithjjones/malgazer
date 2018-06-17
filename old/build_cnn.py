@@ -42,8 +42,8 @@ data = Utils.filter_hashes(all_data, hashes)
 
 # Read in the final training data
 #data = pd.read_csv(os.path.join(datadir, 'data.csv'), index_col=0)
-X = data.drop('classification', axis=1).as_matrix().copy()
-y = pd.DataFrame(data['classification']).as_matrix().copy()
+X = data.drop('classification', axis=1).values.copy()
+y = pd.DataFrame(data['classification']).values.copy()
 
 # Preprocess the data
 ml = ML()

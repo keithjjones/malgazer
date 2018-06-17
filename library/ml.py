@@ -18,6 +18,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier, NearestCentroid
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.utils.validation import column_or_1d
 import keras.backend as K
 import keras.callbacks
@@ -67,6 +69,46 @@ class ML(object):
         else:
             with open(os.path.join(directory, filename+".pickle"), 'rb') as file:
                 return pickle.load(file)
+
+    @staticmethod
+    def build_ovr_static(*args, **kwargs):
+        """
+        Builds a OneVRest classifier.
+
+        :return:  The classifier
+        """
+        classifier = OneVsRestClassifier(*args, **kwargs)
+        return classifier
+
+    def build_ovr(self, *args, **kwargs):
+        """
+        Builds a OneVRest classifier.
+
+        :return:  The classifier
+        """
+        self.classifier_type = 'ovr'
+        self.classifier = ML.build_ovr_static(*args, **kwargs)
+        return self.classifier
+
+    @staticmethod
+    def build_adaboost_static(*args, **kwargs):
+        """
+        Builds an AdaBoost classifier.
+
+        :return:  The classifier
+        """
+        classifier = AdaBoostClassifier(*args, **kwargs)
+        return classifier
+
+    def build_adaboost(self, *args, **kwargs):
+        """
+        Builds an AdaBoost classifier.
+
+        :return:  The classifier
+        """
+        self.classifier_type = 'adaboost'
+        self.classifier = ML.build_adaboost_static(*args, **kwargs)
+        return self.classifier
 
     @staticmethod
     def build_nc_static(*args, **kwargs):

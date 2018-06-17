@@ -1101,7 +1101,7 @@ class Utils(object):
         raw_data = raw_data[~raw_data.index.duplicated(keep='first')]
         classifications = classifications.loc[classifications.index.isin(raw_data.index)]
         raw_data = raw_data.loc[raw_data.index.isin(classifications.index)]
-        all_data = pd.concat([raw_data, classifications], axis=1)
+        all_data = pd.concat([raw_data, classifications], axis=1, sort=False)
         return all_data, raw_data, classifications
 
     @staticmethod
