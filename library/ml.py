@@ -501,7 +501,7 @@ class ML(object):
         :param y:  The y training data.
         :param cv:  The number of cfv groups.
         :param n_jobs:  The number of jobs.  Use -1 to use all CPU cores.
-        :return:  A tuple of accuracies, mean, and variance.
+        :return:  A tuple of accuracies, mean, variance, classifiers, confusion matrices.
         """
         cvkfold = StratifiedKFold(n_splits=cv)
 
@@ -510,13 +510,15 @@ class ML(object):
         classifiers = list()
         accuracies = list()
         cms = list()
+        fold = 0
         for train, test in cvkfold.split(X, Y.tolist()):
+            fold += 1
+            print("Cross Fold Validation - Fold {0}".format(fold))
             classifier = classifier.fit(X[train], Y[train].tolist())
             # probas_ = classifier.predict_proba(X[test])
             # print(probas_)
             y_pred = classifier.predict(X[test])
             accuracy, cm = ML.confusion_matrix_scikitlearn(Y[test], y_pred)
-
             classifiers.append(classifier)
             accuracies.append(accuracy)
             cms.append(cm)
@@ -524,7 +526,7 @@ class ML(object):
         accuracies = np.array(accuracies)
         mean = accuracies.mean()
         variance = accuracies.std()
-        return accuracies, mean, variance
+        return accuracies, mean, variance, classifiers, cms
 
         # accuracies = cross_val_score(estimator=classifier,
         #                              X=X,

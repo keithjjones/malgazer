@@ -246,10 +246,10 @@ if build_classifier:
             print(accuracy)
         else:
             # Cross Fold Validation
-            accuracies, mean, variance = ML.cross_fold_validation_scikitlearn(classifier,
-                                                                              X_train, y_train, 
-                                                                              cv=cfv_groups, 
-                                                                              n_jobs=n_jobs)
+            accuracies, mean, variance, classifiers, cms = ML.cross_fold_validation_scikitlearn(classifier,
+                                                                                                X_train, y_train, 
+                                                                                                cv=cfv_groups, 
+                                                                                                n_jobs=n_jobs)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
