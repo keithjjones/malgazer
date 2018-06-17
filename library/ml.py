@@ -491,8 +491,7 @@ class ML(object):
         return X_train, X_test, y_train, y_test
 
     @staticmethod
-    def cross_fold_validation_scikitlearn(classifier, X, y,
-                                          cv=10, n_jobs=-1):
+    def cross_fold_validation_scikitlearn(classifier, X, y, cv=10, n_jobs=-1):
         """
         Calculates the cross fold validation mean and variance of Scikit Learn models.
 
