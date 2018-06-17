@@ -13,6 +13,7 @@ import os
 import pickle
 from sklearn import tree
 from sklearn.metrics import roc_curve, auc
+from sklearn.preprocessing import label_binarize
 import matplotlib.pyplot as plt
 
 
@@ -27,7 +28,7 @@ preprocess_data = False
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'ovr'
+classifier_type = 'dt'
 
 #
 # Calculate features
@@ -42,11 +43,11 @@ batch_size = 100
 epochs = 10
 
 # Cross fold validation variables
-cross_fold_validation = True
+cross_fold_validation = False
 cfv_groups = 4
 n_jobs = 10
 
-# ROC Curves
+# ROC Curves - only works for SciKit Learn models right now
 generate_roc_curves=True
 
 # KNN params
@@ -252,6 +253,37 @@ if build_classifier:
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
 
+        if generate_roc_curves:
+            # Compute micro-average ROC curve and ROC area
+            n_classes = [0, 1, 2, 3, 4, 5]
+            yt = label_binarize(y_test.tolist(), classes=n_classes)
+            yp = label_binarize(y_pred.tolist(), classes=n_classes)
+            fpr = dict()
+            tpr = dict()
+            roc_auc = dict()
+            for i in n_classes:
+                fpr[i], tpr[i], _ = roc_curve(yt[:, i], yp[:, i])
+                roc_auc[i] = auc(fpr[i], tpr[i])
+    
+            # Compute micro-average ROC curve and ROC area
+            fpr["micro"], tpr["micro"], _ = roc_curve(yt.ravel(), yp.ravel())
+            roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+    
+            class_to_plot = 0
+            class_name = ml.decode_classifications([[class_to_plot]])
+            plt.figure()
+            lw = 2
+            plt.plot(fpr[class_to_plot], tpr[class_to_plot], color='darkorange',
+                     lw=lw, label='ROC curve (area = {0:2f})'.format(roc_auc[class_to_plot]))
+            plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+            plt.xlim([0.0, 1.0])
+            plt.ylim([0.0, 1.05])
+            plt.xlabel('False Positive Rate')
+            plt.ylabel('True Positive Rate')
+            plt.title('Receiver operating characteristic for class {0}'.format(class_name))
+            plt.legend(loc="lower right")
+            plt.show()
+
     # Save the classifier
     if cross_fold_validation is False:
         print("Saving the classifier...")
@@ -263,20 +295,3 @@ if build_classifier:
         ml.save_classifier(path, "classifier")
         if classifier_type.lower() == 'dt':
             tree.export_graphviz(classifier, out_file=os.path.join(path, 'tree.dot'))
-
-    if generate_roc_curves:
-        # Compute micro-average ROC curve and ROC area
-        fpr, tpr, _ = roc_curve(y_test.ravel(), y_pred.ravel())
-        roc_auc = auc(fpr, tpr)
-        plt.figure()
-        lw = 2
-        plt.plot(fpr, tpr, color='darkorange',
-                 lw=lw, label='ROC curve (area = {0:2f})'.format(roc_auc))
-        plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-        plt.xlim([0.0, 1.0])
-        plt.ylim([0.0, 1.05])
-        plt.xlabel('False Positive Rate')
-        plt.ylabel('True Positive Rate')
-        plt.title('Receiver operating characteristic example')
-        plt.legend(loc="lower right")
-        plt.show()

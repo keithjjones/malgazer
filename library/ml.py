@@ -440,17 +440,21 @@ class ML(object):
             y[:, 0] = self.y_labelencoder.transform(y[:, 0])
         if categorical:
             y = to_categorical(y)
+        self.categorical = categorical
         return y, self.y_labelencoder
 
-    def decode_classifications(self, y):
+    def decode_classifications(self, y, categorical=False):
         """
         Decodes the classifications.
 
         :param y:  The preprocessed data as a DataFrame.
+        :param categorical:  Set to True if categorical was used for encoding.
+        Leave false to use the value used for encoding.
         :return:  The decoded data y.
         """
         if self.y_labelencoder is not None:
-            y = np.argmax(y, axis=1)
+            if self.categorical or categorical:
+                y = np.argmax(y, axis=1)
             y_out = self.y_labelencoder.inverse_transform(y)
             return y_out
         else:
