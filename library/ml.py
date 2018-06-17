@@ -528,6 +528,8 @@ class ML(object):
         variance = accuracies.std()
         return accuracies, mean, variance, classifiers, cms
 
+        # Original code here...
+        #
         # accuracies = cross_val_score(estimator=classifier,
         #                              X=X,
         #                              y=column_or_1d(y).tolist(),
