@@ -66,7 +66,7 @@ ovr_base_estimator = ML.build_svm_static(kernel='rbf')
 
 # Set this to the percentage for test size, 
 # 0 makes the train and test set be the whole data set
-test_percent = 0.7
+test_percent = 0.8
 # Make the whole data set for training if we are doing cross fold validation
 if cross_fold_validation is True:
     test_percent = 0
@@ -91,7 +91,7 @@ if assemble_preprocessed_data:
     
     # Pick 60k samples, 10k from each classification
     trimmed_data = all_data.groupby('classification').head(10000)
-    trimmed_data.to_csv(os.path.join(datadir, 'data.csv'))
+    # trimmed_data.to_csv(os.path.join(datadir, 'data.csv'))
     pd.DataFrame(trimmed_data.index).to_csv(os.path.join(datadir, 'hashes_60k.txt'), header=False, index=False)
     
     # Pull the hashes we care about
@@ -255,56 +255,7 @@ if build_classifier:
             print("CFV Var: {0}".format(variance))
 
         if generate_roc_curves:
-            # Compute micro-average ROC curve and ROC area
-            n_classes = [0, 1, 2, 3, 4, 5]
-            yt = label_binarize(y_test.tolist(), classes=n_classes)
-            yp = label_binarize(y_pred.tolist(), classes=n_classes)
-            fpr = dict()
-            tpr = dict()
-            roc_auc = dict()
-            for i in n_classes:
-                fpr[i], tpr[i], _ = roc_curve(yt[:, i], yp[:, i])
-                roc_auc[i] = auc(fpr[i], tpr[i])
-    
-            # Compute micro-average ROC curve and ROC area
-            fpr["micro"], tpr["micro"], _ = roc_curve(yt.ravel(), yp.ravel())
-            roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
-            
-            all_fpr = np.unique(np.concatenate([fpr[i] for i in n_classes]))
-            mean_tpr = np.zeros_like(all_fpr)
-            print(fpr)
-            print("ALL FPR {0}".format(all_fpr))
-            for i in n_classes:
-                print("FPR {0}".format(fpr[i]))
-                print("TPR {0}".format(tpr[i]))
-                print("Interp {0}".format(interp(all_fpr, fpr[i], tpr[i])))
-                mean_tpr += interp(all_fpr, fpr[i], tpr[i])
-            
-            # Finally average it and compute AUC
-            mean_tpr /= len(n_classes)
-            
-            fpr["macro"] = all_fpr
-            tpr["macro"] = mean_tpr
-            roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
-    
-            plt.figure()
-            lw = 2
-            for i, color in zip(n_classes, ['aqua', 'darkorange', 'cornflowerblue', 'red', 'green', 'yellow']):
-                class_name = ml.decode_classifications([[i]])[0][0]
-                plt.plot(fpr[i], tpr[i], color=color, lw=lw,
-                         label='ROC curve of class {0} (area = {1:0.2f})'.format(class_name, roc_auc[i]))
-            plt.plot(fpr["micro"], tpr["micro"], color='darkmagenta',
-                     lw=lw, label='Micro ROC curve (area = {0:2f})'.format(roc_auc["micro"]))
-            plt.plot(fpr["macro"], tpr["macro"], color='darkorange',
-                     lw=lw, label='Macro ROC curve (area = {0:2f})'.format(roc_auc["macro"]))
-            plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
-            plt.xlim([0.0, 1.0])
-            plt.ylim([0.0, 1.05])
-            plt.xlabel('False Positive Rate')
-            plt.ylabel('True Positive Rate')
-            plt.title('Receiver operating characteristic')
-            plt.legend(loc="lower right")
-            plt.show()
+            ml.plot_roc_curves(y_test, y_pred, list(range(6)))
 
     # Save the classifier
     if cross_fold_validation is False:

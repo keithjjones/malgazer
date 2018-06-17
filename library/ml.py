@@ -21,6 +21,12 @@ from sklearn.neighbors import KNeighborsClassifier, NearestCentroid
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.utils.validation import column_or_1d
+from sklearn.metrics import roc_curve, auc
+from sklearn.preprocessing import label_binarize
+from scipy import interp
+import matplotlib.pyplot as plt
+
+
 import keras.backend as K
 import keras.callbacks
 import os
@@ -526,3 +532,51 @@ class ML(object):
         mean = accuracies.mean()
         variance = accuracies.std()
         return accuracies, mean, variance
+
+    def plot_roc_curves(self, y_test, y_pred, n_classes=[0, 1, 2, 3, 4, 5]):
+        # Compute micro-average ROC curve and ROC area
+        yt = label_binarize(y_test.tolist(), classes=n_classes)
+        yp = label_binarize(y_pred.tolist(), classes=n_classes)
+        fpr = dict()
+        tpr = dict()
+        roc_auc = dict()
+        for i in n_classes:
+            fpr[i], tpr[i], _ = roc_curve(yt[:, i], yp[:, i])
+            roc_auc[i] = auc(fpr[i], tpr[i])
+
+        # Compute micro-average ROC curve and ROC area
+        fpr["micro"], tpr["micro"], _ = roc_curve(yt.ravel(), yp.ravel())
+        roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
+
+        all_fpr = np.unique(np.concatenate([fpr[i] for i in n_classes]))
+        mean_tpr = np.zeros_like(all_fpr)
+        for i in n_classes:
+            mean_tpr += interp(all_fpr, fpr[i], tpr[i])
+
+        # Finally average it and compute AUC
+        mean_tpr /= len(n_classes)
+
+        fpr["macro"] = all_fpr
+        tpr["macro"] = mean_tpr
+        roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
+
+        plt.figure()
+        lw = 2
+        for i, color in zip(n_classes,
+                            ['aqua', 'darkorange', 'cornflowerblue', 'red',
+                             'green', 'yellow']):
+            class_name = self.decode_classifications([i])[0]
+            plt.plot(fpr[i], tpr[i], color=color, lw=lw,
+                     label='ROC curve of class {0} (area = {1:0.2f})'.format(class_name, roc_auc[i]))
+        plt.plot(fpr["micro"], tpr["micro"], color='darkmagenta',
+                 lw=lw, label='Micro ROC curve (area = {0:2f})'.format(roc_auc["micro"]))
+        plt.plot(fpr["macro"], tpr["macro"], color='darkorange',
+                 lw=lw, label='Macro ROC curve (area = {0:2f})'.format(roc_auc["macro"]))
+        plt.plot([0, 1], [0, 1], color='navy', lw=lw, linestyle='--')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver operating characteristic')
+        plt.legend(loc="lower right")
+        plt.show()
