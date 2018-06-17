@@ -44,7 +44,7 @@ batch_size = 100
 epochs = 10
 
 # Cross fold validation variables
-cross_fold_validation = False
+cross_fold_validation = True
 cfv_groups = 4
 n_jobs = 10
 

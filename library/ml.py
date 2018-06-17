@@ -23,6 +23,7 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.utils.validation import column_or_1d
 from sklearn.metrics import roc_curve, auc
 from sklearn.preprocessing import label_binarize
+from sklearn.model_selection import StratifiedKFold
 from scipy import interp
 import matplotlib.pyplot as plt
 
@@ -387,14 +388,10 @@ class ML(object):
 
         :param y_test:  The y testing data.
         :param y_pred:  The y predicted data.
-        :return:  The accuracty,confusion_matrix, as a tuple.
+        :return:  The accuracy,confusion_matrix, as a tuple.
         """
         cm = confusion_matrix(y_test.argmax(1), y_pred.argmax(1))
-        accuracy = 0.
-        for i in range(0, len(cm)):
-            accuracy += cm[i, i]
-        accuracy = accuracy/cm.sum()
-        return accuracy, cm
+        return ML._calculate_confusion_matrix(cm)
 
     @staticmethod
     def confusion_matrix_scikitlearn(y_test, y_pred):
@@ -403,9 +400,19 @@ class ML(object):
 
         :param y_test:  The y testing data.
         :param y_pred:  The y predicted data.
-        :return:  The accuracty,confusion_matrix, as a tuple.
+        :return:  The accuracy,confusion_matrix, as a tuple.
         """
         cm = confusion_matrix(column_or_1d(y_test).tolist(), column_or_1d(y_pred).tolist())
+        return ML._calculate_confusion_matrix(cm)
+
+    @staticmethod
+    def _calculate_confusion_matrix(cm):
+        """
+        Internal method to calculate statistics from a confusion matrix.
+
+        :param cm:  A confusion matrix from scikit learn
+        :return: The accuracy, confusion_matrix, as a tuple
+        """
         accuracy = 0.
         for i in range(0, len(cm)):
             accuracy += cm[i, i]
@@ -484,37 +491,60 @@ class ML(object):
         return X_train, X_test, y_train, y_test
 
     @staticmethod
-    def cross_fold_validation_scikitlearn(classifier, X_train, y_train,
+    def cross_fold_validation_scikitlearn(classifier, X, y,
                                           cv=10, n_jobs=-1):
         """
         Calculates the cross fold validation mean and variance of Scikit Learn models.
 
         :param classifier:  The function that builds the classifier.
-        :param X_train:  The X training data.
-        :param y_train:  The y training data.
+        :param X:  The X training data.
+        :param y:  The y training data.
         :param cv:  The number of cfv groups.
         :param n_jobs:  The number of jobs.  Use -1 to use all CPU cores.
         :return:  A tuple of accuracies, mean, and variance.
         """
-        accuracies = cross_val_score(estimator=classifier,
-                                     X=X_train,
-                                     y=column_or_1d(y_train).tolist(),
-                                     cv=cv,
-                                     n_jobs=n_jobs)
+        cvkfold = StratifiedKFold(n_splits=cv)
+
+        Y = column_or_1d(y)
+
+        classifiers = list()
+        accuracies = list()
+        cms = list()
+        for train, test in cvkfold.split(X, Y.tolist()):
+            classifier = classifier.fit(X[train], Y[train].tolist())
+            # probas_ = classifier.predict_proba(X[test])
+            # print(probas_)
+            y_pred = classifier.predict(X[test])
+            accuracy, cm = ML.confusion_matrix_scikitlearn(Y[test], y_pred)
+
+            classifiers.append(classifier)
+            accuracies.append(accuracy)
+            cms.append(cm)
+
+        accuracies = np.array(accuracies)
         mean = accuracies.mean()
         variance = accuracies.std()
         return accuracies, mean, variance
 
+        # accuracies = cross_val_score(estimator=classifier,
+        #                              X=X,
+        #                              y=column_or_1d(y).tolist(),
+        #                              cv=cv,
+        #                              n_jobs=n_jobs)
+        # mean = accuracies.mean()
+        # variance = accuracies.std()
+        # return accuracies, mean, variance
+
     @staticmethod
-    def cross_fold_validation_keras(classifier_fn, X_train, y_train,
+    def cross_fold_validation_keras(classifier_fn, X, y,
                                     batch_size = 10, epochs=100,
                                     cv=10, n_jobs=-1):
         """
         Calculates the cross fold validation mean and variance of Keras models.
 
         :param classifier_fn:  The function that builds the classifier.
-        :param X_train:  The X training data.
-        :param y_train:  The y training data.
+        :param X:  The X training data.
+        :param y:  The y training data.
         :param batch_size:  The batch size.
         :param epochs:  The number of epochs.
         :param cv:  The number of cfv groups.
@@ -525,8 +555,8 @@ class ML(object):
                                      batch_size=batch_size,
                                      epochs=epochs)
         accuracies = cross_val_score(estimator=keras_classifier,
-                                     X=X_train,
-                                     y=y_train,
+                                     X=X,
+                                     y=y,
                                      cv=cv,
                                      n_jobs=n_jobs)
         mean = accuracies.mean()
