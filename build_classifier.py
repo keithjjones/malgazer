@@ -244,6 +244,9 @@ if build_classifier:
             print(cm)
             print("Accuracy:")
             print(accuracy)
+
+            if generate_roc_curves:
+                ml.plot_roc_curves(y_test, y_pred, list(range(6)))
         else:
             # Cross Fold Validation
             accuracies, mean, variance, classifiers, cms = ML.cross_fold_validation_scikitlearn(classifier,
@@ -253,9 +256,6 @@ if build_classifier:
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
-
-        if generate_roc_curves and cross_fold_validation is False:
-            ml.plot_roc_curves(y_test, y_pred, list(range(6)))
 
     # Save the classifier
     if cross_fold_validation is False:
