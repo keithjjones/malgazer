@@ -3,7 +3,9 @@ services:
   classifier:
 #    image: python:3
 #    command: bash -c "pip install -r /malgazer/requirements.txt && python /malgazer/tornado/malgazer.py"
-    build: .
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile
     ports:
       - "8080:8080"
     volumes:
