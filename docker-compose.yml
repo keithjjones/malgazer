@@ -10,3 +10,10 @@ services:
       - "8080:8080"
     volumes:
       - .:/malgazer
+
+  db:
+    image: postgres:latest
+    volumes:
+      - ./docker/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=malgazer
