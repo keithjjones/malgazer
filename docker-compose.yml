@@ -4,6 +4,8 @@ services:
     build:
       context: ./
       dockerfile: docker/Dockerfile-classifier
+    depends_on:
+      - db
     ports:
       - "8888:8888"
     volumes:
