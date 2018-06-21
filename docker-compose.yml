@@ -11,6 +11,18 @@ services:
     volumes:
       - .:/malgazer
 
+  web:
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile-web
+    depends_on:
+      - db
+      - classifier
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/malgazer
+
   db:
     image: postgres:latest
     volumes:
