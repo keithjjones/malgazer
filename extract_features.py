@@ -22,6 +22,9 @@ def main(arguments=None):
     parser.add_argument("-n", "--nonormalize", action='store_true',
                         help="Disables entropy normalization."
                              "", required=False)
+    parser.add_argument("-d", "--datapoints",
+                        help="The number of data points to sample running window entropy."
+                             "", type=int, default=512, required=False)
     parser.add_argument("-j", "--jobs", type=int, default=1,
                         help="The number of jobs to do the work, but be 1 or greater."
                              "", required=False)
@@ -45,6 +48,7 @@ def main(arguments=None):
                                           args.DataDirectory,
                                           window_size=args.window,
                                           normalize=normalize,
+                                          number_of_data_points=args.datapoints,
                                           njobs=args.jobs)
 
 

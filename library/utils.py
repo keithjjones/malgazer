@@ -9,6 +9,7 @@ import csv
 import pandas as pd
 import numpy as np
 from .files import FileObject, Sample
+from .entropy import resample
 from tsfresh import extract_features, select_features, extract_relevant_features
 from tsfresh.utilities.dataframe_functions import impute
 from tsfresh.feature_extraction import EfficientFCParameters
@@ -110,38 +111,42 @@ class Utils(object):
         return True
 
     @staticmethod
-    def _calculate_rwe(filename, window_size=256, normalize=True):
+    def _calculate_rwe(filename, window_size=256, normalize=True,
+                       number_of_data_points=1024):
         """
         Internal method to calculate the RWE for a sample.
 
         :param filename:  The file name of the sample to calculate.
         :param window_size: A window size to calculate.
         :param normalize: Set to False to not normalize.
+        :param number_of_data_points: The number of data points you want in
+        your new data set.  The output will be resampled to this many data points.
         :return:  Returns a pandas data series so it can be added to a
         data frame.
         """
         s = Sample()
         s.fromfile(filename)
-        return s.running_window_entropy(window_size, normalize)
+        return resample(s.running_window_entropy(window_size, normalize), number_of_data_points)
 
     @staticmethod
     def extract_features_from_directory(in_directory=None,
                                         out_directory=None,
                                         window_size=256,
                                         normalize=True,
-                                        njobs=os.cpu_count(),
-                                        compression='bz2'):
+                                        number_of_data_points=1024,
+                                        njobs=os.cpu_count()):
         """
         Calculates the running window entropy of a directory containing
         malware samples that are named from their SHA256 value.  It will
-        skip all other files.
+        skip all other files.  The output format will be HDF.
 
         :param in_directory:  The input directory for malware.
         :param out_directory: The output directory for calculated data.
         :param window_size: A window size to calculate.
         :param normalize: Set to False to not normalize.
+        :param number_of_data_points: The number of data points you want in
+        your new data set.  The output will be resampled to this many data points.
         :param njobs: The number of processes to use
-        :param compression:  The compression to use for the output CSV.
         :return: Nothing
         """
         if in_directory is None or out_directory is None:
@@ -162,39 +167,39 @@ class Utils(object):
         malware_files_re = re.compile('[a-z0-9]{64}',
                                       flags=re.IGNORECASE)
         samples_processed = 0
+        batch_size = 10
         saved_futures = {}
         rows_to_add = []
-        csvfilename = os.path.join(out_directory, 'rwe_{0}.csv.{1}'.format(window_size, compression))
+        hdffilename = os.path.join(out_directory, 'rwe_{0}.hdf'.format(window_size))
+        if os.path.isfile(hdffilename):
+            os.remove(hdffilename)
         with ProcessPoolExecutor(max_workers=njobs) as executor:
             for root, dirs, files in os.walk(in_directory):
                 for file in files:
                     filename = os.path.join(root, file)
                     if malware_files_re.match(file):
                         # print("Input file: {0}".format(filename))
-                        future = executor.submit(Utils._calculate_rwe, filename, window_size, normalize)
+                        future = executor.submit(Utils._calculate_rwe,
+                                                 filename, window_size,
+                                                 normalize,
+                                                 number_of_data_points)
                         saved_futures[future] = filename
             for future in as_completed(saved_futures):
                 samples_processed += 1
-                if samples_processed == 1:
-                    print("Writing first row of CSV: {0}".format(csvfilename))
-                    df = pd.DataFrame()
-                    df = df.append(future.result())
-                    df.to_csv(csvfilename, compression='bz2', mode='a')
-                elif samples_processed % 100 == 0:
-                    print("Writing chunk to CSV: {0}".format(csvfilename))
+                rows_to_add.append(future.result())
+                if samples_processed % batch_size == 0:
+                    print("Writing chunk to HDF: {0}".format(hdffilename))
                     df = pd.DataFrame()
                     df = df.append(rows_to_add)
-                    df.to_csv(csvfilename, compression='bz2')
+                    df.to_hdf(hdffilename, 'rwe', format='table', mode='a')
                     rows_to_add = []
-                else:
-                    rows_to_add.append(future.result())
                 print("Processed file: {0}".format(saved_futures[future]))
                 print("\t{0:,} samples processed...".format(samples_processed))
         if len(rows_to_add) > 0:
-            print("Writing chunk to CSV: {0}".format(csvfilename))
+            print("Writing chunk to HDF: {0}".format(hdffilename))
             df = pd.DataFrame()
             df = df.append(rows_to_add)
-            df.to_csv(csvfilename, compression='bz2')
+            df.to_hdf(hdffilename, 'rwe', format='table', mode='a')
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
 

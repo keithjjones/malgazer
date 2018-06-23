@@ -135,55 +135,24 @@ class RunningEntropy(object):
         return xnew, ynew
 
 
-def resample_rwe(in_filename, out_filename, number_of_data_points=1024, compression='bz2'):
+def resample(in_data, number_of_data_points=1024):
     """
-    Resamples a RWE CSV file to the number_of_data_points.
+    Resamples a RWE to the number_of_data_points.
 
-    :param in_filename:  The filename of the raw data.
-    :param out_filename:  The file name of the output resampled data.
+    :param in_data:  The filename of the raw data.
     :param number_of_data_points: The number of data points you want in
     your new data set.
-    :param compression:  The compression to use for the input and output CSVs.
     :return: Nothing
     """
-    # Start the timer
-    start_time = time.time()
-
-    print("Resampling raw RWE: {0}".format(in_filename))
-    chunksize = 10
-    chunk_number = 0
-    for in_df in pd.read_csv(in_filename, index_col=0, compression=compression, chunksize=chunksize):
-        chunk_number += 1
-        print("\tResampling rows, Chunk {0}".format(chunk_number))
-        rows_to_add = []
-        n_rows = len(in_df.index)
-        row_number = 1
-        for index, row in in_df.iterrows():
-            rwe = np.array(row)
-            x_rwe = list(range(len(rwe)))
-            step = (len(x_rwe)-1)/number_of_data_points
-            xnew = np.arange(0, len(x_rwe)-1, step)
-            interp_rwe = interpolate.interp1d(x_rwe, rwe)
-            ynew = interp_rwe(xnew)
-            if len(ynew) != number_of_data_points:
-                raise Exception('Unhandled Exception - This should not happen!')
-            ds = pd.Series(ynew)
-            ds.name = index
-            rows_to_add.append(ds)
-            if row_number % 100 == 0:
-                print("\t\t{0} out of {1} total rows resampled in chunk {2}..."
-                      .format(row_number, n_rows, chunk_number))
-            row_number += 1
-        print("\tAssembling new DataFrame for chunk {0}...".format(chunk_number))
-        out_df = pd.DataFrame()
-        out_df = out_df.append(rows_to_add)
-        print("\tWriting resampled RWE chunk {0} to file: {1}"
-              .format(chunk_number, out_filename))
-        if chunk_number == 1:
-            out_df.to_csv(out_filename, compression=compression)
-        else:
-            out_df.to_csv(out_filename, compression=compression, mode='a')
-    print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+    rwe = np.array(in_data)
+    x_rwe = list(range(len(rwe)))
+    step = (len(x_rwe)-1)/number_of_data_points
+    xnew = np.arange(0, len(x_rwe)-1, step)
+    interp_rwe = interpolate.interp1d(x_rwe, rwe)
+    ynew = interp_rwe(xnew)
+    if len(ynew) != number_of_data_points:
+        raise Exception('Unhandled Exception - This should not happen!')
+    return ynew
 
 
 def calculate_entropy(counts, windowsize):
