@@ -38,10 +38,24 @@ class ML(object):
         super(ML, self).__init__()
         self.classifer = None
         self.classifier_type = None
+        self.classifiers = None
         # X scaler
         self.X_sc = None
         # y label encoder
         self.y_labelencoder = None
+
+    def set_classifier_by_fold(self, fold):
+        """
+        Sets the classifier.  This is useful after picking the best cross fold
+        validated classifier, for example.
+
+        :param fold:  The classifier fold number.
+        :return: Nothing.
+        """
+        if self.classifiers:
+            self.classifier = self.classifiers[fold]['classifier']
+        else:
+            raise AttributeError("Must use CFV before there are classifiers to set.")
 
     def save_classifier(self, directory, filename):
         """
@@ -489,8 +503,7 @@ class ML(object):
                                                             stratify=y)
         return X_train, X_test, y_train, y_test
 
-    @staticmethod
-    def cross_fold_validation_scikitlearn(classifier, X, y, cv=10):
+    def cross_fold_validation_scikitlearn(self, classifier, X, y, cv=10):
         """
         Calculates the cross fold validation mean and variance of Scikit Learn models.
 
@@ -502,6 +515,7 @@ class ML(object):
         """
         cvkfold = StratifiedKFold(n_splits=cv)
 
+        # Maybe max instead?
         n_classes = len(np.unique(y))
 
         Y = column_or_1d(y)
@@ -509,19 +523,21 @@ class ML(object):
         fold = 0
         saved_futures = {}
         classifiers = {}
+        print("Start Cross Fold Validation...")
         with ProcessPoolExecutor(max_workers=cv) as executor:
             for train, test in cvkfold.split(X, Y.tolist()):
                 fold += 1
-                print("Calculating fold: {0}".format(fold))
+                print("\tCalculating fold: {0}".format(fold))
                 future = executor.submit(ML._cfv_skl_runner,
                                          X[train], Y[train].tolist(),
                                          X[test], Y[test].tolist(),
                                          classifier)
                 saved_futures[future] = fold
             for future in as_completed(saved_futures):
-                print("Finished calculating fold: {0}".format(saved_futures[future]))
+                print("\tFinished calculating fold: {0}".format(saved_futures[future]))
                 result_dict = future.result()
                 classifiers[saved_futures[future]] = result_dict
+        self.classifiers = classifiers
         accuracies = np.array([classifiers[f]['accuracy'] for f in classifiers])
         mean = accuracies.mean()
         variance = accuracies.std()
@@ -542,11 +558,12 @@ class ML(object):
         my_classifier = classifier.fit(X_train, Y_train)
         y_pred = my_classifier.predict(X_test)
         accuracy, cm = ML.confusion_matrix_scikitlearn(Y_test, y_pred)
-        return_dict = {'classifier': my_classifier, 'cm': cm, 'accuracy': accuracy}
+        return_dict = {'classifier': my_classifier, 'cm': cm,
+                       'accuracy': accuracy, 'y_test': np.array(Y_test),
+                       'y_pred': np.array(y_pred)}
         return return_dict
 
-    @staticmethod
-    def cross_fold_validation_keras(classifier_fn, X, y,
+    def cross_fold_validation_keras(self, classifier_fn, X, y,
                                     batch_size = 10, epochs=100,
                                     cv=10, n_jobs=-1):
         """
@@ -573,7 +590,7 @@ class ML(object):
         variance = accuracies.std()
         return accuracies, mean, variance
 
-    def plot_roc_curves(self, y_test, y_pred, n_categories=6):
+    def plot_roc_curves(self, y_test, y_pred, n_categories=6, fold=None):
         """
         Plot ROC curves for the data and classifier.
 
@@ -581,6 +598,7 @@ class ML(object):
         :param y_pred:  The y predicted data.
         :param n_categories: The number of categories, starting and 0 and
         ending at n_categories-1.
+        :param fold:  An optional fold number to add to the title.
         :return: Nothing.  This plots the curve.
         """
         n_classes = range(n_categories)
@@ -628,6 +646,9 @@ class ML(object):
         plt.ylim([0.0, 1.05])
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
-        plt.title('Receiver operating characteristic')
+        if fold:
+            plt.title('Receiver operating characteristic Fold={0}'.format(fold))
+        else:
+            plt.title('Receiver operating characteristic')
         plt.legend(loc="lower right")
         plt.show()
