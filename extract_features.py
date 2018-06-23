@@ -11,16 +11,14 @@ import sys
 def main(arguments=None):
     # Argument parsing
     parser = argparse.ArgumentParser(
-        description='Calculates the entropy of a directory of files.')
+        description='Calculates the features from a directory of files.')
     parser.add_argument('MalwareDirectory',
                         help='The directory containing malware to analyze.')
     parser.add_argument('DataDirectory',
                         help='The directory that will contain the data files.')
     parser.add_argument("-w", "--window",
                         help="Window size, in bytes, for running entropy."
-                             "Multiple windows can be identified as comma "
-                             "separated values without spaces."
-                             "", type=str, required=False)
+                             "", type=int, required=False)
     parser.add_argument("-n", "--nonormalize", action='store_true',
                         help="Disables entropy normalization."
                              "", required=False)
@@ -31,7 +29,7 @@ def main(arguments=None):
         args = parser.parse_args(arguments)
     else:
         args = parser.parse_args()
-        
+
     if args.jobs < 1:
         print("Jobs must be 1 or greater.")
         exit()
@@ -42,37 +40,12 @@ def main(arguments=None):
     else:
         normalize = True
 
-    # Find window sizes
-    windows = None
-    if args.window:
-        windows = args.window.split(',')
-        windows = [x.strip() for x in windows]
-        windows = [int(x) for x in windows]
-
-    # Delete old data...
-    # try:
-    #     shutil.rmtree(args.DataDirectory, ignore_errors=True)
-    # except:
-    #     pass
-
-    # Create DB directory...
-    try:
-        os.mkdir(args.DataDirectory)
-    except:
-        pass
-
-    # # Create the DB directory if needed...
-    # try:
-    #     os.stat(args.DBDirectory)
-    # except:
-    #     os.mkdir(args.DBDirectory)
-
     # Crawl the directories for malware and calculate rwe
-    Utils.batch_running_window_entropy(args.MalwareDirectory,
-                                       args.DataDirectory,
-                                       window_sizes=windows,
-                                       normalize=normalize,
-                                       njobs=args.jobs)
+    Utils.extract_features_from_directory(args.MalwareDirectory,
+                                          args.DataDirectory,
+                                          window_size=args.window,
+                                          normalize=normalize,
+                                          njobs=args.jobs)
 
 
 if __name__ == "__main__":

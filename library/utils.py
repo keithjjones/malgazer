@@ -8,7 +8,7 @@ import gzip
 import csv
 import pandas as pd
 import numpy as np
-from .files import FileObject
+from .files import FileObject, Sample
 from tsfresh import extract_features, select_features, extract_relevant_features
 from tsfresh.utilities.dataframe_functions import impute
 from tsfresh.feature_extraction import EfficientFCParameters
@@ -108,6 +108,81 @@ class Utils(object):
         if changed:
             m.write(picklefile)
         return True
+
+    @staticmethod
+    def _calculate_rwe(filename, window_size=256, normalize=True):
+        """
+        Internal method to calculate the RWE for a sample.
+
+        :param filename:  The file name of the sample to calculate.
+        :param window_size: A window size to calculate.
+        :param normalize: Set to False to not normalize.
+        :return:  Returns a pandas data series so it can be added to a
+        data frame.
+        """
+        s = Sample()
+        s.fromfile(filename)
+        return s.running_window_entropy(window_size, normalize)
+
+    @staticmethod
+    def extract_features_from_directory(in_directory=None,
+                                        out_directory=None,
+                                        window_size=256,
+                                        normalize=True,
+                                        njobs=os.cpu_count()):
+        """
+        Calculates the running window entropy of a directory containing
+        malware samples that are named from their SHA256 value.  It will
+        skip all other files.
+
+        :param in_directory:  The input directory for malware.
+        :param out_directory: The output directory for calculated data.
+        :param window_size: A window size to calculate.
+        :param normalize: Set to False to not normalize.
+        :param njobs: The number of processes to use
+        :return: Nothing
+        """
+        if in_directory is None or out_directory is None:
+            raise ValueError('Input and output directories must be real.')
+        if njobs < 1:
+            raise ValueError('The number of jobs needs to be >= 1')
+
+        print("Starting running window entropy batch processing for malware samples...")
+
+        # Test to make sure the input directory exists, will throw exception
+        # if it does not exist.
+        os.stat(in_directory)
+
+        # Start the timer
+        start_time = time.time()
+
+        # The RE for malware files with sha256 as the name.
+        malware_files_re = re.compile('[a-z0-9]{64}',
+                                      flags=re.IGNORECASE)
+        samples_processed = 0
+        saved_futures = {}
+        rows_to_add = []
+        with ProcessPoolExecutor(max_workers=njobs) as executor:
+            for root, dirs, files in os.walk(in_directory):
+                for file in files:
+                    filename = os.path.join(root, file)
+                    if malware_files_re.match(file):
+                        # print("Input file: {0}".format(filename))
+                        future = executor.submit(Utils._calculate_rwe, filename, window_size, normalize)
+                        saved_futures[future] = filename
+            for future in as_completed(saved_futures):
+                rows_to_add.append(future.result())
+                samples_processed += 1
+                print("Processed file: {0}".format(saved_futures[future]))
+                print("\t{0:,} samples processed...".format(samples_processed))
+        csvfilename = os.path.join(out_directory, 'rwe_{0}.csv'.format(window_size))
+        print("Assembling the data...")
+        df = pd.DataFrame()
+        df = df.append(rows_to_add)
+        df.to_csv(csvfilename)
+        print("Writing CSV file: {0}".format(csvfilename))
+        print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+        print("{0:,} total samples processed...".format(samples_processed))
 
     @staticmethod
     def batch_running_window_entropy(in_directory=None,

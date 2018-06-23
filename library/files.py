@@ -8,6 +8,7 @@ import pickle
 import gzip
 from . import entropy
 from hashlib import sha256
+import pandas as pd
 
 
 class FileObject(object):
@@ -183,7 +184,7 @@ class Sample(object):
         """
         self.rawdata = None
         self.filename = None
-        super(Sample, self).__init__(*args, **kwargs)
+        # super(Sample, self).__init__(*args, **kwargs)
 
     def fromfile(self, filename):
         """
@@ -196,6 +197,13 @@ class Sample(object):
             self.rawdata = myfile.read()
         self.filename = filename
         return self.rawdata
+
+    def running_window_entropy(self, window_size=256, normalize=True):
+        e = entropy.RunningEntropy()
+        rwe = e.calculate(self.data, window_size, normalize)
+        ds = pd.Series(rwe)
+        ds.name = self.sha256
+        return ds
 
     @property
     def data(self):
