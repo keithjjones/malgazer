@@ -135,16 +135,16 @@ class RunningEntropy(object):
         return xnew, ynew
 
 
-def resample(in_data, number_of_data_points=1024):
+def resample(data, number_of_data_points=1024):
     """
     Resamples a RWE to the number_of_data_points.
 
-    :param in_data:  The filename of the raw data.
+    :param data:  The original data.
     :param number_of_data_points: The number of data points you want in
     your new data set.
     :return: Nothing
     """
-    rwe = np.array(in_data)
+    rwe = np.array(data)
     x_rwe = list(range(len(rwe)))
     step = (len(x_rwe)-1)/number_of_data_points
     xnew = np.arange(0, len(x_rwe)-1, step)
