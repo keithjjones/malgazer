@@ -164,6 +164,7 @@ class Utils(object):
         samples_processed = 0
         saved_futures = {}
         rows_to_add = []
+        csvfilename = os.path.join(out_directory, 'rwe_{0}.csv.{1}'.format(window_size, compression))
         with ProcessPoolExecutor(max_workers=njobs) as executor:
             for root, dirs, files in os.walk(in_directory):
                 for file in files:
@@ -173,16 +174,27 @@ class Utils(object):
                         future = executor.submit(Utils._calculate_rwe, filename, window_size, normalize)
                         saved_futures[future] = filename
             for future in as_completed(saved_futures):
-                rows_to_add.append(future.result())
                 samples_processed += 1
+                if samples_processed == 1:
+                    print("Writing first row of CSV: {0}".format(csvfilename))
+                    df = pd.DataFrame()
+                    df = df.append(future.result())
+                    df.to_csv(csvfilename, compression='bz2', mode='a')
+                elif samples_processed % 100 == 0:
+                    print("Writing chunk to CSV: {0}".format(csvfilename))
+                    df = pd.DataFrame()
+                    df = df.append(rows_to_add)
+                    df.to_csv(csvfilename, compression='bz2')
+                    rows_to_add = []
+                else:
+                    rows_to_add.append(future.result())
                 print("Processed file: {0}".format(saved_futures[future]))
                 print("\t{0:,} samples processed...".format(samples_processed))
-        csvfilename = os.path.join(out_directory, 'rwe_{0}.csv.{1}'.format(window_size, compression))
-        print("Assembling the data...")
-        df = pd.DataFrame()
-        df = df.append(rows_to_add)
-        df.to_csv(csvfilename, compression='bz2')
-        print("Writing CSV file: {0}".format(csvfilename))
+        if len(rows_to_add) > 0:
+            print("Writing chunk to CSV: {0}".format(csvfilename))
+            df = pd.DataFrame()
+            df = df.append(rows_to_add)
+            df.to_csv(csvfilename, compression='bz2')
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
 
