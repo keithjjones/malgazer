@@ -26,8 +26,7 @@ from sklearn.preprocessing import label_binarize
 from sklearn.model_selection import StratifiedKFold
 from scipy import interp
 import matplotlib.pyplot as plt
-
-
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 import keras.backend as K
 import keras.callbacks
 import os
@@ -491,7 +490,7 @@ class ML(object):
         return X_train, X_test, y_train, y_test
 
     @staticmethod
-    def cross_fold_validation_scikitlearn(classifier, X, y, cv=10, n_jobs=-1):
+    def cross_fold_validation_scikitlearn(classifier, X, y, cv=10):
         """
         Calculates the cross fold validation mean and variance of Scikit Learn models.
 
@@ -499,44 +498,52 @@ class ML(object):
         :param X:  The X training data.
         :param y:  The y training data.
         :param cv:  The number of cfv groups.
-        :param n_jobs:  The number of jobs.  Use -1 to use all CPU cores.
-        :return:  A tuple of accuracies, mean, variance, classifiers, confusion matrices.
+        :return:  A tuple of mean, variance, classifiers (dict).
         """
         cvkfold = StratifiedKFold(n_splits=cv)
 
+        n_classes = len(np.unique(y))
+
         Y = column_or_1d(y)
 
-        classifiers = list()
-        accuracies = list()
-        cms = list()
         fold = 0
-        for train, test in cvkfold.split(X, Y.tolist()):
-            fold += 1
-            print("Cross Fold Validation - Fold {0}".format(fold))
-            classifier = classifier.fit(X[train], Y[train].tolist())
-            # probas_ = classifier.predict_proba(X[test])
-            # print(probas_)
-            y_pred = classifier.predict(X[test])
-            accuracy, cm = ML.confusion_matrix_scikitlearn(Y[test], y_pred)
-            classifiers.append(classifier)
-            accuracies.append(accuracy)
-            cms.append(cm)
-
-        accuracies = np.array(accuracies)
+        saved_futures = {}
+        classifiers = {}
+        with ProcessPoolExecutor(max_workers=cv) as executor:
+            for train, test in cvkfold.split(X, Y.tolist()):
+                fold += 1
+                print("Calculating fold: {0}".format(fold))
+                future = executor.submit(ML._cfv_skl_runner,
+                                         X[train], Y[train].tolist(),
+                                         X[test], Y[test].tolist(),
+                                         classifier)
+                saved_futures[future] = fold
+            for future in as_completed(saved_futures):
+                print("Finished calculating fold: {0}".format(saved_futures[future]))
+                result_dict = future.result()
+                classifiers[saved_futures[future]] = result_dict
+        accuracies = np.array([classifiers[f]['accuracy'] for f in classifiers])
         mean = accuracies.mean()
         variance = accuracies.std()
-        return accuracies, mean, variance, classifiers, cms
+        return mean, variance, classifiers
 
-        # Original code here...
-        #
-        # accuracies = cross_val_score(estimator=classifier,
-        #                              X=X,
-        #                              y=column_or_1d(y).tolist(),
-        #                              cv=cv,
-        #                              n_jobs=n_jobs)
-        # mean = accuracies.mean()
-        # variance = accuracies.std()
-        # return accuracies, mean, variance
+    @staticmethod
+    def _cfv_skl_runner(X_train, Y_train, X_test, Y_test, classifier):
+        """
+        Internal method for multi-processing to calculate the CFV of a Scikit Learn classifier.
+
+        :param X_train:  The X training set.
+        :param Y_train:  The Y training set.
+        :param X_test:  The X testing set.
+        :param Y_test:  The X testing set.
+        :param classifier:  A function that builds a classifier from Scikit learn.
+        :return:  A dictionary with the results.
+        """
+        my_classifier = classifier.fit(X_train, Y_train)
+        y_pred = my_classifier.predict(X_test)
+        accuracy, cm = ML.confusion_matrix_scikitlearn(Y_test, y_pred)
+        return_dict = {'classifier': my_classifier, 'cm': cm, 'accuracy': accuracy}
+        return return_dict
 
     @staticmethod
     def cross_fold_validation_keras(classifier_fn, X, y,

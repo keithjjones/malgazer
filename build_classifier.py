@@ -45,7 +45,7 @@ epochs = 10
 
 # Cross fold validation variables
 cross_fold_validation = True
-cfv_groups = 4
+cfv_groups = 5
 n_jobs = 10
 
 # ROC Curves - only works for SciKit Learn models right now
@@ -249,10 +249,9 @@ if build_classifier:
                 ml.plot_roc_curves(y_test, y_pred, list(range(6)))
         else:
             # Cross Fold Validation
-            accuracies, mean, variance, classifiers, cms = ML.cross_fold_validation_scikitlearn(classifier,
-                                                                                                X_train, y_train, 
-                                                                                                cv=cfv_groups, 
-                                                                                                n_jobs=n_jobs)
+            mean, variance, classifiers = ML.cross_fold_validation_scikitlearn(classifier,
+                                                                               X_train, y_train, 
+                                                                               cv=cfv_groups)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
