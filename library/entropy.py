@@ -135,7 +135,7 @@ class RunningEntropy(object):
         return xnew, ynew
 
 
-def resample_rwe(in_filename, out_filename, number_of_data_points=1024):
+def resample_rwe(in_filename, out_filename, number_of_data_points=1024, compression='bz2'):
     """
     Resamples a RWE CSV file to the number_of_data_points.
 
@@ -143,11 +143,12 @@ def resample_rwe(in_filename, out_filename, number_of_data_points=1024):
     :param out_filename:  The file name of the output resampled data.
     :param number_of_data_points: The number of data points you want in
     your new data set.
+    :param compression:  The compression to use for the input and output CSVs.
     :return: Nothing
     """
     print("Resampling raw RWE...")
     print("\tReading original RWE file: {0}".format(in_filename))
-    in_df = pd.read_csv(in_filename, index_col=0)
+    in_df = pd.read_csv(in_filename, index_col=0, compression=compression)
 
     print("\tResampling rows...")
     rows_to_add = []
@@ -172,7 +173,7 @@ def resample_rwe(in_filename, out_filename, number_of_data_points=1024):
     out_df = pd.DataFrame()
     out_df = out_df.append(rows_to_add)
     print("\tWriting resampled RWE to file: {0}".format(out_filename))
-    out_df.to_csv(out_filename)
+    out_df.to_csv(out_filename, compression=compression)
 
 
 def calculate_entropy(counts, windowsize):

@@ -129,7 +129,8 @@ class Utils(object):
                                         out_directory=None,
                                         window_size=256,
                                         normalize=True,
-                                        njobs=os.cpu_count()):
+                                        njobs=os.cpu_count(),
+                                        compression='bz2'):
         """
         Calculates the running window entropy of a directory containing
         malware samples that are named from their SHA256 value.  It will
@@ -140,6 +141,7 @@ class Utils(object):
         :param window_size: A window size to calculate.
         :param normalize: Set to False to not normalize.
         :param njobs: The number of processes to use
+        :param compression:  The compression to use for the output CSV.
         :return: Nothing
         """
         if in_directory is None or out_directory is None:
@@ -175,11 +177,11 @@ class Utils(object):
                 samples_processed += 1
                 print("Processed file: {0}".format(saved_futures[future]))
                 print("\t{0:,} samples processed...".format(samples_processed))
-        csvfilename = os.path.join(out_directory, 'rwe_{0}.csv'.format(window_size))
+        csvfilename = os.path.join(out_directory, 'rwe_{0}.csv.{1}'.format(window_size, compression))
         print("Assembling the data...")
         df = pd.DataFrame()
         df = df.append(rows_to_add)
-        df.to_csv(csvfilename)
+        df.to_csv(csvfilename, compression='bz2')
         print("Writing CSV file: {0}".format(csvfilename))
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
