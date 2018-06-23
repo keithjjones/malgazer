@@ -182,6 +182,7 @@ class Sample(object):
         :param kwargs:   Not currently used.
         """
         self.rawdata = None
+        self.filename = None
         super(self, Sample).__init__(*args, **kwargs)
 
     def fromfile(self, filename):
@@ -193,6 +194,7 @@ class Sample(object):
         """
         with open(filename, 'rb') as myfile:
             self.rawdata = myfile.read()
+        self.filename = filename
         return self.rawdata
 
     @property
@@ -204,6 +206,18 @@ class Sample(object):
         """
         return bytearray(self.rawdatata)
 
+    @property
+    def sha256(self):
+        """
+        Calculates the SHA256 of a file by filename.
+
+        :return:  The SHA256 if successful, None otherwise.
+        """
+        if self.filename:
+            return sha256_file(self.filename)
+        else:
+            return None
+
 
 def sha256_file(filename):
     hasher = sha256()
@@ -211,6 +225,6 @@ def sha256_file(filename):
         with open(filename, 'rb') as f:
             buf = f.read()
             hasher.update(buf)
-        return hasher.hexdigest()
+        return hasher.hexdigest().upper()
     else:
         return ""
