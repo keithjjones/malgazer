@@ -167,7 +167,7 @@ class Utils(object):
         malware_files_re = re.compile('[a-z0-9]{64}',
                                       flags=re.IGNORECASE)
         samples_processed = 0
-        batch_size = 10
+        batch_size = 1000
         saved_futures = {}
         rows_to_add = []
         hdffilename = os.path.join(out_directory, 'rwe_{0}.hdf'.format(window_size))
