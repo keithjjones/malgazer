@@ -573,7 +573,18 @@ class ML(object):
         variance = accuracies.std()
         return accuracies, mean, variance
 
-    def plot_roc_curves(self, y_test, y_pred, n_classes=[0, 1, 2, 3, 4, 5]):
+    def plot_roc_curves(self, y_test, y_pred, n_categories=6):
+        """
+        Plot ROC curves for the data and classifier.
+
+        :param y_test:  The y testing data.
+        :param y_pred:  The y predicted data.
+        :param n_categories: The number of categories, starting and 0 and
+        ending at n_categories-1.
+        :return: Nothing.  This plots the curve.
+        """
+        n_classes = range(n_categories)
+
         # Compute micro-average ROC curve and ROC area
         yt = label_binarize(y_test.tolist(), classes=n_classes)
         yp = label_binarize(y_pred.tolist(), classes=n_classes)
