@@ -151,6 +151,8 @@ def resample_rwe(in_filename, out_filename, number_of_data_points=1024):
 
     print("\tResampling rows...")
     rows_to_add = []
+    n_rows = len(in_df.index)
+    row_number = 1
     for index, row in in_df.iterrows():
         rwe = np.array(row)
         x_rwe = list(range(len(rwe)))
@@ -163,6 +165,9 @@ def resample_rwe(in_filename, out_filename, number_of_data_points=1024):
         ds = pd.Series(ynew)
         ds.name = index
         rows_to_add.append(ds)
+        if row_number % 100 == 0:
+            print("\t\t{0} out of {1} total rows resampled...".format(row_number, n_rows))
+        row_number += 1
     print("\tAssembling new DataFrame...")
     out_df = pd.DataFrame()
     out_df = out_df.append(rows_to_add)
