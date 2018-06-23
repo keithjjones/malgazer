@@ -23,10 +23,10 @@ from sklearn.multiclass import OneVsRestClassifier
 from sklearn.utils.validation import column_or_1d
 from sklearn.metrics import roc_curve, auc
 from sklearn.preprocessing import label_binarize
+from sklearn.model_selection import StratifiedKFold
 from scipy import interp
 import matplotlib.pyplot as plt
-
-
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 import keras.backend as K
 import keras.callbacks
 import os
@@ -38,10 +38,24 @@ class ML(object):
         super(ML, self).__init__()
         self.classifer = None
         self.classifier_type = None
+        self.classifiers = None
         # X scaler
         self.X_sc = None
         # y label encoder
         self.y_labelencoder = None
+
+    def set_classifier_by_fold(self, fold):
+        """
+        Sets the classifier.  This is useful after picking the best cross fold
+        validated classifier, for example.
+
+        :param fold:  The classifier fold number.
+        :return: Nothing.
+        """
+        if self.classifiers:
+            self.classifier = self.classifiers[fold]['classifier']
+        else:
+            raise AttributeError("Must use CFV before there are classifiers to set.")
 
     def save_classifier(self, directory, filename):
         """
@@ -387,14 +401,10 @@ class ML(object):
 
         :param y_test:  The y testing data.
         :param y_pred:  The y predicted data.
-        :return:  The accuracty,confusion_matrix, as a tuple.
+        :return:  The accuracy,confusion_matrix, as a tuple.
         """
         cm = confusion_matrix(y_test.argmax(1), y_pred.argmax(1))
-        accuracy = 0.
-        for i in range(0, len(cm)):
-            accuracy += cm[i, i]
-        accuracy = accuracy/cm.sum()
-        return accuracy, cm
+        return ML._calculate_confusion_matrix(cm)
 
     @staticmethod
     def confusion_matrix_scikitlearn(y_test, y_pred):
@@ -403,9 +413,19 @@ class ML(object):
 
         :param y_test:  The y testing data.
         :param y_pred:  The y predicted data.
-        :return:  The accuracty,confusion_matrix, as a tuple.
+        :return:  The accuracy,confusion_matrix, as a tuple.
         """
         cm = confusion_matrix(column_or_1d(y_test).tolist(), column_or_1d(y_pred).tolist())
+        return ML._calculate_confusion_matrix(cm)
+
+    @staticmethod
+    def _calculate_confusion_matrix(cm):
+        """
+        Internal method to calculate statistics from a confusion matrix.
+
+        :param cm:  A confusion matrix from scikit learn
+        :return: The accuracy, confusion_matrix, as a tuple
+        """
         accuracy = 0.
         for i in range(0, len(cm)):
             accuracy += cm[i, i]
@@ -483,38 +503,75 @@ class ML(object):
                                                             stratify=y)
         return X_train, X_test, y_train, y_test
 
-    @staticmethod
-    def cross_fold_validation_scikitlearn(classifier, X_train, y_train,
-                                          cv=10, n_jobs=-1):
+    def cross_fold_validation_scikitlearn(self, classifier, X, y, cv=10):
         """
         Calculates the cross fold validation mean and variance of Scikit Learn models.
 
         :param classifier:  The function that builds the classifier.
-        :param X_train:  The X training data.
-        :param y_train:  The y training data.
+        :param X:  The X training data.
+        :param y:  The y training data.
         :param cv:  The number of cfv groups.
-        :param n_jobs:  The number of jobs.  Use -1 to use all CPU cores.
-        :return:  A tuple of accuracies, mean, and variance.
+        :return:  A tuple of mean, variance, classifiers (dict).
         """
-        accuracies = cross_val_score(estimator=classifier,
-                                     X=X_train,
-                                     y=column_or_1d(y_train).tolist(),
-                                     cv=cv,
-                                     n_jobs=n_jobs)
+        cvkfold = StratifiedKFold(n_splits=cv)
+
+        # Maybe max instead?
+        n_classes = len(np.unique(y))
+
+        Y = column_or_1d(y)
+
+        fold = 0
+        saved_futures = {}
+        classifiers = {}
+        print("Start Cross Fold Validation...")
+        with ProcessPoolExecutor(max_workers=cv) as executor:
+            for train, test in cvkfold.split(X, Y.tolist()):
+                fold += 1
+                print("\tCalculating fold: {0}".format(fold))
+                future = executor.submit(ML._cfv_skl_runner,
+                                         X[train], Y[train].tolist(),
+                                         X[test], Y[test].tolist(),
+                                         classifier)
+                saved_futures[future] = fold
+            for future in as_completed(saved_futures):
+                print("\tFinished calculating fold: {0}".format(saved_futures[future]))
+                result_dict = future.result()
+                classifiers[saved_futures[future]] = result_dict
+        self.classifiers = classifiers
+        accuracies = np.array([classifiers[f]['accuracy'] for f in classifiers])
         mean = accuracies.mean()
         variance = accuracies.std()
-        return accuracies, mean, variance
+        return mean, variance, classifiers
 
     @staticmethod
-    def cross_fold_validation_keras(classifier_fn, X_train, y_train,
+    def _cfv_skl_runner(X_train, Y_train, X_test, Y_test, classifier):
+        """
+        Internal method for multi-processing to calculate the CFV of a Scikit Learn classifier.
+
+        :param X_train:  The X training set.
+        :param Y_train:  The Y training set.
+        :param X_test:  The X testing set.
+        :param Y_test:  The X testing set.
+        :param classifier:  A function that builds a classifier from Scikit learn.
+        :return:  A dictionary with the results.
+        """
+        my_classifier = classifier.fit(X_train, Y_train)
+        y_pred = my_classifier.predict(X_test)
+        accuracy, cm = ML.confusion_matrix_scikitlearn(Y_test, y_pred)
+        return_dict = {'classifier': my_classifier, 'cm': cm,
+                       'accuracy': accuracy, 'y_test': np.array(Y_test),
+                       'y_pred': np.array(y_pred)}
+        return return_dict
+
+    def cross_fold_validation_keras(self, classifier_fn, X, y,
                                     batch_size = 10, epochs=100,
                                     cv=10, n_jobs=-1):
         """
         Calculates the cross fold validation mean and variance of Keras models.
 
         :param classifier_fn:  The function that builds the classifier.
-        :param X_train:  The X training data.
-        :param y_train:  The y training data.
+        :param X:  The X training data.
+        :param y:  The y training data.
         :param batch_size:  The batch size.
         :param epochs:  The number of epochs.
         :param cv:  The number of cfv groups.
@@ -525,15 +582,27 @@ class ML(object):
                                      batch_size=batch_size,
                                      epochs=epochs)
         accuracies = cross_val_score(estimator=keras_classifier,
-                                     X=X_train,
-                                     y=y_train,
+                                     X=X,
+                                     y=y,
                                      cv=cv,
                                      n_jobs=n_jobs)
         mean = accuracies.mean()
         variance = accuracies.std()
         return accuracies, mean, variance
 
-    def plot_roc_curves(self, y_test, y_pred, n_classes=[0, 1, 2, 3, 4, 5]):
+    def plot_roc_curves(self, y_test, y_pred, n_categories=6, fold=None):
+        """
+        Plot ROC curves for the data and classifier.
+
+        :param y_test:  The y testing data.
+        :param y_pred:  The y predicted data.
+        :param n_categories: The number of categories, starting and 0 and
+        ending at n_categories-1.
+        :param fold:  An optional fold number to add to the title.
+        :return: Nothing.  This plots the curve.
+        """
+        n_classes = range(n_categories)
+
         # Compute micro-average ROC curve and ROC area
         yt = label_binarize(y_test.tolist(), classes=n_classes)
         yp = label_binarize(y_pred.tolist(), classes=n_classes)
@@ -577,6 +646,9 @@ class ML(object):
         plt.ylim([0.0, 1.05])
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
-        plt.title('Receiver operating characteristic')
+        if fold:
+            plt.title('Receiver operating characteristic Fold={0}'.format(fold))
+        else:
+            plt.title('Receiver operating characteristic')
         plt.legend(loc="lower right")
         plt.show()

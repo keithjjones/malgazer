@@ -42,10 +42,11 @@ datadir = os.path.join('/Volumes/JONES/Focused Set May 2018', 'data_vt_window_{0
 arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', str(number_of_jobs), source_dir, datadir]
 batch_size = 100
 epochs = 10
+n_categories = 6
 
 # Cross fold validation variables
-cross_fold_validation = False
-cfv_groups = 4
+cross_fold_validation = True
+cfv_groups = 5
 n_jobs = 10
 
 # ROC Curves - only works for SciKit Learn models right now
@@ -203,7 +204,7 @@ if build_classifier:
             def model():
                 return ML.build_ann_static(datapoints, outputs)
             start_time = time.time()
-            accuracies, mean, variance = ML.cross_fold_validation_keras(model,
+            accuracies, mean, variance = ml.cross_fold_validation_keras(model,
                                                                         X_train, y_train, 
                                                                         batch_size=batch_size, 
                                                                         epochs=epochs, 
@@ -244,18 +245,24 @@ if build_classifier:
             print(cm)
             print("Accuracy:")
             print(accuracy)
+
+            if generate_roc_curves:
+                ml.plot_roc_curves(y_test, y_pred, n_categories)
         else:
             # Cross Fold Validation
-            accuracies, mean, variance = ML.cross_fold_validation_scikitlearn(classifier,
-                                                                              X_train, y_train, 
-                                                                              cv=cfv_groups, 
-                                                                              n_jobs=n_jobs)
+            mean, variance, classifiers = ml.cross_fold_validation_scikitlearn(classifier,
+                                                                               X_train, y_train, 
+                                                                               cv=cfv_groups)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
 
-        if generate_roc_curves and cross_fold_validation is False:
-            ml.plot_roc_curves(y_test, y_pred, list(range(6)))
+            if generate_roc_curves:
+                for fold in range(cfv_groups):
+                    ml.set_classifier_by_fold(fold+1)
+                    y_test = ml.classifiers[fold+1]['y_test']
+                    y_pred = ml.classifiers[fold+1]['y_pred']
+                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1)
 
     # Save the classifier
     if cross_fold_validation is False:

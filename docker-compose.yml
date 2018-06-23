@@ -1,12 +1,31 @@
 version: '3'
 services:
   classifier:
-#    image: python:3
-#    command: bash -c "pip install -r /malgazer/requirements.txt && python /malgazer/tornado/malgazer.py"
     build:
       context: ./
       dockerfile: docker/Dockerfile-classifier
+    depends_on:
+      - db
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/malgazer
+
+  web:
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile-web
+    depends_on:
+      - db
+      - classifier
     ports:
       - "8080:8080"
     volumes:
       - .:/malgazer
+
+  db:
+    image: postgres:latest
+    volumes:
+      - ./docker/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=malgazer

@@ -173,12 +173,58 @@ class MalwareSample(object):
         self.parsedfile = parsedfile
 
 
+class Sample(object):
+    def __init__(self, *args, **kwargs):
+        """
+        An object representing a sample for analysis.
+
+        :param args:  Not currently used.
+        :param kwargs:   Not currently used.
+        """
+        self.rawdata = None
+        self.filename = None
+        super(self, Sample).__init__(*args, **kwargs)
+
+    def fromfile(self, filename):
+        """
+        Read a sample's data from a file.
+
+        :param filename:  The file name to read.
+        :return:  A binary string representing the sample's content.
+        """
+        with open(filename, 'rb') as myfile:
+            self.rawdata = myfile.read()
+        self.filename = filename
+        return self.rawdata
+
+    @property
+    def data(self):
+        """
+        Returns a bytearray of the sample's data.
+
+        :return:  A bytearray of the sample's data.
+        """
+        return bytearray(self.rawdatata)
+
+    @property
+    def sha256(self):
+        """
+        Calculates the SHA256 of a file by filename.
+
+        :return:  The SHA256 if successful, None otherwise.
+        """
+        if self.filename:
+            return sha256_file(self.filename)
+        else:
+            return None
+
+
 def sha256_file(filename):
     hasher = sha256()
     if os.path.isfile(filename):
         with open(filename, 'rb') as f:
             buf = f.read()
             hasher.update(buf)
-        return hasher.hexdigest()
+        return hasher.hexdigest().upper()
     else:
         return ""
