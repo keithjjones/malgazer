@@ -183,7 +183,7 @@ class Sample(object):
         """
         self.rawdata = None
         self.filename = None
-        super(self, Sample).__init__(*args, **kwargs)
+        super(Sample, self).__init__(*args, **kwargs)
 
     def fromfile(self, filename):
         """
@@ -204,7 +204,7 @@ class Sample(object):
 
         :return:  A bytearray of the sample's data.
         """
-        return bytearray(self.rawdatata)
+        return bytearray(self.rawdata)
 
     @property
     def sha256(self):
