@@ -24,7 +24,9 @@ def main(arguments=None):
                              "", required=False)
     parser.add_argument("-d", "--datapoints",
                         help="The number of data points to sample running window entropy."
-                             "", type=int, default=512, required=False)
+                             "Multiple datapoints can be identified as comma "
+                             "separated values without spaces."
+                             "", type=str, default='512', required=False)
     parser.add_argument("-j", "--jobs", type=int, default=1,
                         help="The number of jobs to do the work, but be 1 or greater."
                              "", required=False)
@@ -43,12 +45,19 @@ def main(arguments=None):
     else:
         normalize = True
 
+    # Find window sizes
+    datapoints = None
+    if args.datapoints:
+        datapoints = args.datapoints.split(',')
+        datapoints = [x.strip() for x in datapoints]
+        datapoints = [int(x) for x in datapoints]
+
     # Crawl the directories for malware and calculate rwe
     Utils.extract_features_from_directory(args.MalwareDirectory,
                                           args.DataDirectory,
                                           window_size=args.window,
                                           normalize=normalize,
-                                          number_of_data_points=args.datapoints,
+                                          number_of_data_points=datapoints,
                                           njobs=args.jobs)
 
 

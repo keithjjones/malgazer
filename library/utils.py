@@ -112,7 +112,7 @@ class Utils(object):
 
     @staticmethod
     def _calculate_rwe(filename, window_size=256, normalize=True,
-                       number_of_data_points=1024):
+                       number_of_data_points=[1024]):
         """
         Internal method to calculate the RWE for a sample.
 
@@ -121,22 +121,28 @@ class Utils(object):
         :param normalize: Set to False to not normalize.
         :param number_of_data_points: The number of data points you want in
         your new data set.  The output will be resampled to this many data points.
+        The number of data points is specified in a list.
         :return:  Returns a pandas data series so it can be added to a
-        data frame.
+        data frame.  The output is a dict with the key of the datapoints.
         """
         s = Sample()
         s.fromfile(filename)
-        ds = pd.Series(resample(s.running_window_entropy(window_size, normalize), number_of_data_points))
-        ds.name = s.sha256
-        return ds
+        rwe = s.running_window_entropy(window_size, normalize)
+        output_dict = {}
+        for datapoints in number_of_data_points:
+            ds = pd.Series(resample(rwe, datapoints))
+            ds.name = s.sha256
+            output_dict[datapoints] = ds
+        return output_dict
 
     @staticmethod
     def extract_features_from_directory(in_directory=None,
                                         out_directory=None,
                                         window_size=256,
                                         normalize=True,
-                                        number_of_data_points=1024,
-                                        njobs=os.cpu_count()):
+                                        number_of_data_points=[1024],
+                                        njobs=os.cpu_count(),
+                                        batch_size=1000):
         """
         Calculates the running window entropy of a directory containing
         malware samples that are named from their SHA256 value.  It will
@@ -148,11 +154,17 @@ class Utils(object):
         :param normalize: Set to False to not normalize.
         :param number_of_data_points: The number of data points you want in
         your new data set.  The output will be resampled to this many data points.
-        :param njobs: The number of processes to use
+        The number of data points is specified in a list.
+        :param njobs: The number of processes to use.
+        :param batch_size:  The number of rows to write to the HDF file in each chunk.
         :return: Nothing
         """
         if in_directory is None or out_directory is None:
             raise ValueError('Input and output directories must be real.')
+        if isinstance(number_of_data_points, int):
+            number_of_data_points = list(number_of_data_points)
+        if not isinstance(number_of_data_points, list):
+            raise ValueError('Specify number of datapoints size in a list.')
         if njobs < 1:
             raise ValueError('The number of jobs needs to be >= 1')
 
@@ -169,18 +181,17 @@ class Utils(object):
         malware_files_re = re.compile('[a-z0-9]{64}',
                                       flags=re.IGNORECASE)
         samples_processed = 0
-        batch_size = 1000
         saved_futures = {}
-        rows_to_add = []
-        hdffilename = os.path.join(out_directory, 'rwe_{0}_{1}.hdf'.format(window_size, number_of_data_points))
-        if os.path.isfile(hdffilename):
-            os.remove(hdffilename)
+        rows_to_add = {n: list() for n in number_of_data_points}
+        hdffilenames = {n: os.path.join(out_directory, 'rwe_{0}_{1}.hdf'.format(window_size, n)) for n in number_of_data_points}
+        for filename in hdffilenames:
+            if os.path.isfile(filename):
+                os.remove(filename)
         with ProcessPoolExecutor(max_workers=njobs) as executor:
             for root, dirs, files in os.walk(in_directory):
                 for file in files:
                     filename = os.path.join(root, file)
                     if malware_files_re.match(file):
-                        # print("Input file: {0}".format(filename))
                         future = executor.submit(Utils._calculate_rwe,
                                                  filename, window_size,
                                                  normalize,
@@ -188,20 +199,25 @@ class Utils(object):
                         saved_futures[future] = filename
             for future in as_completed(saved_futures):
                 samples_processed += 1
-                rows_to_add.append(future.result())
-                if samples_processed % batch_size == 0:
-                    print("Writing chunk to HDF: {0}".format(hdffilename))
-                    df = pd.DataFrame()
-                    df = df.append(rows_to_add)
-                    df.to_hdf(hdffilename, 'rwe', mode='a', append=True, format='table')
-                    rows_to_add = []
+                result = future.result()
+                for datapoint in result:
+                    rows_to_add[datapoint].append(result[datapoint].copy())
                 print("Processed file: {0}".format(saved_futures[future]))
                 print("\t{0:,} samples processed...".format(samples_processed))
-        if len(rows_to_add) > 0:
-            print("Writing chunk to HDF: {0}".format(hdffilename))
-            df = pd.DataFrame()
-            df = df.append(rows_to_add)
-            df.to_hdf(hdffilename, 'rwe', mode='a', append=True, format='table')
+                if samples_processed % batch_size == 0:
+                    for datapoint in rows_to_add:
+                        print("Writing chunk to HDF: {0}".format(hdffilenames[datapoint]))
+                        print("\tAssembling DataFrame...")
+                        df = pd.DataFrame(rows_to_add[datapoint])
+                        print("\tWriting HDF...")
+                        df.to_hdf(hdffilenames[datapoint], 'rwe', mode='a', append=True, format='table')
+                        print("\tClear rows to add...")
+                    rows_to_add = {n: list() for n in number_of_data_points}
+        for datapoint in rows_to_add:
+            if len(rows_to_add[datapoint]) > 0:
+                print("Writing last chunk to HDF: {0}".format(hdffilenames[datapoint]))
+                df = pd.DataFrame(rows_to_add[datapoint])
+                df.to_hdf(hdffilenames[datapoint], 'rwe', mode='a', append=True, format='table')
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
 
