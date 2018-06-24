@@ -183,7 +183,7 @@ class Utils(object):
         samples_processed = 0
         saved_futures = {}
         rows_to_add = {n: list() for n in number_of_data_points}
-        hdffilenames = {n: os.path.join(out_directory, 'rwe_{0}_{1}.hdf'.format(window_size, n)) for n in number_of_data_points}
+        hdffilenames = {n: os.path.join(out_directory, 'rwe_window_{0}_datapoints_{1}.hdf'.format(window_size, n)) for n in number_of_data_points}
         for datapoint in hdffilenames:
             if os.path.isfile(hdffilenames[datapoint]):
                 os.remove(hdffilenames[datapoint])
