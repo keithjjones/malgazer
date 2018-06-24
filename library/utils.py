@@ -184,9 +184,9 @@ class Utils(object):
         saved_futures = {}
         rows_to_add = {n: list() for n in number_of_data_points}
         hdffilenames = {n: os.path.join(out_directory, 'rwe_{0}_{1}.hdf'.format(window_size, n)) for n in number_of_data_points}
-        for filename in hdffilenames:
-            if os.path.isfile(filename):
-                os.remove(filename)
+        for datapoint in hdffilenames:
+            if os.path.isfile(hdffilenames[datapoint]):
+                os.remove(hdffilenames[datapoint])
         with ProcessPoolExecutor(max_workers=njobs) as executor:
             for root, dirs, files in os.walk(in_directory):
                 for file in files:
