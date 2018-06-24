@@ -188,38 +188,42 @@ class Utils(object):
             if os.path.isfile(hdffilenames[datapoint]):
                 os.remove(hdffilenames[datapoint])
         with ProcessPoolExecutor(max_workers=njobs) as executor:
-            for root, dirs, files in os.walk(in_directory):
-                for file in files:
-                    filename = os.path.join(root, file)
-                    if malware_files_re.match(file):
-                        future = executor.submit(Utils._calculate_rwe,
-                                                 filename, window_size,
-                                                 normalize,
-                                                 number_of_data_points)
-                        saved_futures[future] = filename
-            for future in as_completed(saved_futures):
-                samples_processed += 1
-                result = future.result()
-                for datapoint in result:
-                    rows_to_add[datapoint].append(result[datapoint].copy())
-                print("Processed file: {0}".format(saved_futures[future]))
-                print("\t{0:,} samples processed...".format(samples_processed))
-                if samples_processed % batch_size == 0:
-                    for datapoint in rows_to_add:
-                        print("Writing chunk to HDF: {0}".format(hdffilenames[datapoint]))
+            try:
+                for root, dirs, files in os.walk(in_directory):
+                    for file in files:
+                        filename = os.path.join(root, file)
+                        if malware_files_re.match(file):
+                            future = executor.submit(Utils._calculate_rwe,
+                                                     filename, window_size,
+                                                     normalize,
+                                                     number_of_data_points)
+                            saved_futures[future] = filename
+                for future in as_completed(saved_futures):
+                    samples_processed += 1
+                    result = future.result()
+                    for datapoint in result:
+                        rows_to_add[datapoint].append(result[datapoint].copy())
+                    print("Processed file: {0}".format(saved_futures[future]))
+                    print("\t{0:,} samples processed...".format(samples_processed))
+                    if samples_processed % batch_size == 0:
+                        for datapoint in rows_to_add:
+                            print("Writing chunk to HDF: {0}".format(hdffilenames[datapoint]))
+                            print("\tAssembling DataFrame...")
+                            df = pd.DataFrame(rows_to_add[datapoint])
+                            print("\tWriting HDF...")
+                            df.to_hdf(hdffilenames[datapoint], 'rwe', mode='a', append=True, format='table')
+                            print("\tClear rows to add...")
+                        rows_to_add = {n: list() for n in number_of_data_points}
+                for datapoint in rows_to_add:
+                    if len(rows_to_add[datapoint]) > 0:
+                        print("Writing last chunk to HDF: {0}".format(hdffilenames[datapoint]))
                         print("\tAssembling DataFrame...")
                         df = pd.DataFrame(rows_to_add[datapoint])
                         print("\tWriting HDF...")
                         df.to_hdf(hdffilenames[datapoint], 'rwe', mode='a', append=True, format='table')
-                        print("\tClear rows to add...")
-                    rows_to_add = {n: list() for n in number_of_data_points}
-        for datapoint in rows_to_add:
-            if len(rows_to_add[datapoint]) > 0:
-                print("Writing last chunk to HDF: {0}".format(hdffilenames[datapoint]))
-                print("\tAssembling DataFrame...")
-                df = pd.DataFrame(rows_to_add[datapoint])
-                print("\tWriting HDF...")
-                df.to_hdf(hdffilenames[datapoint], 'rwe', mode='a', append=True, format='table')
+            except KeyboardInterrupt:
+                print("Shutting down gracefully...")
+                executor.shutdown(wait=False)
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
 
