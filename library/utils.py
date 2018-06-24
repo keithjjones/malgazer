@@ -168,7 +168,7 @@ class Utils(object):
         if njobs < 1:
             raise ValueError('The number of jobs needs to be >= 1')
 
-        print("Starting running window entropy feature extractor for malware samples...")
+        print("Starting running window entropy feature extractor for malware samples in {0}".format(in_directory))
 
         # Test to make sure the input directory exists, will throw exception
         # if it does not exist.
