@@ -216,7 +216,9 @@ class Utils(object):
         for datapoint in rows_to_add:
             if len(rows_to_add[datapoint]) > 0:
                 print("Writing last chunk to HDF: {0}".format(hdffilenames[datapoint]))
+                print("\tAssembling DataFrame...")
                 df = pd.DataFrame(rows_to_add[datapoint])
+                print("\tWriting HDF...")
                 df.to_hdf(hdffilenames[datapoint], 'rwe', mode='a', append=True, format='table')
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
