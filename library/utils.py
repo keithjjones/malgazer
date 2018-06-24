@@ -193,9 +193,7 @@ class Utils(object):
                     print("Writing chunk to HDF: {0}".format(hdffilename))
                     df = pd.DataFrame()
                     df = df.append(rows_to_add)
-                    # with pd.HDFStore(hdffilename, mode='w') as store:
-                    #     store.append('rwe', df)
-                    df.to_hdf(hdffilename, 'rwe', mode='a')
+                    df.to_hdf(hdffilename, 'rwe', mode='a', append=True, format='table')
                     rows_to_add = []
                 print("Processed file: {0}".format(saved_futures[future]))
                 print("\t{0:,} samples processed...".format(samples_processed))
@@ -203,9 +201,7 @@ class Utils(object):
             print("Writing chunk to HDF: {0}".format(hdffilename))
             df = pd.DataFrame()
             df = df.append(rows_to_add)
-            # with pd.HDFStore(hdffilename, mode='w') as store:
-            #     store.append('rwe', df)
-            df.to_hdf(hdffilename, 'rwe', mode='a')
+            df.to_hdf(hdffilename, 'rwe', mode='a', append=True, format='table')
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
 
