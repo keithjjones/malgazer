@@ -126,7 +126,9 @@ class Utils(object):
         """
         s = Sample()
         s.fromfile(filename)
-        return resample(s.running_window_entropy(window_size, normalize), number_of_data_points)
+        ds = pd.Series(resample(s.running_window_entropy(window_size, normalize), number_of_data_points))
+        ds.name = s.sha256
+        return ds
 
     @staticmethod
     def extract_features_from_directory(in_directory=None,
@@ -167,10 +169,10 @@ class Utils(object):
         malware_files_re = re.compile('[a-z0-9]{64}',
                                       flags=re.IGNORECASE)
         samples_processed = 0
-        batch_size = 1000
+        batch_size = 10
         saved_futures = {}
         rows_to_add = []
-        hdffilename = os.path.join(out_directory, 'rwe_{0}.hdf'.format(window_size))
+        hdffilename = os.path.join(out_directory, 'rwe_{0}_{1}.hdf'.format(window_size, number_of_data_points))
         if os.path.isfile(hdffilename):
             os.remove(hdffilename)
         with ProcessPoolExecutor(max_workers=njobs) as executor:
@@ -191,7 +193,9 @@ class Utils(object):
                     print("Writing chunk to HDF: {0}".format(hdffilename))
                     df = pd.DataFrame()
                     df = df.append(rows_to_add)
-                    df.to_hdf(hdffilename, 'rwe', format='table', mode='a')
+                    # with pd.HDFStore(hdffilename, mode='w') as store:
+                    #     store.append('rwe', df)
+                    df.to_hdf(hdffilename, 'rwe', mode='a')
                     rows_to_add = []
                 print("Processed file: {0}".format(saved_futures[future]))
                 print("\t{0:,} samples processed...".format(samples_processed))
@@ -199,7 +203,9 @@ class Utils(object):
             print("Writing chunk to HDF: {0}".format(hdffilename))
             df = pd.DataFrame()
             df = df.append(rows_to_add)
-            df.to_hdf(hdffilename, 'rwe', format='table', mode='a')
+            # with pd.HDFStore(hdffilename, mode='w') as store:
+            #     store.append('rwe', df)
+            df.to_hdf(hdffilename, 'rwe', mode='a')
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
 

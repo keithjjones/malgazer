@@ -142,7 +142,7 @@ def resample(data, number_of_data_points=1024):
     :param data:  The original data.
     :param number_of_data_points: The number of data points you want in
     your new data set.
-    :return: Nothing
+    :return: The data resampled.
     """
     rwe = np.array(data)
     x_rwe = list(range(len(rwe)))
