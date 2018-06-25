@@ -874,8 +874,7 @@ class Utils(object):
                     index_col=0, compression='gzip')
             except:
                 pass
-        return df, classifications
-
+        return df, classification
     @staticmethod
     def load_rwe_features(datadir, windowsize=256, datapoints=512):
         """
