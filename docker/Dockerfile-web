@@ -7,4 +7,5 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /malgazer/flask
 ENV FLASK_APP=malgazer.py
-CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
+#CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
+CMD ["gunicorn", "-w 10", "-b 127.0.0.1:8080", "malgazer:app"]
