@@ -104,7 +104,7 @@ if build_classifier:
     all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
     
     # Pull the hashes we care about
-    hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:,0]
+    hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:, 0]
     data = Utils.filter_hashes(all_data, hashes)
     data.to_csv(os.path.join(datadir, 'data.csv'))
         

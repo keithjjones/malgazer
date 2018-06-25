@@ -877,6 +877,29 @@ class Utils(object):
         return df, classifications
 
     @staticmethod
+    def load_rwe_features(datadir, windowsize=256, datapoints=512):
+        """
+        Loads the data saved from preprocessing.
+
+        :param datadir:  The data directory that contains the data.
+        :param windowsize:  The window size for the RWE to load.
+        :param datapoints:  The number of datapoints to load.
+        :return:  raw_data, classifications tuple
+        """
+        # Check to see that the data directory exists, this will throw an
+        # exception if it does not exist.
+        os.stat(datadir)
+        df = None
+        df = pd.read_hdf(os.path.join(datadir, 'rwe_window_{0}_datapoints_{1}.hdf'.format(windowsize, datapoints)), 'rwe')
+        try:
+            classifications = pd.read_csv(
+                os.path.join(datadir, 'classifications.csv'),
+                index_col=0)
+        except:
+            pass
+        return df, classifications
+
+    @staticmethod
     def sanity_check_classifications(raw_data, classifications):
         """
         Verify that all raw data has a classification and all classifications
