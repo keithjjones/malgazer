@@ -8,7 +8,7 @@ import gzip
 import csv
 import pandas as pd
 import numpy as np
-from .files import FileObject, Sample
+from .files import Sample
 from .entropy import resample
 from tsfresh import extract_features, select_features, extract_relevant_features
 from tsfresh.utilities.dataframe_functions import impute
@@ -248,88 +248,6 @@ class Utils(object):
         impute(extracted_features)
         features_filtered = select_features(extracted_features, classifications)
         return features_filtered
-
-    @staticmethod
-    def get_classifications_from_path(in_directory=None):
-        """
-        Loads classifications from key words in the path.
-
-        :param in_directory:  This is the directory containing batch processed
-        samples with the batch function above (results are pickled).
-        :return: A DataFrame with an index of the sha256 and the value of
-        the classification guessed from the full path name.
-        """
-        print("Starting classifications from path for malware samples...")
-
-        # Keep track so we don't duplicate work
-        processed_sha256 = []
-
-        df = pd.DataFrame(columns=['classification'])
-
-        # Check to see that the input directory exists, this will throw an
-        # exception if it does not exist.
-        os.stat(in_directory)
-        # The RE for malware files with sha256 as the name.
-        malware_files_re = re.compile('[a-z0-9]{64}',
-                                      flags=re.IGNORECASE)
-        samples_processed = 0
-        for root, dirs, files in os.walk(in_directory):
-            for file in files:
-                if malware_files_re.match(file):
-                    samples_processed += 1
-
-                    f = FileObject.read(os.path.join(root, file))
-
-                    if f.malware.sha256.upper() not in processed_sha256:
-                        classified = ""
-                        if "encrypted" in root.lower():
-                            classified = "Encrypted"
-                        elif "unpacked" in root.lower():
-                            classified = "Unpacked"
-                        elif "packed" in root.lower():
-                            classified = "Packed"
-                        else:
-                            classified = ""
-
-                        if "malware" in root.lower():
-                            classified += "-Malware"
-                        elif "pup" in root.lower():
-                            classified += "-PUP"
-                        elif "trusted" in root.lower():
-                            classified += "-Trusted"
-                        else:
-                            classified += ""
-
-                        d = dict()
-                        d['classification'] = classified
-                        ds = pd.Series(d)
-                        ds.name = f.malware.sha256.upper()
-                        df = df.append(ds)
-
-                        processed_sha256.append(f.malware.sha256.upper())
-
-                        samples_processed += 1
-        return df
-
-    @staticmethod
-    def parse_classifications_from_path(classifications):
-        """
-        Parses the classifications from guessed classifications from the paths.
-
-        :param classifications:  A dataframe holding the guessed classifications.
-        :return:  The parsed classifications, as a DataFrame.
-        """
-        cls = pd.DataFrame(columns=['classification'])
-        for index, row in classifications.iterrows():
-            cl = row[0]
-            c = cl.split('-')
-            d = dict()
-            # d['classification'] = cl
-            d['classification'] = c[1]
-            ds = pd.Series(d)
-            ds.name = index.upper()
-            cls = cls.append(ds)
-        return cls
 
     @staticmethod
     def estimate_vt_classifications_from_csv(filename, products=None):
