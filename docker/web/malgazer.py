@@ -1,10 +1,18 @@
 from flask import Flask
 from flask import render_template
-from flask_material import Material
+from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired
+from flask_wtf.csrf import CSRFProtect, CSRFError
+from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
-Material(app)
+app.config.update(dict(
+    SECRET_KEY="secretkey 1",
+    WTF_CSRF_SECRET_KEY="secretkey 2"
+))
+csrf = CSRFProtect(app)
+
 
 @app.route('/')
 def main():
@@ -13,12 +21,18 @@ def main():
 
 @app.route('/submit')
 def submit():
-    return render_template('submit.html')
+    form = Submission()
+    # form = Submission(csrf_enabled=False)
+    return render_template('submit.html', form=form)
 
 
 @app.route('/history')
 def history():
     return render_template('history.html')
+
+
+class Submission(FlaskForm):
+    sample = FileField(validators=[FileRequired()])
 
 
 if __name__ == '__main__':

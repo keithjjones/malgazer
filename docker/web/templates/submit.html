@@ -9,5 +9,9 @@ Submission
 {% endblock %}
 
 {% block content %}
-This is the content of the submit page.
+<form method="POST" enctype="multipart/form-data" action="{{ url_for('submit') }}">
+    {{ form.csrf_token }}
+    {{ form.sample }}
+    <input type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" value="Submit">
+</form>
 {% endblock %}
