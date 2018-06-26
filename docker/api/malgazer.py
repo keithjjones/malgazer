@@ -1,11 +1,12 @@
 from flask import Flask
 from flask import render_template
+import json
 app = Flask(__name__)
 
 
 @app.route('/')
 def main():
-    return render_template('main.html')
+    return json.dumps({})
 
 
 if __name__ == '__main__':
