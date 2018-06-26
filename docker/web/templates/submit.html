@@ -9,14 +9,22 @@ Sample Submission
 {% endblock %}
 
 {% block content %}
+
 <form method="POST" enctype="multipart/form-data" action="{{ url_for('submit') }}">
     {{ form.csrf_token }}
-    <div>
-        {{ form.sample }}
-    </div>
     <br>
-    <div>
-        <input type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" value="Submit">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                {{ form.sample }}
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col">
+                <input type="submit" class="btn btn-outline-primary" value="Submit">
+            </div>
+        </div>
     </div>
 </form>
 {% endblock %}
