@@ -1,5 +1,4 @@
 import argparse
-from library.files import FileObject
 from library.utils import Utils
 import numpy
 import os
