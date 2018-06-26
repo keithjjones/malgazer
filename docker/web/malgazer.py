@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template
+from flask import render_template, abort, redirect, url_for
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from flask_wtf.csrf import CSRFProtect, CSRFError
@@ -19,10 +19,11 @@ def main():
     return render_template('main.html')
 
 
-@app.route('/submit')
+@app.route('/submit', methods=('GET', 'POST'))
 def submit():
     form = Submission()
-    # form = Submission(csrf_enabled=False)
+    if form.validate_on_submit():
+        return redirect(url_for('history'))
     return render_template('submit.html', form=form)
 
 
