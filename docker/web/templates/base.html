@@ -1,13 +1,16 @@
 <!doctype html>
 <title>{% block title %}{% endblock %}</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 
 <nav>
-  <h1>Malgazer</h1>
+  {% block nav %}{% endblock %}
 </nav>
 <section class="content">
   <header>
-    {% block header %}{% endblock %}
+    <h1>{% block header %}{% endblock %}</h1>
   </header>
   {% for message in get_flashed_messages() %}
     <div class="flash">{{ message }}</div>
