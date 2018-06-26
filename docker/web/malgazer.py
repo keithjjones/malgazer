@@ -1,7 +1,10 @@
 from flask import Flask
 from flask import render_template
-app = Flask(__name__)
+from flask_material import Material
 
+
+app = Flask(__name__)
+Material(app)
 
 @app.route('/')
 def main():
