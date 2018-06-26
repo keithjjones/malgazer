@@ -32,14 +32,14 @@
       </nav>
     </div>
     <main class="mdl-layout__content">
-      <div class="page-content"><!-- Your content goes here --></div>
+      <div class="page-content">
+        <section class="content">
+          {% for message in get_flashed_messages() %}
+            <div class="flash">{{ message }}</div>
+          {% endfor %}
+          {% block content %}{% endblock %}
+        </section>
+      </div>
     </main>
   </div>
-</section>
-
-<section class="content">
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
-  {% block content %}{% endblock %}
 </section>
