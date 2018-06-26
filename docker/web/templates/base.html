@@ -15,14 +15,20 @@
         <div class="mdl-layout-spacer"></div>
         <!-- Navigation. We hide it in small screens. -->
         <nav class="mdl-navigation mdl-layout--large-screen-only">
-          {% block nav %}{% endblock %}
+          <a class="mdl-navigation__link" href="{{ url_for('main') }}">Main</a>
+          <a class="mdl-navigation__link" href="{{ url_for('submit') }}">Submit</a>
+          <a class="mdl-navigation__link" href="{{ url_for('history') }}">History</a>
+          <a class="mdl-navigation__link" href="https://github.com/keithjjones/malgazer">GitHub</a>
         </nav>
       </div>
     </header>
     <div class="mdl-layout__drawer">
       <span class="mdl-layout-title">{{ self.title() }}</span>
       <nav class="mdl-navigation">
-        {{ self.nav() }}
+          <a class="mdl-navigation__link" href="{{ url_for('main') }}">Main</a>
+          <a class="mdl-navigation__link" href="{{ url_for('submit') }}">Submit</a>
+          <a class="mdl-navigation__link" href="{{ url_for('history') }}">History</a>
+          <a class="mdl-navigation__link" href="https://github.com/keithjjones/malgazer">GitHub</a>
       </nav>
     </div>
     <main class="mdl-layout__content">
