@@ -44,7 +44,7 @@ def main():
 
 @app.route('/submit', methods=('POST',))
 def submit():
-    ip_addr = request.headers.get('X-Forwarded-For', request.remote_addr)
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     if 'file' not in request.files:
         return "ERROR"
     file = request.files['file']
@@ -77,6 +77,7 @@ def history():
 @app.route("/ip")
 def ip():
     return json.dumps(request.headers.get('X-Forwarded-For', request.remote_addr))
+
 
 if __name__ == '__main__':
       app.run(host='0.0.0.0', port=8888)
