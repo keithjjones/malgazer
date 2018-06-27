@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from ...library.files import Sample
 import datetime
 import sqlalchemy
+from sqlalchemy.dialects import postgresql
 import glob
 
 app = Flask(__name__)
@@ -19,9 +20,12 @@ class Submission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sha256 = db.Column(db.String(80), nullable=False)
     time = db.Column(db.DateTime, nullable=False)
+    classification = db.Column(db.String(120), nullable=True)
+    ip_address = db.Column(postgresql.INET)
 
 
 db.create_all()
+
 
 @app.route('/initdb')
 def initdb():
@@ -40,6 +44,7 @@ def main():
 
 @app.route('/submit', methods=('POST',))
 def submit():
+    ip_addr = request.headers.get('X-Forwarded-For', request.remote_addr)
     if 'file' not in request.files:
         return "ERROR"
     file = request.files['file']
@@ -51,8 +56,8 @@ def submit():
         with open(filepath, 'wb') as f_out:
             f_out.write(s.rawdata)
     submit_time = datetime.datetime.now()
-    submission = Submission(sha256=s.sha256, time=submit_time)
-    return_data = {'sha256': s.sha256, 'time': str(submit_time)}
+    submission = Submission(sha256=s.sha256, time=submit_time, ip_address=ip_addr)
+    return_data = {'sha256': submission.sha256, 'time': str(submission.time), 'ip_address': submission.ip_address}
     db.session.add(submission)
     db.session.commit()
     return json.dumps(return_data)
@@ -63,9 +68,15 @@ def history():
     submissions = Submission.query.all()
     return_data = []
     for s in submissions:
-        return_data.append({'sha256': s.sha256, 'time': str(s.time)})
+        return_data.append({'sha256': s.sha256, 'time': str(s.time),
+                            'classification': s.classification,
+                            'ip_address': s.ip_address})
     return json.dumps(return_data)
 
+
+@app.route("/ip")
+def ip():
+    return json.dumps(request.headers.get('X-Forwarded-For', request.remote_addr))
 
 if __name__ == '__main__':
       app.run(host='0.0.0.0', port=8888)
