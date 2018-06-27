@@ -22,10 +22,10 @@
 </nav>
 
 {% for message in get_flashed_messages() %}
-  <div class="flash top-buffer left-buffer">{{ message }}</div>
+  <div class="alert alert-danger top-buffer left-buffer right-buffer" role="alert">{{ message }}</div>
 {% endfor %}
 
-<div class="top-buffer left-buffer">{% block content %}{% endblock %}</div>
+<div class="top-buffer left-buffer right-buffer">{% block content %}{% endblock %}</div>
 
 <nav class="navbar navbar-expand-lg fixed-bottom navbar-dark bg-dark">
   <p class="footer-text">&copy Keith J. Jones, Malgazer, 2018</p>
