@@ -10,6 +10,7 @@ import requests
 import os
 import json
 
+
 API_URL = "http://api:8888"
 POSSIBLE_CLASSIFICATIONS = [
     ('Trojan', 'Trojan'),

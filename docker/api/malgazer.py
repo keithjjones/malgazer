@@ -10,6 +10,9 @@ from sqlalchemy.dialects import postgresql
 import glob
 import multiprocessing
 import time
+import pickle
+from ...library.ml import ML
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
@@ -120,6 +123,12 @@ def classification(sha256):
                             'ip_address': s.ip_address,
                             'status': s.status})
     return json.dumps(return_data), 200
+
+
+@app.route('/load')
+def load():
+    a = pickle.load(open('../../classifier/ml.pickle', 'rb'))
+    return str(a)
 
 
 if __name__ == '__main__':
