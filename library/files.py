@@ -12,15 +12,21 @@ import pandas as pd
 
 
 class Sample(object):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, fromfile=None, frommemory=None, *args, **kwargs):
         """
         An object representing a sample for analysis.
 
+        :param fromfile:  The file name to read.
+        :param frommemory:  The data in memory for the sample.
         :param args:  Not currently used.
         :param kwargs:   Not currently used.
         """
         self.rawdata = None
         self.filename = None
+        if fromfile:
+            self.fromfile(fromfile)
+        elif frommemory:
+            self.frommemory(frommemory)
         # super(Sample, self).__init__(*args, **kwargs)
 
     def fromfile(self, filename):
