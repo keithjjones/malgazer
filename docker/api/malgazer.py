@@ -8,6 +8,8 @@ import datetime
 import sqlalchemy
 from sqlalchemy.dialects import postgresql
 import glob
+import multiprocessing
+import time
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
@@ -43,6 +45,20 @@ def main():
     return json.dumps({})
 
 
+def process_sample(id):
+    """
+    Processes a sample after it has been submitted.  This runs as a thread.
+
+    :param id:  The ID of the submission in the database.
+    :return: Nothing.
+    """
+    time.sleep(10)
+    submission = Submission.query.filter_by(id=id).first()
+    submission.classification = 'Done'
+    db.session.add(submission)
+    db.session.commit()
+
+
 @app.route('/submit', methods=('POST',))
 def submit():
     if 'ip_address' in request.form:
@@ -66,6 +82,8 @@ def submit():
                    'classification': submission.classification}
     db.session.add(submission)
     db.session.commit()
+    thread = multiprocessing.Process(target=process_sample, args=(submission.id,))
+    thread.start()
     return json.dumps(return_data), 200
 
 
@@ -78,7 +96,7 @@ def history():
                             'sha256': s.sha256, 'time': str(s.time),
                             'classification': s.classification,
                             'ip_address': s.ip_address})
-    return json.dumps(return_data)
+    return json.dumps(return_data), 200
 
 
 if __name__ == '__main__':
