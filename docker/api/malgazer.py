@@ -50,10 +50,16 @@ def submit():
     if not os.path.isfile(filepath):
         with open(filepath, 'wb') as f_out:
             f_out.write(s.rawdata)
-    return_data = {'sha256': s.sha256}
-    submission = Submission(sha256=s.sha256, time=datetime.datetime.now())
+    submit_time = datetime.datetime.now()
+    submission = Submission(sha256=s.sha256, time=submit_time)
+    return_data = {'sha256': s.sha256, 'time': str(submit_time)}
     db.session.add(submission)
     db.session.commit()
+    return json.dumps(return_data)
+
+
+@app.route("/history")
+def history():
     submissions = Submission.query.all()
     return_data = []
     for s in submissions:
@@ -62,4 +68,4 @@ def submit():
 
 
 if __name__ == '__main__':
-      app.run(host='0.0.0.0', port=8080)
+      app.run(host='0.0.0.0', port=8888)
