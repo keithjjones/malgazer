@@ -2,11 +2,9 @@
 import plaidml.keras
 plaidml.keras.install_backend()
 
-import batch_tsfresh_entropy
 from library.utils import Utils
 from library.ml import ML
 import pandas as pd
-import numpy as np
 import os
 
 pd.set_option('max_colwidth', 64)

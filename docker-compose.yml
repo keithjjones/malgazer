@@ -1,15 +1,16 @@
 version: '3'
 services:
-  classifier:
+  api:
     build:
       context: ./
-      dockerfile: docker/Dockerfile-classifier
+      dockerfile: docker/Dockerfile-api
     depends_on:
       - db
     ports:
       - "8888:8888"
     volumes:
       - .:/malgazer
+      - ./samples:/samples
 
   web:
     build:
@@ -17,11 +18,12 @@ services:
       dockerfile: docker/Dockerfile-web
     depends_on:
       - db
-      - classifier
+      - api
     ports:
       - "8080:8080"
     volumes:
       - .:/malgazer
+      - ./samples:/samples
 
   db:
     image: postgres:latest

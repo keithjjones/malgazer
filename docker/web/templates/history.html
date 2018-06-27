@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}
+Malgazer
+{% endblock %}
+
+{% block subtitle %}
+Submission History
+{% endblock %}
+
+{% block content %}
+    <a class="btn btn-outline-primary" href="{{ url_for('history') }}">Refresh</a>
+    <table class="table top-buffer">
+        <thead>
+            <tr><th>ID</th><th>SHA256</th><th>Submitted On</th><th>Submitted By</th><th>Classification</th><th>Processing Status</th></tr>
+        </thead>
+        <tbody>
+            {% for h in history %}
+                <tr><td>{{h.id}}</td><td><a href="https://www.virustotal.com/#/search/{{h.sha256}}">{{h.sha256}}</a></td>
+                    <td>{{h.time}}</td><td>{{h.ip_address}}</td><td>{{h.classification}}</td>
+                    {% if h.status == 'Processing' %}
+                        <td><button type="button" class="btn btn-outline-warning">{{h.status}}</button></td>
+                    {% elif h.status == 'Error' %}
+                        <td><button type="button" class="btn btn-outline-danger">{{h.status}}</button></td>
+                    {% else %}
+                        <td><button type="button" class="btn btn-outline-success">{{h.status}}</button></td>
+                    {% endif %}
+                    </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

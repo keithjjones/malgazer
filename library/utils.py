@@ -8,7 +8,8 @@ import gzip
 import csv
 import pandas as pd
 import numpy as np
-from .files import FileObject
+from .files import Sample
+from .entropy import resample
 from tsfresh import extract_features, select_features, extract_relevant_features
 from tsfresh.utilities.dataframe_functions import impute
 from tsfresh.feature_extraction import EfficientFCParameters
@@ -48,95 +49,64 @@ class Utils(object):
         super(Utils, self).__init__()
 
     @staticmethod
-    def _calculate_new_rwe(root, file, picklefile, window_sizes=[256], normalize=True):
+    def _calculate_rwe(filename, window_size=256, normalize=True,
+                       number_of_data_points=[1024]):
         """
-        Internal method to calculate a new RWE pickle file.
+        Internal method to calculate the RWE for a sample.
 
-        :param root: The directory of the malware file
-        :param file: The file name, without a directory, of the malware file.
-        :param picklefile:  The pickle file for the malware RWE data
-        :param window_sizes: A list of window sizes to calculate.
+        :param filename:  The file name of the sample to calculate.
+        :param window_size: A window size to calculate.
         :param normalize: Set to False to not normalize.
-        :returns: True if success, False otherwise
+        :param number_of_data_points: The number of data points you want in
+        your new data set.  The output will be resampled to this many data points.
+        The number of data points is specified in a list.
+        :return:  Returns a pandas data series so it can be added to a
+        data frame.  The output is a dict with the key of the datapoints.
         """
-        # Create the malware file name...
-        malwarepath = os.path.join(root, file)
-        try:
-            m = FileObject(malwarepath)
-        except:
-            return False
-
-        # Remove old pickle files...
-        if os.path.exists(picklefile):
-            os.remove(picklefile)
-
-        # Calculate the entropy of the file...
-        fileentropy = m.entropy(normalize)
-
-        # Calculate the window entropy for malware samples...
-        # Iterate through the window sizes...
-        for w in window_sizes:
-            if w < m.malware.file_size:
-                # Calculate running entropy...
-                rwe = m.running_entropy(w, normalize)
-        # Write the running entropy...
-        m.write(picklefile)
-        return True
+        s = Sample()
+        s.fromfile(filename)
+        rwe = s.running_window_entropy(window_size, normalize)
+        output_dict = {}
+        for datapoints in number_of_data_points:
+            ds = pd.Series(resample(rwe, datapoints))
+            ds.name = s.sha256
+            output_dict[datapoints] = ds
+        return output_dict
 
     @staticmethod
-    def _calculate_existing_rwe(picklefile, window_sizes=[256], normalize=True):
-        """
-        Internal method to calculate an existing RWE pickle file.
-
-        :param picklefile:  The pickle file for the malware RWE data
-        :param window_sizes: A list of window sizes to calculate.
-        :param normalize: Set to False to not normalize.
-        """
-        # Create the malware file name...
-        m = FileObject.read(picklefile)
-
-        changed = False
-        for w in window_sizes:
-            if w < m.malware.file_size:
-                if w not in m.malware.runningentropy.entropy_data:
-                    # Calculate running entropy...
-                    rwe = m.running_entropy(w, normalize)
-                    changed = True
-                else:
-                    pass
-        # Write the running entropy...
-        if changed:
-            m.write(picklefile)
-        return True
-
-    @staticmethod
-    def batch_running_window_entropy(in_directory=None,
-                                     out_directory=None,
-                                     window_sizes=[256],
-                                     normalize=True,
-                                     njobs=os.cpu_count(),
-                                     process_existing=True):
+    def extract_features_from_directory(in_directory=None,
+                                        out_directory=None,
+                                        window_size=256,
+                                        normalize=True,
+                                        number_of_data_points=[1024],
+                                        njobs=os.cpu_count(),
+                                        batch_size=1000):
         """
         Calculates the running window entropy of a directory containing
         malware samples that are named from their SHA256 value.  It will
-        skip all other files.
+        skip all other files.  The output format will be HDF.
 
         :param in_directory:  The input directory for malware.
         :param out_directory: The output directory for calculated data.
-        :param window_sizes: A list of window sizes to calculate.
+        :param window_size: A window size to calculate.
         :param normalize: Set to False to not normalize.
-        :param njobs: The number of processes to use
-        :param process_existing: Set to True to process existing pickle files
+        :param number_of_data_points: The number of data points you want in
+        your new data set.  The output will be resampled to this many data points.
+        The number of data points is specified in a list.
+        :param njobs: The number of processes to use.
+        :param batch_size:  The number of rows to write to the HDF file in each chunk.
         :return: Nothing
         """
         if in_directory is None or out_directory is None:
             raise ValueError('Input and output directories must be real.')
-        if not isinstance(window_sizes, list):
-            raise ValueError('Specify a window size in a list.')
+        if isinstance(number_of_data_points, int):
+            number_of_data_points = list(number_of_data_points)
+        if not isinstance(number_of_data_points, list):
+            raise ValueError('Specify number of datapoints size in a list.')
         if njobs < 1:
             raise ValueError('The number of jobs needs to be >= 1')
 
-        print("Starting running window entropy batch processing for malware samples...")
+        print("Starting running window entropy feature extractor for malware samples in {0}".format(in_directory))
 
         # Test to make sure the input directory exists, will throw exception
         # if it does not exist.
@@ -150,144 +120,50 @@ class Utils(object):
                                       flags=re.IGNORECASE)
         samples_processed = 0
         saved_futures = {}
+        rows_to_add = {n: list() for n in number_of_data_points}
+        hdffilenames = {n: os.path.join(out_directory, 'rwe_window_{0}_datapoints_{1}.hdf'.format(window_size, n)) for n in number_of_data_points}
+        for datapoint in hdffilenames:
+            if os.path.isfile(hdffilenames[datapoint]):
+                os.remove(hdffilenames[datapoint])
         with ProcessPoolExecutor(max_workers=njobs) as executor:
             try:
                 for root, dirs, files in os.walk(in_directory):
                     for file in files:
+                        filename = os.path.join(root, file)
                         if malware_files_re.match(file):
-                            print("Input file: {0}".format(file))
-                            subdir = root[len(in_directory):]
-
-                            # Create the pickle file name...
-                            datadir = os.path.join(out_directory, subdir)
-                            picklefile = os.path.join(datadir, file) + ".pickle.gz"
-
-                            # Create the directory if needed...
-                            try:
-                                os.stat(datadir)
-                            except:
-                                os.makedirs(datadir)
-
-                            # Old style of checking threads...
-                            # while len(jobs) >= njobs:
-                            #     jobs = [j for j in jobs if j.isAlive()]
-                            #     sleep(.1)
-
-                            if os.path.exists(picklefile) and os.path.isfile(picklefile) and process_existing:
-                                future = executor.submit(Utils._calculate_existing_rwe, picklefile, window_sizes, normalize)
-                                saved_futures[future] = picklefile
-                                # Utils._calculate_new_rwe(root, file, picklefile, window_sizes, normalize)
-                            elif not os.path.exists(picklefile):
-                                future = executor.submit(Utils._calculate_new_rwe, root, file, picklefile, window_sizes, normalize)
-                                saved_futures[future] = picklefile
-                                # Utils._calculate_existing_rwe(picklefile, window_sizes, normalize)
-                            else:
-                                print("\t\tSkipping calculation...")
+                            future = executor.submit(Utils._calculate_rwe,
+                                                     filename, window_size,
+                                                     normalize,
+                                                     number_of_data_points)
+                            saved_futures[future] = filename
                 for future in as_completed(saved_futures):
                     samples_processed += 1
+                    result = future.result()
+                    for datapoint in result:
+                        rows_to_add[datapoint].append(result[datapoint].copy())
                     print("Processed file: {0}".format(saved_futures[future]))
                     print("\t{0:,} samples processed...".format(samples_processed))
+                    if samples_processed % batch_size == 0:
+                        for datapoint in rows_to_add:
+                            print("Writing chunk to HDF: {0}".format(hdffilenames[datapoint]))
+                            print("\tAssembling DataFrame...")
+                            df = pd.DataFrame(rows_to_add[datapoint])
+                            print("\tWriting HDF...")
+                            df.to_hdf(hdffilenames[datapoint], 'rwe', mode='a', append=True, format='table')
+                            print("\tClear rows to add...")
+                        rows_to_add = {n: list() for n in number_of_data_points}
+                for datapoint in rows_to_add:
+                    if len(rows_to_add[datapoint]) > 0:
+                        print("Writing last chunk to HDF: {0}".format(hdffilenames[datapoint]))
+                        print("\tAssembling DataFrame...")
+                        df = pd.DataFrame(rows_to_add[datapoint])
+                        print("\tWriting HDF...")
+                        df.to_hdf(hdffilenames[datapoint], 'rwe', mode='a', append=True, format='table')
             except KeyboardInterrupt:
                 print("Shutting down gracefully...")
                 executor.shutdown(wait=False)
-                futures_to_delete = []
-                for future in saved_futures:
-                    if future.cancel() is True:
-                        futures_to_delete.append(future)
-                for future in futures_to_delete:
-                    del saved_futures[future]
-                for future in as_completed(saved_futures):
-                    samples_processed += 1
-                    print("Processed file: {0}".format(saved_futures[future]))
-                    print("\t{0:,} samples processed...".format(samples_processed))
         print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         print("{0:,} total samples processed...".format(samples_processed))
-
-    @staticmethod
-    def _preprocess_rwe_pickle(root, filename, datapoints=512, window_size=256):
-        """
-        Internal function to pull RWE from a pickle file and insert it into a data frame.
-
-        :param root: The directory for the pickle file
-        :param filename: The pickle file name
-        :param datapoints: The number of datapoints to resample RWE.
-        :param window_size:  The window size of the RWE, that must be already
-        calculated.
-        :returns: A data series of the computation, None otherwise.
-        """
-        f = FileObject.read(os.path.join(root, filename))
-
-        running_entropy = f.malware.runningentropy
-
-        if window_size in running_entropy.entropy_data:
-            # Reduce RWE data points
-            xnew, ynew = running_entropy.resample_rwe(window_size=window_size,
-                                                      number_of_data_points=datapoints)
-            s = pd.Series(ynew)
-            s.name = f.malware.sha256.upper()
-            return s
-        else:
-            print(
-                "ERROR: Window size {0} not in this pickle file: {1}".format(
-                    window_size, filename))
-            return None
-
-    @staticmethod
-    def batch_preprocess_rwe_data(in_directory=None,
-                                  datapoints=512,
-                                  window_size=256,
-                                  njobs=os.cpu_count()):
-        """
-        Return rwe of malware in a dataframe.
-
-        :param in_directory:  The directory containing the malware pickle files
-        created in with the batch function above.
-        :param datapoints: The number of datapoints to resample RWE.
-        :param window_size:  The window size of the RWE, that must be already
-        calculated.
-        :param njobs: The number of threads to use
-        :return:  A Pandas dataframe containing the rwe.
-        """
-        print("Starting batch processing of running window entropy for malware samples...")
-        # Keep track so we don't duplicate work
-        processed_sha256 = []
-
-        # Check to see that the input directory exists, this will throw an
-        # exception if it does not exist.
-        os.stat(in_directory)
-        # Only find pickle malware files created by the batch function above.
-        malware_files_re = re.compile('([a-z0-9]{64}).pickle.gz',
-                                      flags=re.IGNORECASE)
-        df = pd.DataFrame()
-        saved_futures = {}
-        samples_processed = 0
-        rows_to_add = []
-        with ProcessPoolExecutor(max_workers=njobs) as executor:
-            try:
-                for root, dirs, files in os.walk(in_directory):
-                    for file in files:
-                        m = malware_files_re.match(file)
-                        if m:
-                            if m.group(1).upper() not in processed_sha256:
-                                future = executor.submit(Utils._preprocess_rwe_pickle,
-                                                         root, file,
-                                                         datapoints, window_size)
-                                saved_futures[future] = os.path.join(root, file)
-                                processed_sha256.append(m.group(1).upper())
-                for future in as_completed(saved_futures):
-                    rows_to_add.append(future.result())
-                    samples_processed += 1
-                    print("Processed file: {0}".format(saved_futures[future]))
-                    print("\t{0:,} samples processed...".format(samples_processed))
-                print("{0:,} total samples processed...".format(samples_processed))
-                print("Creating dataframe...")
-                return df.append(rows_to_add)
-            except KeyboardInterrupt:
-                print("Shutting down gracefully...")
-                executor.shutdown(wait=False)
-                for future in saved_futures:
-                    future.cancel()
-                return df
 
     @staticmethod
     def batch_tsfresh_rwe_data(in_directory=None,
@@ -372,88 +248,6 @@ class Utils(object):
         impute(extracted_features)
         features_filtered = select_features(extracted_features, classifications)
         return features_filtered
-
-    @staticmethod
-    def get_classifications_from_path(in_directory=None):
-        """
-        Loads classifications from key words in the path.
-
-        :param in_directory:  This is the directory containing batch processed
-        samples with the batch function above (results are pickled).
-        :return: A DataFrame with an index of the sha256 and the value of
-        the classification guessed from the full path name.
-        """
-        print("Starting classifications from path for malware samples...")
-
-        # Keep track so we don't duplicate work
-        processed_sha256 = []
-
-        df = pd.DataFrame(columns=['classification'])
-
-        # Check to see that the input directory exists, this will throw an
-        # exception if it does not exist.
-        os.stat(in_directory)
-        # The RE for malware files with sha256 as the name.
-        malware_files_re = re.compile('[a-z0-9]{64}',
-                                      flags=re.IGNORECASE)
-        samples_processed = 0
-        for root, dirs, files in os.walk(in_directory):
-            for file in files:
-                if malware_files_re.match(file):
-                    samples_processed += 1
-
-                    f = FileObject.read(os.path.join(root, file))
-
-                    if f.malware.sha256.upper() not in processed_sha256:
-                        classified = ""
-                        if "encrypted" in root.lower():
-                            classified = "Encrypted"
-                        elif "unpacked" in root.lower():
-                            classified = "Unpacked"
-                        elif "packed" in root.lower():
-                            classified = "Packed"
-                        else:
-                            classified = ""
-
-                        if "malware" in root.lower():
-                            classified += "-Malware"
-                        elif "pup" in root.lower():
-                            classified += "-PUP"
-                        elif "trusted" in root.lower():
-                            classified += "-Trusted"
-                        else:
-                            classified += ""
-
-                        d = dict()
-                        d['classification'] = classified
-                        ds = pd.Series(d)
-                        ds.name = f.malware.sha256.upper()
-                        df = df.append(ds)
-
-                        processed_sha256.append(f.malware.sha256.upper())
-
-                        samples_processed += 1
-        return df
-
-    @staticmethod
-    def parse_classifications_from_path(classifications):
-        """
-        Parses the classifications from guessed classifications from the paths.
-
-        :param classifications:  A dataframe holding the guessed classifications.
-        :return:  The parsed classifications, as a DataFrame.
-        """
-        cls = pd.DataFrame(columns=['classification'])
-        for index, row in classifications.iterrows():
-            cl = row[0]
-            c = cl.split('-')
-            d = dict()
-            # d['classification'] = cl
-            d['classification'] = c[1]
-            ds = pd.Series(d)
-            ds.name = index.upper()
-            cls = cls.append(ds)
-        return cls
 
     @staticmethod
     def estimate_vt_classifications_from_csv(filename, products=None):
@@ -1080,6 +874,28 @@ class Utils(object):
                     index_col=0, compression='gzip')
             except:
                 pass
+        return df, classification
+    @staticmethod
+    def load_rwe_features(datadir, windowsize=256, datapoints=512):
+        """
+        Loads the data saved from preprocessing.
+
+        :param datadir:  The data directory that contains the data.
+        :param windowsize:  The window size for the RWE to load.
+        :param datapoints:  The number of datapoints to load.
+        :return:  raw_data, classifications tuple
+        """
+        # Check to see that the data directory exists, this will throw an
+        # exception if it does not exist.
+        os.stat(datadir)
+        df = None
+        df = pd.read_hdf(os.path.join(datadir, 'rwe_window_{0}_datapoints_{1}.hdf'.format(windowsize, datapoints)), 'rwe')
+        try:
+            classifications = pd.read_csv(
+                os.path.join(datadir, 'classifications.csv'),
+                index_col=0)
+        except:
+            pass
         return df, classifications
 
     @staticmethod

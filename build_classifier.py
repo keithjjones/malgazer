@@ -2,7 +2,6 @@
 #import plaidml.keras
 #plaidml.keras.install_backend()
 
-import batch_preprocess_entropy
 from library.utils import Utils
 from library.ml import ML
 from sklearn.utils.validation import column_or_1d
@@ -23,8 +22,6 @@ pd.set_option('max_colwidth', 64)
 #
 # Script actions
 #
-# Preprocess the data into one DataFrame
-preprocess_data = False
 # Assemble the preprocessed data
 assemble_preprocessed_data = False
 # Build a classifier
@@ -78,10 +75,6 @@ if classifier_type.lower() in ['ann', 'cnn']:
 else:
     categorical = False
 
-# Preprocess data
-if preprocess_data:
-    batch_preprocess_entropy.main(arguments)
-
 # Put the data together and save hashes used for training
 if assemble_preprocessed_data:
     # Load data
@@ -111,7 +104,7 @@ if build_classifier:
     all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
     
     # Pull the hashes we care about
-    hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:,0]
+    hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:, 0]
     data = Utils.filter_hashes(all_data, hashes)
     data.to_csv(os.path.join(datadir, 'data.csv'))
         
