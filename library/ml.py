@@ -274,6 +274,25 @@ class ML(object):
         """
         return self.classifier.predict(X)
 
+    def train(self, *args, **kwargs):
+        if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
+            return self.train_nn(*args, **kwargs)
+        else:
+            return self.train_scikitlearn(*args, **kwargs)
+
+    def predict(self, *args, **kwargs):
+        """
+        Perform a prediction on input data.
+
+        :param args:  Passed through.
+        :param kwargs:  Passed through.
+        :return: The predictions.
+        """
+        if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
+            return self.predict_nn(*args, **kwargs)
+        else:
+            return self.predict_scikitlearn(*args, **kwargs)
+
     @staticmethod
     def build_ann_static(input, outputs=9):
         """

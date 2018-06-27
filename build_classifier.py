@@ -10,6 +10,7 @@ import numpy as np
 import time
 import os
 import pickle
+import dill
 from sklearn import tree
 from sklearn.metrics import roc_curve, auc
 from sklearn.preprocessing import label_binarize
@@ -143,12 +144,12 @@ if build_classifier:
 
             # Train the CNN
             start_time = time.time()
-            classifier = ml.train_nn(Xt, yt, batch_size=batch_size, epochs=epochs)
+            classifier = ml.train(Xt, yt, batch_size=batch_size, epochs=epochs)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             
             # Predict the results
             Xtest = np.expand_dims(X_test, axis=2)
-            y_pred = ml.predict_nn(Xtest)
+            y_pred = ml.predict(Xtest)
             
             # Making the Confusion Matrix
             accuracy, cm = ml.confusion_matrix_nn(y_test, y_pred)
@@ -179,12 +180,12 @@ if build_classifier:
 
             # Train the NN
             start_time = time.time()
-            classifier = ml.train_nn(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=False)
+            classifier = ml.train(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=False)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))                
 
             # Predict the results
             Xtest = np.expand_dims(X_test, axis=2)
-            y_pred = ml.predict_nn(X_test)
+            y_pred = ml.predict(X_test)
             
             # Making the Confusion Matrix
             accuracy, cm = ml.confusion_matrix_nn(y_test, y_pred)
@@ -228,9 +229,9 @@ if build_classifier:
             
         start_time = time.time()
         if cross_fold_validation is False:
-            classifier = ml.train_scikitlearn(X_train, y_train)
+            classifier = ml.train(X_train, y_train)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-            y_pred = ml.predict_scikitlearn(X_test)
+            y_pred = ml.predict(X_test)
     
             # Making the Confusion Matrix
             accuracy, cm = ml.confusion_matrix_scikitlearn(y_test, y_pred)

@@ -10,8 +10,12 @@ from sqlalchemy.dialects import postgresql
 import glob
 import multiprocessing
 import time
+import dill
 import pickle
-from ...library.ml import ML
+import sys
+sys.path.append("..")
+sys.path.append(os.path.join("..", ".."))
+from malgazer.library.ml import ML
 
 
 app = Flask(__name__)
