@@ -1,11 +1,13 @@
-from flask import Flask
-from flask import render_template, abort, redirect, url_for
+from flask import Flask, render_template, abort, redirect, url_for, flash
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from werkzeug.utils import secure_filename
 from ...library.files import Sample
+import requests
 import os
+
+API_URL = "http://api:8888"
 
 app = Flask(__name__)
 app.config.update(dict(
@@ -26,10 +28,16 @@ def submit():
     if form.validate_on_submit():
         f = form.sample.data
         s = Sample(frommemory=f.stream.read())
-        filename = secure_filename(s.sha256)
-        filepath = os.path.join('/samples', filename)
-        if not os.path.isfile(filepath):
-            f.save(filepath)
+        files = {'file': s.rawdata}
+        url = "{0}/submit".format(API_URL)
+        try:
+            req = requests.post(url, files=files)
+        except:
+            flash('Exception while sending file to API!')
+            return redirect(url_for('submit'))
+        if req.status_code != 200:
+            flash("API HTTP Code: {0}".format(req.status_code))
+            return redirect(url_for('submit'))
         return redirect(url_for('history'))
     return render_template('submit.html', form=form)
 

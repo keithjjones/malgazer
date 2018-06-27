@@ -21,6 +21,10 @@
   </ul>
 </nav>
 
+{% for message in get_flashed_messages() %}
+  <div class="flash">{{ message }}</div>
+{% endfor %}
+
 <div class="top-buffer left-buffer">{% block content %}{% endblock %}</div>
 
 <nav class="navbar navbar-expand-lg fixed-bottom navbar-dark bg-dark">
