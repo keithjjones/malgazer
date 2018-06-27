@@ -5,7 +5,8 @@ import os
 from werkzeug.utils import secure_filename
 from ...library.files import Sample
 import datetime
-
+import sqlalchemy
+import glob
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
@@ -21,6 +22,15 @@ class Submission(db.Model):
 
 
 db.create_all()
+
+@app.route('/initdb')
+def initdb():
+    engine = sqlalchemy.create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+    Submission.__table__.drop(engine)
+    db.create_all()
+    for f in glob.glob(os.path.join(SAMPLES_DIRECTORY, '*')):
+        os.remove(f)
+    return json.dumps({})
 
 
 @app.route('/')
@@ -47,7 +57,7 @@ def submit():
     submissions = Submission.query.all()
     return_data = []
     for s in submissions:
-        return_data.append(s.sha256)
+        return_data.append({'sha256':s.sha256, 'time': str(s.time)})
     return json.dumps(return_data)
 
 
