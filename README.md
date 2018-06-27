@@ -17,7 +17,7 @@ Be aware that this code will change often as I add more functionality.  There wi
 
 # Docker
 
-You can stand up this classifier with the following command, after you have installed Docker:
+You can stand up this project with the following command, after you have installed Docker on your system:
 
 ```
 docker-compose up
@@ -28,6 +28,16 @@ You can rebuild all of the docker images at any time with the following command:
 ```
 docker-compose build --no-cache
 ```
+
+This was developed using Docker on a Mac.  Other operating systems have not been tested (yet).
+
+## Web
+
+After bringing it up in Docker, you can access the web portion of this project at http://localhost:8080.
+
+## API
+
+After bringing it up in Docker, you can access the API portion of this project at http://localhost:8888
 
 # Installation
 
