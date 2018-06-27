@@ -60,8 +60,10 @@ def submit():
         with open(filepath, 'wb') as f_out:
             f_out.write(s.rawdata)
     submit_time = datetime.datetime.now()
-    submission = Submission(sha256=s.sha256, time=submit_time, ip_address=ip_addr)
-    return_data = {'id': submission.id, 'sha256': submission.sha256, 'time': str(submission.time), 'ip_address': submission.ip_address}
+    submission = Submission(sha256=s.sha256, time=submit_time, ip_address=ip_addr, classification='Pending')
+    return_data = {'id': submission.id, 'sha256': submission.sha256,
+                   'time': str(submission.time), 'ip_address': submission.ip_address,
+                   'classification': submission.classification}
     db.session.add(submission)
     db.session.commit()
     return json.dumps(return_data), 200
