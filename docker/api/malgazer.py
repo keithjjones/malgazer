@@ -1,11 +1,26 @@
 from flask import Flask, flash, request, redirect, url_for, render_template
+from flask_sqlalchemy import SQLAlchemy
 import json
 import os
 from werkzeug.utils import secure_filename
 from ...library.files import Sample
+import datetime
 
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
+db = SQLAlchemy(app)
+
+SAMPLES_DIRECTORY = "/samples"
+
+
+class Submission(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sha256 = db.Column(db.String(80), nullable=False)
+    time = db.Column(db.DateTime, nullable=False)
+
+
+db.create_all()
 
 
 @app.route('/')
@@ -21,11 +36,18 @@ def submit():
     f = file.stream.read()
     s = Sample(frommemory=f)
     filename = secure_filename(s.sha256)
-    filepath = os.path.join('/samples', filename)
+    filepath = os.path.join(SAMPLES_DIRECTORY, filename)
     if not os.path.isfile(filepath):
         with open(filepath, 'wb') as f_out:
             f_out.write(s.rawdata)
     return_data = {'sha256': s.sha256}
+    submission = Submission(sha256=s.sha256, time=datetime.datetime.now())
+    db.session.add(submission)
+    db.session.commit()
+    submissions = Submission.query.all()
+    return_data = []
+    for s in submissions:
+        return_data.append(s.sha256)
     return json.dumps(return_data)
 
 
