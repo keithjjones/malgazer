@@ -44,7 +44,10 @@ def main():
 
 @app.route('/submit', methods=('POST',))
 def submit():
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    if 'ip_address' in request.form:
+        ip_addr = request.form.get('ip_address', 'None')
+    else:
+        ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     if 'file' not in request.files:
         return "ERROR"
     file = request.files['file']
@@ -60,12 +63,12 @@ def submit():
     return_data = {'id': submission.id, 'sha256': submission.sha256, 'time': str(submission.time), 'ip_address': submission.ip_address}
     db.session.add(submission)
     db.session.commit()
-    return json.dumps(return_data)
+    return json.dumps(return_data), 200
 
 
 @app.route("/history")
 def history():
-    submissions = Submission.query.all()
+    submissions = Submission.query.order_by(Submission.id.desc()).all()
     return_data = []
     for s in submissions:
         return_data.append({'id': s.id,

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, abort, redirect, url_for, flash
+from flask import Flask, render_template, abort, redirect, url_for, flash, request
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from flask_wtf.csrf import CSRFProtect, CSRFError
@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from ...library.files import Sample
 import requests
 import os
+import json
 
 API_URL = "http://api:8888"
 
@@ -24,19 +25,21 @@ def main():
 
 @app.route('/submit', methods=('GET', 'POST'))
 def submit():
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     form = Submission()
     if form.validate_on_submit():
         f = form.sample.data
         s = Sample(frommemory=f.stream.read())
         files = {'file': s.rawdata}
+        data = {'ip_address': ip_addr}
         url = "{0}/submit".format(API_URL)
         try:
-            req = requests.post(url, files=files)
+            req = requests.post(url, files=files, data=data)
         except:
             flash('Exception while sending file to API!')
             return redirect(url_for('submit'))
         if req.status_code != 200:
-            flash("API HTTP Code: {0}".format(req.status_code))
+            flash("API FAILURE - HTTP Code: {0}".format(req.status_code))
             return redirect(url_for('submit'))
         return redirect(url_for('history'))
     return render_template('submit.html', form=form)
@@ -44,7 +47,17 @@ def submit():
 
 @app.route('/history')
 def history():
-    return render_template('history.html')
+    url = "{0}/history".format(API_URL)
+    try:
+        req = requests.get(url)
+    except:
+        flash('Exception while pulling history from API!')
+        return redirect(url_for('main'))
+    if req.status_code != 200:
+        flash("API FAILURE - HTTP Code: {0}".format(req.status_code))
+        return redirect(url_for('main'))
+    history = json.loads(req.text)
+    return render_template('history.html', history=history)
 
 
 class Submission(FlaskForm):
