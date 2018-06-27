@@ -16,6 +16,8 @@ import sys
 sys.path.append("..")
 sys.path.append(os.path.join("..", ".."))
 from malgazer.library.ml import ML
+from malgazer.library.entropy import resample
+import pandas as pd
 
 
 app = Flask(__name__)
@@ -61,9 +63,17 @@ def process_sample(id):
     :param id:  The ID of the submission in the database.
     :return: Nothing.
     """
-    time.sleep(10)
+    ml = pickle.load(open(os.path.join('..', '..', 'classifier', 'ml.pickle'), 'rb'))
+    s = Sample(fromfile=os.path.join('/samples', 'EAC3819C21477733CAA897ACB219BEA72063AA8427369B1AADC89089E3C9F747'))
+    ds1 = s.running_window_entropy(ml.rwe_windowsize)
+    ds2 = pd.Series(resample(ds1, ml.datapoints))
+    ds2.name = ds1.name
+    rwe = pd.DataFrame([ds2])
+    rwe, _ = ml.scale_features(rwe.values)
+    y = ml.decode_classifications(ml.predict(rwe))
     submission = Submission.query.filter_by(id=id).first()
     submission.status = 'Done'
+    submission.classification = y[0]
     db.session.add(submission)
     db.session.commit()
 
@@ -127,12 +137,6 @@ def classification(sha256):
                             'ip_address': s.ip_address,
                             'status': s.status})
     return json.dumps(return_data), 200
-
-
-@app.route('/load')
-def load():
-    a = pickle.load(open('../../classifier/ml.pickle', 'rb'))
-    return str(a)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-    # Install the plaidml backend
+# Install the plaidml backend
 #import plaidml.keras
 #plaidml.keras.install_backend()
 
@@ -100,7 +100,7 @@ if build_classifier:
     print("Loading data...")
     
     # Load data
-    raw_data_tmp, classifications_tmp = Utils.load_rwe_features(datadir)
+    raw_data_tmp, classifications_tmp = Utils.load_rwe_features(datadir, windowsize=windowsize, datapoints=datapoints)
     
     # Make sure data lines up
     all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
