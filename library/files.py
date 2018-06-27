@@ -35,6 +35,16 @@ class Sample(object):
         self.filename = filename
         return self.rawdata
 
+    def frommemory(self, filestream):
+        """
+        Read a sample's data from a memory.
+
+        :param filestream:  The file stream to store.
+        :return:  A binary string representing the sample's content.
+        """
+        self.rawdata = filestream
+        return self.rawdata
+
     def running_window_entropy(self, window_size=256, normalize=True):
         e = entropy.RunningEntropy()
         rwe = e.calculate(self.data, window_size, normalize)
@@ -58,18 +68,25 @@ class Sample(object):
 
         :return:  The SHA256 if successful, None otherwise.
         """
-        if self.filename:
-            return sha256_file(self.filename)
-        else:
-            return None
+        return sha256(self.rawdata)
 
 
 def sha256_file(filename):
-    hasher = sha256()
     if os.path.isfile(filename):
         with open(filename, 'rb') as f:
             buf = f.read()
-            hasher.update(buf)
-        return hasher.hexdigest().upper()
+            return sha256(buf)
     else:
         return ""
+
+
+def sha256(data):
+    """
+    Calculates the SHA256 from data.
+
+    :param data:  The data to calculate.
+    :return:  The SHA256
+    """
+    hasher = sha256()
+    hasher.update(data)
+    return hasher.hexdigest().upper()
