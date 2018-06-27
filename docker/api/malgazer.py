@@ -108,5 +108,19 @@ def history():
     return json.dumps(return_data), 200
 
 
+@app.route("/classification/<sha256>")
+def classification(sha256):
+    submissions = Submission.query.filter_by(sha256=sha256.upper()).order_by(Submission.id.desc()).all()
+    return_data = []
+    for s in submissions:
+        return_data.append({'id': s.id,
+                            'sha256': s.sha256, 'time': str(s.time),
+                            'classification': s.classification,
+                            'possible_classification': s.possible_classification,
+                            'ip_address': s.ip_address,
+                            'status': s.status})
+    return json.dumps(return_data), 200
+
+
 if __name__ == '__main__':
       app.run(host='0.0.0.0', port=8888)
