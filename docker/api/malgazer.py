@@ -57,7 +57,7 @@ def submit():
             f_out.write(s.rawdata)
     submit_time = datetime.datetime.now()
     submission = Submission(sha256=s.sha256, time=submit_time, ip_address=ip_addr)
-    return_data = {'sha256': submission.sha256, 'time': str(submission.time), 'ip_address': submission.ip_address}
+    return_data = {'id': submission.id, 'sha256': submission.sha256, 'time': str(submission.time), 'ip_address': submission.ip_address}
     db.session.add(submission)
     db.session.commit()
     return json.dumps(return_data)
@@ -68,7 +68,8 @@ def history():
     submissions = Submission.query.all()
     return_data = []
     for s in submissions:
-        return_data.append({'sha256': s.sha256, 'time': str(s.time),
+        return_data.append({'id': s.id,
+                            'sha256': s.sha256, 'time': str(s.time),
                             'classification': s.classification,
                             'ip_address': s.ip_address})
     return json.dumps(return_data)
