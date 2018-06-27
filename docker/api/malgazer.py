@@ -57,7 +57,7 @@ def submit():
     submissions = Submission.query.all()
     return_data = []
     for s in submissions:
-        return_data.append({'sha256':s.sha256, 'time': str(s.time)})
+        return_data.append({'sha256': s.sha256, 'time': str(s.time)})
     return json.dumps(return_data)
 
 
