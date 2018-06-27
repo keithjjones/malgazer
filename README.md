@@ -6,10 +6,14 @@ A Python malware analysis library.  Mostly for machine learning purposes.
 
 More info coming soon.  This is it for now.
 
+# Bugs and Issues
+
+Please file any bugs or issues using the GitHub issues facility above.
+
 # Timeline
 
 This source code supports my dissertation.  The code is not production ready until that time.
-Be aware that this code will change often as I add more functionality.
+Be aware that this code will change often as I add more functionality.  There will be frequent breaking changes.
 
 # Docker
 
