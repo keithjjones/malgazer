@@ -25,6 +25,7 @@ class Submission(db.Model):
     time = db.Column(db.DateTime, nullable=False)
     classification = db.Column(db.String(120), nullable=True)
     ip_address = db.Column(postgresql.INET)
+    status = db.Column(db.String(120), nullable=True)
 
 
 db.create_all()
@@ -54,7 +55,7 @@ def process_sample(id):
     """
     time.sleep(10)
     submission = Submission.query.filter_by(id=id).first()
-    submission.classification = 'Done'
+    submission.status = 'Done'
     db.session.add(submission)
     db.session.commit()
 
@@ -76,10 +77,12 @@ def submit():
         with open(filepath, 'wb') as f_out:
             f_out.write(s.rawdata)
     submit_time = datetime.datetime.now()
-    submission = Submission(sha256=s.sha256, time=submit_time, ip_address=ip_addr, classification='Pending')
+    submission = Submission(sha256=s.sha256, time=submit_time, ip_address=ip_addr,
+                            classification='', status='Processing')
     return_data = {'id': submission.id, 'sha256': submission.sha256,
                    'time': str(submission.time), 'ip_address': submission.ip_address,
-                   'classification': submission.classification}
+                   'classification': submission.classification,
+                   'status': submission.status}
     db.session.add(submission)
     db.session.commit()
     thread = multiprocessing.Process(target=process_sample, args=(submission.id,))
@@ -95,7 +98,8 @@ def history():
         return_data.append({'id': s.id,
                             'sha256': s.sha256, 'time': str(s.time),
                             'classification': s.classification,
-                            'ip_address': s.ip_address})
+                            'ip_address': s.ip_address,
+                            'status': s.status})
     return json.dumps(return_data), 200
 
 
