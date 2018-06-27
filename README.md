@@ -4,11 +4,30 @@ A Python malware analysis library.  Mostly for machine learning purposes.
 
 # Documentation
 
-More info coming soon.
+More info coming soon.  This is it for now.
+
+# Timeline
+
+This source code supports my dissertation.  The code is not production ready until that time.
+Be aware that this code will change often as I add more functionality.
+
+# Docker
+
+You can stand up this classifier with the following command, after you have installed Docker:
+
+```
+docker-compose up
+```
+
+You can rebuild all of the docker images at any time with the following command:
+
+```
+docker-compose build --no-cache
+```
 
 # Installation
 
-Install the requirements:
+To use this module, you will need the requirement.  The following command installs the requirements:
 
 ```
 pip install -r requirements.txt
