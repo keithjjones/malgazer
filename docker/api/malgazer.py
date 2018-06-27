@@ -63,8 +63,9 @@ def process_sample(id):
     :param id:  The ID of the submission in the database.
     :return: Nothing.
     """
+    submission = Submission.query.filter_by(id=id).first()
     ml = pickle.load(open(os.path.join('..', '..', 'classifier', 'ml.pickle'), 'rb'))
-    s = Sample(fromfile=os.path.join('/samples', 'EAC3819C21477733CAA897ACB219BEA72063AA8427369B1AADC89089E3C9F747'))
+    s = Sample(fromfile=os.path.join('/samples', submission.sha256))
     ds1 = s.running_window_entropy(ml.rwe_windowsize)
     ds2 = pd.Series(resample(ds1, ml.datapoints))
     ds2.name = ds1.name
