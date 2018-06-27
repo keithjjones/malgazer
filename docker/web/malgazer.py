@@ -27,7 +27,9 @@ def submit():
         f = form.sample.data
         s = Sample(frommemory=f.stream.read())
         filename = secure_filename(s.sha256)
-        f.save(os.path.join('/samples', filename))
+        filepath = os.path.join('/samples', filename)
+        if not os.path.isfile(filepath):
+            f.save(filepath)
         return redirect(url_for('history'))
     return render_template('submit.html', form=form)
 
