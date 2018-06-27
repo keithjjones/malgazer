@@ -24,6 +24,7 @@ class Submission(db.Model):
     sha256 = db.Column(db.String(80), nullable=False)
     time = db.Column(db.DateTime, nullable=False)
     classification = db.Column(db.String(120), nullable=True)
+    possible_classification = db.Column(db.String(120), nullable=True)
     ip_address = db.Column(postgresql.INET)
     status = db.Column(db.String(120), nullable=True)
 
@@ -66,6 +67,7 @@ def submit():
         ip_addr = request.form.get('ip_address', 'None')
     else:
         ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    possible_classification = request.form.get('classification', 'Unknown')
     if 'file' not in request.files:
         return "ERROR"
     file = request.files['file']
@@ -78,10 +80,12 @@ def submit():
             f_out.write(s.rawdata)
     submit_time = datetime.datetime.now()
     submission = Submission(sha256=s.sha256, time=submit_time, ip_address=ip_addr,
-                            classification='', status='Processing')
+                            classification='', possible_classification=possible_classification,
+                            status='Processing')
     return_data = {'id': submission.id, 'sha256': submission.sha256,
                    'time': str(submission.time), 'ip_address': submission.ip_address,
                    'classification': submission.classification,
+                   'possible_classification': submission.possible_classification,
                    'status': submission.status}
     db.session.add(submission)
     db.session.commit()
@@ -98,6 +102,7 @@ def history():
         return_data.append({'id': s.id,
                             'sha256': s.sha256, 'time': str(s.time),
                             'classification': s.classification,
+                            'possible_classification': s.possible_classification,
                             'ip_address': s.ip_address,
                             'status': s.status})
     return json.dumps(return_data), 200

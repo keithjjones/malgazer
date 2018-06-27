@@ -1,5 +1,7 @@
 from flask import Flask, render_template, abort, redirect, url_for, flash, request
 from flask_wtf import FlaskForm
+from wtforms import RadioField, StringField
+from wtforms.validators import DataRequired
 from flask_wtf.file import FileField, FileRequired
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from werkzeug.utils import secure_filename
@@ -9,6 +11,15 @@ import os
 import json
 
 API_URL = "http://api:8888"
+POSSIBLE_CLASSIFICATIONS = [
+    ('Trojan', 'Trojan'),
+    ('Virus', 'Virus'),
+    ('Worm', 'Worm'),
+    ('Backdoor', 'Backdoor'),
+    ('Ransomware', 'Ransomware'),
+    ('PUP', 'PUP'),
+    ('Unknown', 'Unknown')
+]
 
 app = Flask(__name__)
 app.config.update(dict(
@@ -32,7 +43,8 @@ def submit():
         f = form.sample.data
         s = Sample(frommemory=f.stream.read())
         files = {'file': s.rawdata}
-        data = {'ip_address': ip_addr}
+        data = {'ip_address': ip_addr,
+                'classification': form.classification.data}
         url = "{0}/submit".format(API_URL)
         try:
             req = requests.post(url, files=files, data=data)
@@ -63,6 +75,7 @@ def history():
 
 class Submission(FlaskForm):
     sample = FileField(validators=[FileRequired()])
+    classification = RadioField('name', choices=POSSIBLE_CLASSIFICATIONS, default='Unknown', validators=[DataRequired()])
 
 
 if __name__ == '__main__':
