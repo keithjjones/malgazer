@@ -25,7 +25,7 @@ def submit():
     form = Submission()
     if form.validate_on_submit():
         f = form.sample.data
-        s = Sample(frommemory=f)
+        s = Sample(frommemory=f.stream.read())
         filename = secure_filename(s.sha256)
         f.save(os.path.join('/samples', filename))
         return redirect(url_for('history'))
