@@ -874,7 +874,8 @@ class Utils(object):
                     index_col=0, compression='gzip')
             except:
                 pass
-        return df, classification
+        return df, classifications
+
     @staticmethod
     def load_rwe_features(datadir, windowsize=256, datapoints=512):
         """
@@ -888,14 +889,8 @@ class Utils(object):
         # Check to see that the data directory exists, this will throw an
         # exception if it does not exist.
         os.stat(datadir)
-        df = None
         df = pd.read_hdf(os.path.join(datadir, 'rwe_window_{0}_datapoints_{1}.hdf'.format(windowsize, datapoints)), 'rwe')
-        try:
-            classifications = pd.read_csv(
-                os.path.join(datadir, 'classifications.csv'),
-                index_col=0)
-        except:
-            pass
+        classifications = pd.read_csv(os.path.join(datadir, 'classifications.csv'), index_col=0)
         return df, classifications
 
     @staticmethod

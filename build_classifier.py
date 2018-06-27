@@ -1,4 +1,4 @@
-# Install the plaidml backend
+    # Install the plaidml backend
 #import plaidml.keras
 #plaidml.keras.install_backend()
 
@@ -35,14 +35,15 @@ source_dir = '/Volumes/JONES/Focused Set May 2018/RWE'
 datapoints = 1024
 windowsize = 256
 number_of_jobs = 50
-datadir = os.path.join('/Volumes/JONES/Focused Set May 2018', 'data_vt_window_{0}_samples_{1}'.format(windowsize, datapoints))
+#datadir = os.path.join('/Volumes/JONES/Focused Set May 2018', 'data_vt_window_{0}_samples_{1}'.format(windowsize, datapoints))
+datadir = '/Volumes/JONES/Focused Set May 2018/RWE'
 arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', str(number_of_jobs), source_dir, datadir]
 batch_size = 100
 epochs = 10
 n_categories = 6
 
 # Cross fold validation variables
-cross_fold_validation = True
+cross_fold_validation = False
 cfv_groups = 5
 n_jobs = 10
 
@@ -98,7 +99,7 @@ if build_classifier:
     print("Loading data...")
     
     # Load data
-    raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
+    raw_data_tmp, classifications_tmp = Utils.load_rwe_features(datadir)
     
     # Make sure data lines up
     all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
@@ -268,3 +269,4 @@ if build_classifier:
         ml.save_classifier(path, "classifier")
         if classifier_type.lower() == 'dt':
             tree.export_graphviz(classifier, out_file=os.path.join(path, 'tree.dot'))
+        pickle.dump(ml, open(os.path.join(path, 'ml.pickle'), 'wb')
