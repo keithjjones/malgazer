@@ -107,7 +107,7 @@ if build_classifier:
     # Pull the hashes we care about
     hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:, 0]
     data = Utils.filter_hashes(all_data, hashes)
-    data.to_csv(os.path.join(datadir, 'data.csv'))
+#    data.to_csv(os.path.join(datadir, 'data.csv'))
         
     print("Test percent: {0}".format(test_percent))
     
@@ -117,7 +117,7 @@ if build_classifier:
     y = pd.DataFrame(data['classification']).values.copy()
     
     # Make the classifier
-    ml = ML()
+    ml = ML(rwe_windowsize=windowsize, datapoints=datapoints)
     y, y_encoder = ml.encode_classifications(y, categorical=categorical)
     X, X_scaler = ml.scale_features(X)
     if test_percent > 0:
@@ -261,12 +261,14 @@ if build_classifier:
     # Save the classifier
     if cross_fold_validation is False:
         print("Saving the classifier...")
-        path = os.path.join(datadir, classifier_type.lower())
+        path = os.path.join(datadir, 
+                             '{0}_window_{1}_datapoints'.format(windowsize, datapoints), 
+                             classifier_type.lower())
         try:
             os.stat(path)
         except:
-            os.mkdir(path)
+            os.makedirs(path)
         ml.save_classifier(path, "classifier")
         if classifier_type.lower() == 'dt':
             tree.export_graphviz(classifier, out_file=os.path.join(path, 'tree.dot'))
-        pickle.dump(ml, open(os.path.join(path, 'ml.pickle'), 'wb')
+        pickle.dump(ml, open(os.path.join(path, 'ml.pickle'), 'wb'))

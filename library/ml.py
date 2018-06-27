@@ -34,7 +34,7 @@ import pickle
 
 
 class ML(object):
-    def __init__(self):
+    def __init__(self, rwe_windowsize=None, datapoints=None):
         super(ML, self).__init__()
         self.classifer = None
         self.classifier_type = None
@@ -43,6 +43,8 @@ class ML(object):
         self.X_sc = None
         # y label encoder
         self.y_labelencoder = None
+        self.rwe_windowsize = rwe_windowsize
+        self.datapoints = datapoints
 
     def set_classifier_by_fold(self, fold):
         """
@@ -273,13 +275,14 @@ class ML(object):
         return self.classifier.predict(X)
 
     @staticmethod
-    def build_ann_static(datapoints=1024, outputs=9):
+    def build_ann_static(input, outputs=9):
         """
         Create a generic ANN.
 
-        :param datapoints:  The number of data points on the input.
+        :param input:  The input to the ANN, used to find input shape.
         :return:  The classifier.
         """
+        datapoints = input.shape[1]
         classifier = Sequential()
         classifier.add(Dense(units=datapoints, kernel_initializer='uniform',
                              activation='relu', input_dim=datapoints))
@@ -297,15 +300,15 @@ class ML(object):
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_ann(self, datapoints=1024, outputs=9):
+    def build_ann(self, input, outputs=9):
         """
         Create a generic ANN.
 
-        :param datapoints:  The number of data points on the input.
+        :param input:  The input to the ANN, used to find input shape.
         :return:  The classifier.
         """
         self.classifier_type = 'ann'
-        self.classifier = ML.build_ann_static(datapoints, outputs)
+        self.classifier = ML.build_ann_static(input, outputs)
         self.classifier.summary()
         return self.classifier
 
