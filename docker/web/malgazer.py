@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from werkzeug.utils import secure_filename
+from ...library.files import Sample
 import os
 
 app = Flask(__name__)
@@ -24,7 +25,8 @@ def submit():
     form = Submission()
     if form.validate_on_submit():
         f = form.sample.data
-        filename = secure_filename(f.filename)
+        s = Sample(frommemory=f)
+        filename = secure_filename(s.sha256)
         f.save(os.path.join('/samples', filename))
         return redirect(url_for('history'))
     return render_template('submit.html', form=form)

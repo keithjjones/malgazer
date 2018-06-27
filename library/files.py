@@ -52,6 +52,13 @@ class Sample(object):
         return self.rawdata
 
     def running_window_entropy(self, window_size=256, normalize=True):
+        """
+        Calculates the running window entropy of the sample.
+
+        :param window_size:  The window size of the RWE.
+        :param normalize:  Normalize the RWE between 0 and 8.
+        :return: The running window entropy as a Series.
+        """
         e = entropy.RunningEntropy()
         rwe = e.calculate(self.data, window_size, normalize)
         ds = pd.Series(rwe)
@@ -74,19 +81,19 @@ class Sample(object):
 
         :return:  The SHA256 if successful, None otherwise.
         """
-        return sha256(self.rawdata)
+        return sha256_memory(self.rawdata)
 
 
 def sha256_file(filename):
     if os.path.isfile(filename):
         with open(filename, 'rb') as f:
             buf = f.read()
-            return sha256(buf)
+            return sha256_memory(buf)
     else:
         return ""
 
 
-def sha256(data):
+def sha256_memory(data):
     """
     Calculates the SHA256 from data.
 
