@@ -11,6 +11,7 @@ import glob
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 db = SQLAlchemy(app)
 
 SAMPLES_DIRECTORY = "/samples"

@@ -15,6 +15,7 @@ app.config.update(dict(
     SECRET_KEY="secretkey 1",
     WTF_CSRF_SECRET_KEY="secretkey 2"
 ))
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 csrf = CSRFProtect(app)
 
 
