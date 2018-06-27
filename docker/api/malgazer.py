@@ -74,10 +74,5 @@ def history():
     return json.dumps(return_data)
 
 
-@app.route("/ip")
-def ip():
-    return json.dumps(request.headers.get('X-Forwarded-For', request.remote_addr))
-
-
 if __name__ == '__main__':
       app.run(host='0.0.0.0', port=8888)
