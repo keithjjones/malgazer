@@ -1,18 +1,20 @@
 from flask import Flask, render_template, abort, redirect, url_for, flash, request
 from flask_wtf import FlaskForm
+from flask_sqlalchemy import SQLAlchemy
 from wtforms import RadioField, StringField
 from wtforms.validators import DataRequired
 from flask_wtf.file import FileField, FileRequired
 from flask_wtf.csrf import CSRFProtect, CSRFError
-from werkzeug.utils import secure_filename
 import requests
 import os
 import json
-import sys
+import datetime
 import sys
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
+sys.path.append(os.path.join('..', '..', '..'))
 from malgazer.library.files import Sample
+from malgazer.docker.db_models.models import Submission, WebRequest, setup_database, db
 
 
 # Global values
@@ -34,10 +36,12 @@ app.config.update(dict(
     WTF_CSRF_SECRET_KEY="secretkey 2"
 ))
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
+db.init_app(app)
 csrf = CSRFProtect(app)
 
 
-class Submission(FlaskForm):
+class SubmissionForm(FlaskForm):
     """
     The submission form.
     """
@@ -59,13 +63,12 @@ def submit():
     The sample submission page.
     """
     ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
-    form = Submission()
+    form = SubmissionForm()
     if form.validate_on_submit():
         f = form.sample.data
         s = Sample(frommemory=f.stream.read())
         files = {'file': s.rawdata}
-        data = {'ip_address': ip_addr,
-                'classification': form.classification.data}
+        data = {'classification': form.classification.data}
         url = "{0}/submit".format(API_URL)
         try:
             req = requests.post(url, files=files, data=data)
@@ -75,6 +78,12 @@ def submit():
         if req.status_code != 200:
             flash("API FAILURE - HTTP Code: {0}".format(req.status_code))
             return redirect(url_for('submit'))
+        submit_time = datetime.datetime.now()
+        req = WebRequest(sha256=s.sha256, time=submit_time,
+                         possible_classification=form.classification.data,
+                         ip_address=ip_addr)
+        db.session.add(req)
+        db.session.commit()
         return redirect(url_for('history'))
     return render_template('submit.html', form=form)
 

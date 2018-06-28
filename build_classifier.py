@@ -273,3 +273,4 @@ if build_classifier:
         if classifier_type.lower() == 'dt':
             tree.export_graphviz(classifier, out_file=os.path.join(path, 'tree.dot'))
         pickle.dump(ml, open(os.path.join(path, 'ml.pickle'), 'wb'))
+        dill.dump(ml, open(os.path.join(path, 'ml.dill'), 'wb'))

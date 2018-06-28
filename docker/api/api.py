@@ -5,46 +5,36 @@ import os
 from werkzeug.utils import secure_filename
 import datetime
 import sqlalchemy
-from sqlalchemy.dialects import postgresql
 import glob
 import multiprocessing
-import time
 import dill
 import pickle
 import sys
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
-from malgazer.library.ml import ML
-from malgazer.library.entropy import resample
+sys.path.append(os.path.join('..', '..', '..'))
 from malgazer.library.files import Sample
-import pandas as pd
+from malgazer import library
+from malgazer.docker.db_models.models import Submission, WebRequest, setup_database, db
 
 
 # Initialize and configure the Flask API
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
-db = SQLAlchemy(app)
+db.init_app(app)
 
 # Global values
 SAMPLES_DIRECTORY = "/samples"
 
 
-class Submission(db.Model):
-    """
-    The submission class for database storage.
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    sha256 = db.Column(db.String(80), nullable=False)
-    time = db.Column(db.DateTime, nullable=False)
-    classification = db.Column(db.String(120), nullable=True)
-    possible_classification = db.Column(db.String(120), nullable=True)
-    ip_address = db.Column(postgresql.INET)
-    status = db.Column(db.String(120), nullable=True)
+def setup_db():
+    setup_database(app.config['SQLALCHEMY_DATABASE_URI'])
 
 
-# Create the DB
-db.create_all()
+@app.before_first_request
+def setup():
+    setup_db()
 
 
 @app.route('/reset')
@@ -52,9 +42,25 @@ def reset():
     """
     Put all cleaning logic here.
     """
+    # try:
+    #     engine = sqlalchemy.create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+    #     Submission.__table__.drop(engine)
+    #     WebRequest.__table__.drop(engine)
+    # except:
+    #     pass
+    # db.drop_all()
+    # db.create_all()
     engine = sqlalchemy.create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-    Submission.__table__.drop(engine)
-    db.create_all()
+    try:
+        Submission.__table__.drop(engine)
+    except:
+        pass
+    try:
+        WebRequest.__table__.drop(engine)
+    except:
+        pass
+    Submission.__table__.create(engine)
+    WebRequest.__table__.create(engine)
     for f in glob.glob(os.path.join(SAMPLES_DIRECTORY, '*')):
         if os.path.isfile(f):
             os.remove(f)
@@ -68,9 +74,11 @@ def process_sample(id):
     :param id:  The ID of the submission in the database.
     :return: Nothing.
     """
+    sys.modules['library'] = library
     submission = Submission.query.filter_by(id=id).first()
     try:
-        ml = pickle.load(open(os.path.join('..', '..', 'classifier', 'ml.pickle'), 'rb'))
+        # ml = pickle.load(open(os.path.join('..', '..', 'classifier', 'ml.pickle'), 'rb'))
+        ml = dill.load(open(os.path.join('..', '..', 'classifier', 'ml.dill'), 'rb'))
         s = Sample(fromfile=os.path.join('/samples', submission.sha256))
         y = ml.predict_sample(s)
         submission = Submission.query.filter_by(id=id).first()
@@ -87,10 +95,7 @@ def submit():
     """
     Submits a sample and executes thread to process it.
     """
-    if 'ip_address' in request.form:
-        ip_addr = request.form.get('ip_address', 'None')
-    else:
-        ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     possible_classification = request.form.get('classification', 'Unknown')
     if 'file' not in request.files:
         return "ERROR"
