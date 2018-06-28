@@ -42,14 +42,6 @@ def reset():
     """
     Put all cleaning logic here.
     """
-    # try:
-    #     engine = sqlalchemy.create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-    #     Submission.__table__.drop(engine)
-    #     WebRequest.__table__.drop(engine)
-    # except:
-    #     pass
-    # db.drop_all()
-    # db.create_all()
     engine = sqlalchemy.create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     try:
         Submission.__table__.drop(engine)
