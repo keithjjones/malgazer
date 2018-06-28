@@ -10,6 +10,6 @@ WORKDIR /malgazer
 ENV FLASK_APP=docker.web.web
 ENV FLASK_ENV=development
 # Below is for development.
-CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
+#CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
 # Below is for production.
-#CMD ["gunicorn", "-w 10", "-b 0.0.0.0:8080", "docker.web.web:app"]
+CMD ["gunicorn", "-w 10", "-b 0.0.0.0:8080", "docker.web.web:app"]
