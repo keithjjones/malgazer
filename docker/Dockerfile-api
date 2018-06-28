@@ -9,6 +9,6 @@ RUN mkdir /samples
 WORKDIR /malgazer/docker/api
 ENV FLASK_APP=malgazer.py
 ENV FLASK_ENV=development
-CMD ["flask", "run", "--host=0.0.0.0", "--port=8888"]
-#CMD ["gunicorn", "-w 10", "-b 127.0.0.1:8080", "malgazer:app"]
+#CMD ["flask", "run", "--host=0.0.0.0", "--port=8888"]
+CMD ["gunicorn", "-w 10", "-b 127.0.0.1:8080", "malgazer:app"]
 
