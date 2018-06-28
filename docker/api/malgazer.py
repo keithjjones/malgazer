@@ -56,8 +56,9 @@ def reset():
     Submission.__table__.drop(engine)
     db.create_all()
     for f in glob.glob(os.path.join(SAMPLES_DIRECTORY, '*')):
-        os.remove(f)
-    return json.dumps({})
+        if os.path.isfile(f):
+            os.remove(f)
+    return json.dumps({'status': 'reset'}), 200
 
 
 def process_sample(id):
