@@ -12,31 +12,38 @@ Sample Submission
 
 <form method="POST" enctype="multipart/form-data" action="{{ url_for('submit') }}">
     {{ form.csrf_token }}
-    <div class="row">
-        <div class="col-md-3">
-            {{ form.sample }}
-        </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Step 1: Select your file...</h5>
+        <p class="card-text">{{ form.sample }}</p>
+      </div>
     </div>
-    <br>
-    <div class="row">
-        <div class="col-md-2">
-            Possible Classification:
-        </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Step 2: Input your classification...</h5>
+        <p class="card-text">
+            <div class="small-text">
+                {% for subfield in form.classification %}
+                    {{ subfield(class_="radio-inline") }}
+                    {{ subfield.label }}
+                {% endfor %}
+            </div>
+        </p>
+      </div>
     </div>
-    <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-md-6 small-text">
-            {% for subfield in form.classification %}
-                {{ subfield(class_="radio-inline") }}
-                {{ subfield.label }}
-            {% endfor %}
-        </div>
-    </div>
-    <br>
-    <div class="row">
-        <div class="col-md-3">
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Step 3: Submit...</h5>
+        <p class="card-text">
             <input type="submit" class="btn btn-outline-primary" value="Submit">
-        </div>
+        </p>
+      </div>
     </div>
+  </div>
 </form>
 {% endblock %}
