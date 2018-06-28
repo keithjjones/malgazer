@@ -4,7 +4,8 @@ A Python malware analysis library.  Mostly for machine learning purposes.
 
 # Documentation
 
-More info coming soon.  This is it for now.
+More info coming soon, along with my dissertation, which will go much deeper into what this is.
+For now, this page is all of the documentation for this project.
 
 # Bugs and Issues
 
@@ -17,7 +18,10 @@ Be aware that this code will change often as I add more functionality.  There wi
 
 # Docker
 
-You can stand up this project with the following command, after you have installed Docker on your system:
+To run the Docker portion of this project, you will need a trained classifier that will predict classifications
+with the "predict_sample" function, such as the library.ml.ML class.  Pickle this classifier and place it in
+samples/ml.pickle.  Then, you can stand up this project with the following command,
+after you have installed Docker on your system:
 
 ```
 docker-compose up
@@ -34,6 +38,7 @@ This was developed using Docker on a Mac.  Other operating systems have not been
 ## Web
 
 After bringing it up in Docker, you can access the web portion of this project at http://localhost:8080.
+Information about the API is on the "API" page of the website.
 
 ## API
 
@@ -41,7 +46,7 @@ After bringing it up in Docker, you can access the API portion of this project a
 
 # Installation
 
-To use this module, you will need the requirement.  The following command installs the requirements:
+To use this module outside Docker, you will need the requirement.  The following command installs the requirements:
 
 ```
 pip install -r requirements.txt
