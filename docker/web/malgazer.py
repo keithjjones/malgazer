@@ -10,7 +10,7 @@ import requests
 import os
 import json
 
-
+# Global values
 API_URL = "http://api:8888"
 POSSIBLE_CLASSIFICATIONS = [
     ('Trojan', 'Trojan'),
@@ -22,6 +22,7 @@ POSSIBLE_CLASSIFICATIONS = [
     ('Unknown', 'Unknown')
 ]
 
+# Initialize and configure the Flask website.
 app = Flask(__name__)
 app.config.update(dict(
     SECRET_KEY="secretkey 1",
@@ -31,13 +32,27 @@ app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 csrf = CSRFProtect(app)
 
 
+class Submission(FlaskForm):
+    """
+    The submission form.
+    """
+    sample = FileField(validators=[FileRequired()])
+    classification = RadioField('name', choices=POSSIBLE_CLASSIFICATIONS, default='Unknown', validators=[DataRequired()])
+
+
 @app.route('/')
 def main():
+    """
+    The main page.
+    """
     return render_template('main.html')
 
 
 @app.route('/submit', methods=('GET', 'POST'))
 def submit():
+    """
+    The sample submission page.
+    """
     ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     form = Submission()
     if form.validate_on_submit():
@@ -61,6 +76,9 @@ def submit():
 
 @app.route('/history')
 def history():
+    """
+    The submission history page.
+    """
     url = "{0}/history".format(API_URL)
     try:
         req = requests.get(url)
@@ -72,11 +90,6 @@ def history():
         return redirect(url_for('main'))
     history = json.loads(req.text)
     return render_template('history.html', history=history)
-
-
-class Submission(FlaskForm):
-    sample = FileField(validators=[FileRequired()])
-    classification = RadioField('name', choices=POSSIBLE_CLASSIFICATIONS, default='Unknown', validators=[DataRequired()])
 
 
 if __name__ == '__main__':

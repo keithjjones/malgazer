@@ -20,15 +20,20 @@ from malgazer.library.entropy import resample
 import pandas as pd
 
 
+# Initialize and configure the Flask API
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 db = SQLAlchemy(app)
 
+# Global values
 SAMPLES_DIRECTORY = "/samples"
 
 
 class Submission(db.Model):
+    """
+    The submission class for database storage.
+    """
     id = db.Column(db.Integer, primary_key=True)
     sha256 = db.Column(db.String(80), nullable=False)
     time = db.Column(db.DateTime, nullable=False)
@@ -38,21 +43,20 @@ class Submission(db.Model):
     status = db.Column(db.String(120), nullable=True)
 
 
+# Create the DB
 db.create_all()
 
 
-@app.route('/initdb')
-def initdb():
+@app.route('/reset')
+def reset():
+    """
+    Put all cleaning logic here.
+    """
     engine = sqlalchemy.create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
     Submission.__table__.drop(engine)
     db.create_all()
     for f in glob.glob(os.path.join(SAMPLES_DIRECTORY, '*')):
         os.remove(f)
-    return json.dumps({})
-
-
-@app.route('/')
-def main():
     return json.dumps({})
 
 
@@ -84,6 +88,9 @@ def process_sample(id):
 
 @app.route('/submit', methods=('POST',))
 def submit():
+    """
+    Submits a sample and executes thread to process it.
+    """
     if 'ip_address' in request.form:
         ip_addr = request.form.get('ip_address', 'None')
     else:
@@ -117,6 +124,9 @@ def submit():
 
 @app.route("/history")
 def history():
+    """
+    Lists the history of submissions.
+    """
     submissions = Submission.query.order_by(Submission.id.desc()).all()
     return_data = []
     for s in submissions:
@@ -131,6 +141,9 @@ def history():
 
 @app.route("/classification/<sha256>")
 def classification(sha256):
+    """
+    Provides the classifications for a specific hash.
+    """
     submissions = Submission.query.filter_by(sha256=sha256.upper()).order_by(Submission.id.desc()).all()
     return_data = []
     for s in submissions:
