@@ -19,8 +19,8 @@ Be aware that this code will change often as I add more functionality.  There wi
 # Docker
 
 To run the Docker portion of this project, you will need a trained classifier that will predict classifications
-with the "predict_sample" function, such as the library.ml.ML class.  Pickle this classifier and place it in
-samples/ml.pickle.  Then, you can stand up this project with the following command,
+with the "predict_sample" function, such as the library.ml.ML class.  Dill Pickle this classifier and place it in
+samples/ml.dill.  Then, you can stand up this project with the following command,
 after you have installed Docker on your system:
 
 ```
