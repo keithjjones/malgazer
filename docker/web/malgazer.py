@@ -5,10 +5,15 @@ from wtforms.validators import DataRequired
 from flask_wtf.file import FileField, FileRequired
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from werkzeug.utils import secure_filename
-from ...library.files import Sample
 import requests
 import os
 import json
+import sys
+import sys
+sys.path.append('..')
+sys.path.append(os.path.join('..', '..'))
+from malgazer.library.files import Sample
+
 
 # Global values
 API_URL = "http://api:8888"

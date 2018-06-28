@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 import os
 from werkzeug.utils import secure_filename
-from ...library.files import Sample
 import datetime
 import sqlalchemy
 from sqlalchemy.dialects import postgresql
@@ -13,10 +12,11 @@ import time
 import dill
 import pickle
 import sys
-sys.path.append("..")
-sys.path.append(os.path.join("..", ".."))
+sys.path.append('..')
+sys.path.append(os.path.join('..', '..'))
 from malgazer.library.ml import ML
 from malgazer.library.entropy import resample
+from malgazer.library.files import Sample
 import pandas as pd
 
 

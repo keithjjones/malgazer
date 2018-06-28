@@ -6,11 +6,11 @@ RUN pip install -r /requirements.txt
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN mkdir /samples
 
-WORKDIR /malgazer/docker/api
-ENV FLASK_APP=malgazer.py
+WORKDIR /malgazer
+ENV FLASK_APP=docker.api.malgazer.py
 ENV FLASK_ENV=development
 # Below is for development.
 #CMD ["flask", "run", "--host=0.0.0.0", "--port=8888"]
 # Below is for production.
-CMD ["gunicorn", "-w 10", "-b 0.0.0.0:8888", "malgazer:app"]
+CMD ["gunicorn", "-w 10", "-b 0.0.0.0:8888", "docker.api.malgazer:app"]
 
