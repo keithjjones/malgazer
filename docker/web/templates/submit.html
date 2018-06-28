@@ -14,13 +14,22 @@ Sample Submission
     {{ form.csrf_token }}
     <div class="row">
         <div class="col-md-3">
+            {{ form.sample }}
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-2">
             Possible Classification:
-            {{ form.classification }}
         </div>
     </div>
     <div class="row">
-        <div class="col-md-3">
-            {{ form.sample }}
+        <div class="col-md-1"></div>
+        <div class="col-md-6">
+            {% for subfield in form.classification %}
+                {{ subfield(class_="radio-inline") }}
+                {{ subfield.label }}
+            {% endfor %}
         </div>
     </div>
     <br>
