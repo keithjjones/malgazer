@@ -92,5 +92,12 @@ def history():
     return render_template('history.html', history=history)
 
 
+@app.route('/api')
+def api():
+    """
+    The API information page.
+    """
+    return render_template('api.html')
+
 if __name__ == '__main__':
       app.run(host='0.0.0.0', port=8080)
