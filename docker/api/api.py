@@ -15,7 +15,7 @@ sys.path.append(os.path.join('..', '..'))
 sys.path.append(os.path.join('..', '..', '..'))
 from malgazer.library.files import Sample
 from malgazer import library
-from malgazer.docker.db_models.models import Submission, WebRequest, setup_database, db
+from malgazer.docker.db_models.models import Submission, WebRequest, setup_database, clear_database, db
 
 
 # Initialize and configure the Flask API
@@ -29,7 +29,7 @@ SAMPLES_DIRECTORY = "/samples"
 
 
 def setup_db():
-    setup_database(app.config['SQLALCHEMY_DATABASE_URI'])
+    setup_database()
 
 
 @app.before_first_request
@@ -42,17 +42,7 @@ def reset():
     """
     Put all cleaning logic here.
     """
-    engine = sqlalchemy.create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-    try:
-        Submission.__table__.drop(engine)
-    except:
-        pass
-    try:
-        WebRequest.__table__.drop(engine)
-    except:
-        pass
-    Submission.__table__.create(engine)
-    WebRequest.__table__.create(engine)
+    clear_database()
     for f in glob.glob(os.path.join(SAMPLES_DIRECTORY, '*')):
         if os.path.isfile(f):
             os.remove(f)

@@ -30,13 +30,56 @@ class Submission(db.Model):
     status = db.Column(db.String(120), nullable=True)
 
 
-def setup_database(databaseURI):
+TABLES = [WebRequest, Submission]
+
+
+def setup_database():
+    """
+    Sets up the DB.
+
+    :return:  Nothing.
+    """
+    db.create_all()
+    # engine = sqlalchemy.create_engine(databaseURI)
+    # for table in TABLES:
+    #     if not table_exists(databaseURI, table.__tablename__):
+    #         table.__table__.create(engine)
+
+
+def clear_database():
+    """
+    Sets up the DB.
+
+    :return:  Nothing.
+    """
+    db.drop_all()
+    setup_database()
+    # engine = sqlalchemy.create_engine(databaseURI)
+    # for table in TABLES:
+    #     if table_exists(databaseURI, table.__tablename__):
+    #         table.__table__.drop(engine)
+
+
+def database_is_empty(databaseURI):
+    """
+    Checks to see if the database is empty.
+
+    :param databaseURI:  The connection URI.
+    :return: Boolean
+    """
     engine = sqlalchemy.create_engine(databaseURI)
-    try:
-        Submission.__table__.create(engine)
-    except:
-        pass
-    try:
-        WebRequest.__table__.create(engine)
-    except:
-        pass
+    table_names = sqlalchemy.inspect(engine).get_table_names()
+    is_empty = table_names == []
+    return is_empty
+
+
+def table_exists(databaseURI, name):
+    """
+
+    :param databaseURI:  The connection URI.
+    :param name:  The name of the table to check.
+    :return: Boolean
+    """
+    engine = sqlalchemy.create_engine(databaseURI)
+    ret = engine.dialect.has_table(engine, name)
+    return ret
