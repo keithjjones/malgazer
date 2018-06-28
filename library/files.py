@@ -85,6 +85,12 @@ class Sample(object):
 
 
 def sha256_file(filename):
+    """
+    Calculates the SHA256 of a file.
+
+    :param filename:  The file to calculate.
+    :return:  The SHA256
+    """
     if os.path.isfile(filename):
         with open(filename, 'rb') as f:
             buf = f.read()
