@@ -31,6 +31,7 @@ import keras.backend as K
 import keras.callbacks
 import os
 import pickle
+from .entropy import resample
 
 
 class ML(object):
@@ -45,6 +46,42 @@ class ML(object):
         self.y_labelencoder = None
         self.rwe_windowsize = rwe_windowsize
         self.datapoints = datapoints
+
+    def train(self, *args, **kwargs):
+        if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
+            return self.train_nn(*args, **kwargs)
+        else:
+            return self.train_scikitlearn(*args, **kwargs)
+
+    def predict(self, *args, **kwargs):
+        """
+        Perform a prediction on input data.
+
+        :param args:  Passed through.
+        :param kwargs:  Passed through.
+        :return: The predictions.
+        """
+        if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
+            return self.predict_nn(*args, **kwargs)
+        else:
+            return self.predict_scikitlearn(*args, **kwargs)
+
+    def predict_sample(self, sample, *args, **kwargs):
+        """
+        Perform a prediction on a single sample.
+
+        :param sample:  The sample object to predict.
+        :param args:  Passed through.
+        :param kwargs:  Passed through.
+        :return: The prediction.
+        """
+        ds1 = sample.running_window_entropy(self.rwe_windowsize)
+        ds2 = pd.Series(resample(ds1, self.datapoints))
+        ds2.name = ds1.name
+        rwe = pd.DataFrame([ds2])
+        rwe, _ = self.scale_features(rwe.values)
+        y = self.decode_classifications(self.predict(rwe))
+        return y[0]
 
     def set_classifier_by_fold(self, fold):
         """
@@ -273,25 +310,6 @@ class ML(object):
         :return:  The predictions.
         """
         return self.classifier.predict(X)
-
-    def train(self, *args, **kwargs):
-        if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
-            return self.train_nn(*args, **kwargs)
-        else:
-            return self.train_scikitlearn(*args, **kwargs)
-
-    def predict(self, *args, **kwargs):
-        """
-        Perform a prediction on input data.
-
-        :param args:  Passed through.
-        :param kwargs:  Passed through.
-        :return: The predictions.
-        """
-        if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
-            return self.predict_nn(*args, **kwargs)
-        else:
-            return self.predict_scikitlearn(*args, **kwargs)
 
     @staticmethod
     def build_ann_static(input, outputs=9):

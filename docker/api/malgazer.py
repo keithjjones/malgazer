@@ -72,15 +72,10 @@ def process_sample(id):
     try:
         ml = pickle.load(open(os.path.join('..', '..', 'classifier', 'ml.pickle'), 'rb'))
         s = Sample(fromfile=os.path.join('/samples', submission.sha256))
-        ds1 = s.running_window_entropy(ml.rwe_windowsize)
-        ds2 = pd.Series(resample(ds1, ml.datapoints))
-        ds2.name = ds1.name
-        rwe = pd.DataFrame([ds2])
-        rwe, _ = ml.scale_features(rwe.values)
-        y = ml.decode_classifications(ml.predict(rwe))
+        y = ml.predict_sample(s)
         submission = Submission.query.filter_by(id=id).first()
         submission.status = 'Done'
-        submission.classification = y[0]
+        submission.classification = y
     except:
         submission.status = 'Error'
     db.session.add(submission)
