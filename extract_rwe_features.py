@@ -10,7 +10,7 @@ import sys
 def main(arguments=None):
     # Argument parsing
     parser = argparse.ArgumentParser(
-        description='Calculates the features from a directory of files.')
+        description='Calculates the RWE features from a directory of files.')
     parser.add_argument('MalwareDirectory',
                         help='The directory containing malware to analyze.')
     parser.add_argument('DataDirectory',
@@ -52,12 +52,12 @@ def main(arguments=None):
         datapoints = [int(x) for x in datapoints]
 
     # Crawl the directories for malware and calculate rwe
-    Utils.extract_features_from_directory(args.MalwareDirectory,
-                                          args.DataDirectory,
-                                          window_size=args.window,
-                                          normalize=normalize,
-                                          number_of_data_points=datapoints,
-                                          njobs=args.jobs)
+    Utils.extract_rwe_features_from_directory(args.MalwareDirectory,
+                                              args.DataDirectory,
+                                              window_size=args.window,
+                                              normalize=normalize,
+                                              number_of_data_points=datapoints,
+                                              njobs=args.jobs)
 
 
 if __name__ == "__main__":

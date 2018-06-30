@@ -74,13 +74,13 @@ class Utils(object):
         return output_dict
 
     @staticmethod
-    def extract_features_from_directory(in_directory=None,
-                                        out_directory=None,
-                                        window_size=256,
-                                        normalize=True,
-                                        number_of_data_points=[1024],
-                                        njobs=os.cpu_count(),
-                                        batch_size=1000):
+    def extract_rwe_features_from_directory(in_directory=None,
+                                            out_directory=None,
+                                            window_size=256,
+                                            normalize=True,
+                                            number_of_data_points=[1024],
+                                            njobs=os.cpu_count(),
+                                            batch_size=1000):
         """
         Calculates the running window entropy of a directory containing
         malware samples that are named from their SHA256 value.  It will
