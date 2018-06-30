@@ -6,9 +6,16 @@ import pefile
 import hashlib
 import pickle
 import gzip
+import array
+import io
 from . import entropy
 from hashlib import sha256
 import pandas as pd
+import numpy as np
+from PIL import Image
+import leargist
+import tempfile
+import scipy.misc
 
 
 class Sample(object):
@@ -82,6 +89,32 @@ class Sample(object):
         :return:  The SHA256 if successful, None otherwise.
         """
         return sha256_memory(self.rawdata)
+
+    @property
+    def image_data(self):
+        """
+        Algorithm discussed on http://sarvamblog.blogspot.com/2014/08/supervised-classification-with-k-fold.html
+
+        :return:  The GIST image data as a Pandas Series.
+        """
+        ln = len(self.rawdata)
+        width = 256
+        rem = ln % width
+        a = array.array("B")
+        a.fromstring(self.rawdata[0:ln-rem])
+        g = np.reshape(a, (int(len(a) / width), width))
+        g = np.uint8(g)
+        filename = '{0}.png'.format(self.sha256)
+        scipy.misc.imsave(filename, g)
+
+        im = Image.open(filename)
+        im1 = im.resize((64, 64), Image.ANTIALIAS);
+        im.close()
+        des = leargist.color_gist(im1)
+        X = pd.Series(des[0:320])
+        X.name = self.sha256
+        os.remove(filename)
+        return X
 
 
 def sha256_file(filename):
