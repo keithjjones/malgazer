@@ -35,7 +35,7 @@ from .entropy import resample
 
 
 class ML(object):
-    def __init__(self, rwe_windowsize=None, datapoints=None):
+    def __init__(self, feature_type='rwe', rwe_windowsize=None, datapoints=None):
         super(ML, self).__init__()
         self.classifer = None
         self.classifier_type = None
@@ -46,6 +46,7 @@ class ML(object):
         self.y_labelencoder = None
         self.rwe_windowsize = rwe_windowsize
         self.datapoints = datapoints
+        self.feature_type = feature_type
 
     def train(self, *args, **kwargs):
         if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
@@ -75,13 +76,20 @@ class ML(object):
         :param kwargs:  Passed through.
         :return: The prediction.
         """
-        ds1 = sample.running_window_entropy(self.rwe_windowsize)
-        ds2 = pd.Series(resample(ds1, self.datapoints))
-        ds2.name = ds1.name
-        rwe = pd.DataFrame([ds2])
-        rwe, _ = self.scale_features(rwe.values)
-        y = self.decode_classifications(self.predict(rwe))
-        return y[0]
+        if self.feature_type == 'rwe':
+            ds1 = sample.running_window_entropy(self.rwe_windowsize)
+            ds2 = pd.Series(resample(ds1, self.datapoints))
+            ds2.name = ds1.name
+            rwe = pd.DataFrame([ds2])
+            rwe, _ = self.scale_features(rwe.values)
+            y = self.decode_classifications(self.predict(rwe))
+            return y[0]
+        elif self.feature_type == 'gist':
+            ds1 = sample.gist_data
+            gist = pd.DataFrame([ds1])
+            gist, _ = self.scale_features(gist.values)
+            y = self.decode_classifications(self.predict(gist))
+            return y[0]
 
     def set_classifier_by_fold(self, fold):
         """
