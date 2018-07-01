@@ -166,6 +166,95 @@ class Utils(object):
         print("{0:,} total samples processed...".format(samples_processed))
 
     @staticmethod
+    def _calculate_gist(filename):
+        """
+        Internal method to calculate the GIST for a sample.
+
+        :param filename:  The file name of the sample to calculate.
+        :return:  Returns a pandas data series so it can be added to a
+        data frame.
+        """
+        s = Sample()
+        s.fromfile(filename)
+        gist = s.gist_data
+        ds = pd.Series(gist)
+        ds.name = s.sha256
+        return ds
+
+    @staticmethod
+    def extract_gist_features_from_directory(in_directory=None,
+                                             out_directory=None,
+                                             njobs=os.cpu_count(),
+                                             batch_size=1000):
+        """
+        Calculates the GIST of a directory containing
+        malware samples that are named from their SHA256 value.  It will
+        skip all other files.  The output format will be HDF.
+
+        :param in_directory:  The input directory for malware.
+        :param out_directory: The output directory for calculated data.
+        :param njobs: The number of processes to use.
+        :param batch_size:  The number of rows to write to the HDF file in each chunk.
+        :return: Nothing
+        """
+        if in_directory is None or out_directory is None:
+            raise ValueError('Input and output directories must be real.')
+        if njobs < 1:
+            raise ValueError('The number of jobs needs to be >= 1')
+
+        print("Starting GIST feature extractor for malware samples in {0}".format(in_directory))
+
+        # Test to make sure the input directory exists, will throw exception
+        # if it does not exist.
+        os.stat(in_directory)
+
+        # Start the timer
+        start_time = time.time()
+
+        # The RE for malware files with sha256 as the name.
+        malware_files_re = re.compile('[a-z0-9]{64}',
+                                      flags=re.IGNORECASE)
+        samples_processed = 0
+        saved_futures = {}
+        rows_to_add = []
+        hdffilename = os.path.join(out_directory, 'gist.hdf')
+        if os.path.isfile(hdffilename):
+            os.remove(hdffilename)
+        with ProcessPoolExecutor(max_workers=njobs) as executor:
+            try:
+                for root, dirs, files in os.walk(in_directory):
+                    for file in files:
+                        filename = os.path.join(root, file)
+                        if malware_files_re.match(file):
+                            future = executor.submit(Utils._calculate_gist, filename)
+                            saved_futures[future] = filename
+                for future in as_completed(saved_futures):
+                    samples_processed += 1
+                    result = future.result()
+                    rows_to_add.append(result.copy())
+                    print("Processed file: {0}".format(saved_futures[future]))
+                    print("\t{0:,} samples processed...".format(samples_processed))
+                    if samples_processed % batch_size == 0:
+                        print("Writing chunk to HDF: {0}".format(hdffilename))
+                        print("\tAssembling DataFrame...")
+                        df = pd.DataFrame(rows_to_add)
+                        print("\tWriting HDF...")
+                        df.to_hdf(hdffilename, 'gist', mode='a', append=True, format='table')
+                        print("\tClear rows to add...")
+                        rows_to_add = []
+                if len(rows_to_add) > 0:
+                    print("Writing last chunk to HDF: {0}".format(hdffilename))
+                    print("\tAssembling DataFrame...")
+                    df = pd.DataFrame(rows_to_add)
+                    print("\tWriting HDF...")
+                    df.to_hdf(hdffilename, 'gist', mode='a', append=True, format='table')
+            except KeyboardInterrupt:
+                print("Shutting down gracefully...")
+                executor.shutdown(wait=False)
+        print("Total elapsed time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+        print("{0:,} total samples processed...".format(samples_processed))
+
+    @staticmethod
     def estimate_vt_classifications_from_csv(filename, products=None):
         """
         Reads a CSV containing VT classifications and attempts to estimate
@@ -662,6 +751,21 @@ class Utils(object):
         # exception if it does not exist.
         os.stat(datadir)
         df = pd.read_hdf(os.path.join(datadir, 'rwe_window_{0}_datapoints_{1}.hdf'.format(windowsize, datapoints)), 'rwe')
+        classifications = pd.read_csv(os.path.join(datadir, 'classifications.csv'), index_col=0)
+        return df, classifications
+
+    @staticmethod
+    def load_gist_features(datadir):
+        """
+        Loads the data saved from preprocessing.
+
+        :param datadir:  The data directory that contains the data.
+        :return:  raw_data, classifications tuple
+        """
+        # Check to see that the data directory exists, this will throw an
+        # exception if it does not exist.
+        os.stat(datadir)
+        df = pd.read_hdf(os.path.join(datadir, 'gist.hdf'), 'gist')
         classifications = pd.read_csv(os.path.join(datadir, 'classifications.csv'), index_col=0)
         return df, classifications
 

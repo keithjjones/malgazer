@@ -91,12 +91,13 @@ class Sample(object):
         return sha256_memory(self.rawdata)
 
     @property
-    def image_data(self):
+    def gist_data(self):
         """
         Algorithm discussed on http://sarvamblog.blogspot.com/2014/08/supervised-classification-with-k-fold.html
 
         :return:  The GIST image data as a Pandas Series.
         """
+        defult_tmp_dir = tempfile._get_default_tempdir()
         ln = len(self.rawdata)
         width = 256
         rem = ln % width
@@ -104,7 +105,7 @@ class Sample(object):
         a.fromstring(self.rawdata[0:ln-rem])
         g = np.reshape(a, (int(len(a) / width), width))
         g = np.uint8(g)
-        filename = '{0}.png'.format(self.sha256)
+        filename = os.path.join(defult_tmp_dir, '{0}.png'.format(self.sha256))
         scipy.misc.imsave(filename, g)
 
         im = Image.open(filename)
