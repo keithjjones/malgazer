@@ -28,6 +28,7 @@ assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
 classifier_type = 'dt'
+feature_type = 'rwe'
 
 #
 # Calculate features
@@ -80,8 +81,11 @@ else:
 # Put the data together and save hashes used for training
 if assemble_preprocessed_data:
     # Load data
-    raw_data_tmp, classifications_tmp = Utils.load_preprocessed_data(datadir)
-    
+    if feature_type == 'rwe':
+        raw_data_tmp, classifications_tmp = Utils.load_rwe_features(datadir, windowsize=windowsize, datapoints=datapoints)
+    elif feature_type == 'gist':
+        raw_data_tmp, classifications_tmp = Utils.load_gist_features(datadir)
+
     # Make sure data lines up
     all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
     
@@ -100,7 +104,10 @@ if build_classifier:
     print("Loading data...")
     
     # Load data
-    raw_data_tmp, classifications_tmp = Utils.load_rwe_features(datadir, windowsize=windowsize, datapoints=datapoints)
+    if feature_type == 'rwe':
+        raw_data_tmp, classifications_tmp = Utils.load_rwe_features(datadir, windowsize=windowsize, datapoints=datapoints)
+    elif feature_type == 'gist':
+        raw_data_tmp, classifications_tmp = Utils.load_gist_features(datadir)
     
     # Make sure data lines up
     all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
