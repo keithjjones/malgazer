@@ -27,18 +27,22 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'dt'
+classifier_type = 'knn'
 feature_type = 'rwe'
 
 #
 # Calculate features
 #
-source_dir = '/Volumes/JONES/Focused Set May 2018/RWE'
+source_dir = '/Volumes/JONES/Focused Set May 2018/Binaries'
+    
 datapoints = 1024
 windowsize = 256
 number_of_jobs = 50
 #datadir = os.path.join('/Volumes/JONES/Focused Set May 2018', 'data_vt_window_{0}_samples_{1}'.format(windowsize, datapoints))
-datadir = '/Volumes/JONES/Focused Set May 2018/RWE'
+if feature_type == 'rwe':
+    datadir = '/Volumes/JONES/Focused Set May 2018/RWE'
+elif feature_type == 'gist':
+    datadir = '/Volumes/JONES/Focused Set May 2018/GIST'
 arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', str(number_of_jobs), source_dir, datadir]
 batch_size = 100
 epochs = 10
@@ -53,7 +57,8 @@ n_jobs = 10
 generate_roc_curves=True
 
 # KNN params
-knn_neighbors = 100
+knn_neighbors = 1
+knn_weights = 'distance'
 
 # Centroid params
 shrink_threshold = 0.2
@@ -67,7 +72,7 @@ ovr_base_estimator = ML.build_svm_static(kernel='rbf')
 
 # Set this to the percentage for test size, 
 # 0 makes the train and test set be the whole data set
-test_percent = 0.8
+test_percent = 0.2
 # Make the whole data set for training if we are doing cross fold validation
 if cross_fold_validation is True:
     test_percent = 0
@@ -226,7 +231,7 @@ if build_classifier:
         elif classifier_type.lower() == 'rf':
             classifier = ml.build_rf(n_estimators=10, criterion='entropy')
         elif classifier_type.lower() == 'knn':
-            classifier = ml.build_knn(n_neighbors=knn_neighbors, n_jobs=n_jobs)
+            classifier = ml.build_knn(n_neighbors=knn_neighbors, weights=knn_weights, n_jobs=n_jobs)
         elif classifier_type.lower() == 'nc':
             classifier = ml.build_nc(shrink_threshold=shrink_threshold)
         elif classifier_type.lower() == 'adaboost':
