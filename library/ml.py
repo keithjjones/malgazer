@@ -43,7 +43,9 @@ class ML(object):
         """
         super(ML, self).__init__()
         self.classifer = None
-        self.classifier_type = None
+        self.classifier_type = kwargs.get('classifier_type', None)
+        if self.classifier_type:
+            self.classifier_type = self.classifier_type.lower()
         self.classifiers = None
         # X scaler
         self.X_sc = None
@@ -639,18 +641,18 @@ class ML(object):
             classifier = KerasClassifier(build_fn=classifier,
                                          batch_size=batch_size,
                                          epochs=epochs)
-            my_classifier = classifier.fit(X_train, Y_train, batch_size=batch_size, epochs=epochs, **kwargs)
+            classifier.fit(X_train, Y_train, batch_size=batch_size, epochs=epochs, **kwargs)
         else:
-            my_classifier = classifier.fit(X_train, Y_train, **kwargs)
-        y_pred = my_classifier.predict(X_test, **kwargs)
+            classifier.fit(X_train, Y_train, **kwargs)
+        y_pred = classifier.predict(X_test, **kwargs)
         accuracy, cm = ML.confusion_matrix_scikitlearn(Y_test, y_pred)
-        return_dict = {'classifier': my_classifier, 'cm': cm,
+        return_dict = {'classifier': classifier, 'cm': cm,
                        'accuracy': accuracy, 'y_test': np.array(Y_test),
                        'y_pred': np.array(y_pred), 'type': 'sklearn'}
         if batch_size or epochs:
             classifier_dict = {}
-            classifier_dict['json'] = my_classifier.to_json()
-            classifier_dict['weights'] = my_classifier.get_weights()
+            classifier_dict['json'] = classifier.model.to_json()
+            classifier_dict['weights'] = classifier.model.get_weights()
             return_dict['type'] = 'keras'
             return_dict['classifier'] = classifier_dict
         return return_dict
@@ -664,7 +666,11 @@ class ML(object):
         :return: Nothing.
         """
         if self.classifiers:
-            self.classifier = self.classifiers[fold]['classifier']
+            if self.classifiers[fold]['type'] == 'keras':
+                self.classifier = model_from_json(self.classifiers[fold]['classifier']['json'])
+                self.classifier.set_weights(self.classifiers[fold]['classifier']['weights'])
+            else:
+                self.classifier = self.classifiers[fold]['classifier']
         else:
             raise AttributeError("Must use CFV before there are classifiers to set.")
 

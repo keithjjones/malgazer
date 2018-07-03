@@ -127,7 +127,7 @@ if build_classifier:
     y = pd.DataFrame(data['classification']).values.copy()
     
     # Make the classifier
-    ml = ML(feature_type=feature_type, rwe_windowsize=windowsize, datapoints=datapoints)
+    ml = ML(feature_type=feature_type, classifier_type=classifier_type, rwe_windowsize=windowsize, datapoints=datapoints)
     y, y_encoder = ml.encode_classifications(y, categorical=categorical)
     X, X_scaler = ml.scale_features(X)
     if test_percent > 0:
@@ -173,7 +173,7 @@ if build_classifier:
             if generate_roc_curves:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
         else:        
-            #Cross Fold Validation
+            # Cross Fold Validation
             def model():
                 return ML.build_cnn_static(Xt, yt)
             start_time = time.time()
@@ -185,6 +185,14 @@ if build_classifier:
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
+
+            if generate_roc_curves:
+                for fold in range(cfv_groups):
+                    ml.set_classifier_by_fold(fold+1)
+                    y_test = ml.classifiers[fold+1]['y_test']
+                    y_pred = ml.classifiers[fold+1]['y_pred']
+                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1)
+
     elif classifier_type.lower() == 'ann':
         if cross_fold_validation is False:
             # Create the ANN
@@ -222,6 +230,13 @@ if build_classifier:
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
+
+            if generate_roc_curves:
+                for fold in range(cfv_groups):
+                    ml.set_classifier_by_fold(fold+1)
+                    y_test = ml.classifiers[fold+1]['y_test']
+                    y_pred = ml.classifiers[fold+1]['y_pred']
+                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1)
     else:
         # This area is for scikit learn models
         if classifier_type.lower() == 'svm':
