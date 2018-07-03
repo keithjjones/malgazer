@@ -384,20 +384,21 @@ class ML(object):
         :return:  The classifier.
         """
         datapoints = input.shape[1:]
+        input_dim = datapoints[0]
+        print(input.shape)
         output_shape = outputs.shape[1]
         classifier = Sequential()
-        # classifier.add(InputLayer(input_shape=input.shape[1:]))
         classifier.add(InputLayer(input_shape=datapoints))
-        classifier.add(Conv1D(filters=100, kernel_size=100, activation='relu'))
-        classifier.add(MaxPooling1D(pool_size=16))
-        classifier.add(Conv1D(filters=100, kernel_size=20, activation='relu'))
-        classifier.add(MaxPooling1D(pool_size=4))
-        classifier.add(Conv1D(filters=100, kernel_size=3, activation='relu'))
+        classifier.add(Conv1D(filters=10, kernel_size=int(input_dim/4), activation='relu'))
+        classifier.add(MaxPooling1D(pool_size=10))
+        classifier.add(Conv1D(filters=10, kernel_size=int(input_dim/30), activation='relu'))
+        classifier.add(MaxPooling1D(pool_size=2))
+        classifier.add(Conv1D(filters=10, kernel_size=2, activation='relu'))
         classifier.add(MaxPooling1D(pool_size=2))
         classifier.add(Flatten())
-        classifier.add(Dense(units=700, activation='relu'))
-        classifier.add(Dense(units=250, activation='relu'))
-        classifier.add(Dense(units=50, activation='relu'))
+        classifier.add(Dense(units=int(input_dim/4), activation='relu'))
+        classifier.add(Dense(units=int(input_dim/8), activation='relu'))
+        classifier.add(Dense(units=int(input_dim/16), activation='relu'))
         classifier.add(Dense(units=output_shape, activation='softmax'))
         classifier.compile(optimizer='adam', loss='categorical_crossentropy',
                            metrics=['categorical_accuracy', 'accuracy'])

@@ -39,6 +39,8 @@ if feature_type == 'rwe':
 elif feature_type == 'gist':
     datadir = '/Volumes/JONES/Focused Set May 2018/GIST'
 arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', str(number_of_jobs), source_dir, datadir]
+
+# Neural Network params
 batch_size = 100
 epochs = 10
 n_categories = 6
