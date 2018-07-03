@@ -23,8 +23,8 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'ann'
-feature_type = 'gist'
+classifier_type = 'cnn'
+feature_type = 'rwe'
 
 #
 # Calculate features
@@ -136,8 +136,11 @@ if build_classifier:
         X_test = X
         y_test = y
 
-    print("Training Class Count: \n{0}".format(pd.DataFrame(y_train)[0].value_counts()))
-    print("Testing Class Count: \n{0}".format(pd.DataFrame(y_test)[0].value_counts()))
+    ytr = ml.decode_classifications(y_train, categorical)
+    yte = ml.decode_classifications(y_test, categorical)
+
+    print("Training Class Count: \n{0}".format(pd.DataFrame(ytr)[0].value_counts()))
+    print("Testing Class Count: \n{0}".format(pd.DataFrame(yte)[0].value_counts()))
 
     print("Beginning training...")
 

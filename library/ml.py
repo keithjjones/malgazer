@@ -132,6 +132,26 @@ class ML(object):
                 return pickle.load(file)
 
     @staticmethod
+    def build_gridsearch_static(*args, **kwargs):
+        """
+        Builds a Grid Search classifier.
+
+        :return: The classifier.
+        """
+        classifier = GridSearchCV(*args, **kwargs)
+        return classifier
+
+    def build_gridsearch(self, *args, **kwargs):
+        """
+        Builds a Grid Search classifier.
+
+        :return: The classifier.
+        """
+        self.classifier_type = 'gridsearch'
+        self.classifier = ML.build_gridsearch_static(*args, **kwargs)
+        return self.classifier
+
+    @staticmethod
     def build_ovr_static(*args, **kwargs):
         """
         Builds a OneVRest classifier.
