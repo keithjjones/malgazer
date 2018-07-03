@@ -468,6 +468,21 @@ class ML(object):
         return y_pred
 
     @staticmethod
+    def confusion_matrix(y_test, y_pred, categorical=False):
+        """
+        Calculates the confusion matrix for neural network predictions.
+
+        :param y_test:  The y testing data.
+        :param y_pred:  The y predicted data.
+        :param categorical:  Set to True if you are using categorical/one hot encoding.
+        :return:  The accuracy,confusion_matrix, as a tuple.
+        """
+        if categorical:
+            return ML.confusion_matrix_nn(y_test, y_pred)
+        else:
+            return ML.confusion_matrix_scikitlearn(y_test, y_pred)
+
+    @staticmethod
     def confusion_matrix_nn(y_test, y_pred):
         """
         Calculates the confusion matrix for neural network predictions.
@@ -653,7 +668,11 @@ class ML(object):
         else:
             classifier.fit(X_train, Y_train, **kwargs)
         y_pred = classifier.predict(X_test, **kwargs)
-        accuracy, cm = ML.confusion_matrix_scikitlearn(Y_test, y_pred)
+        if batch_size or epochs:
+            categorical = True
+        else:
+            categorical = False
+        accuracy, cm = ML.confusion_matrix(Y_test, y_pred, categorical)
         return_dict = {'classifier': classifier, 'cm': cm,
                        'accuracy': accuracy, 'y_test': np.array(Y_test),
                        'y_pred': np.array(y_pred), 'type': 'sklearn'}
