@@ -27,7 +27,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'knn'
+classifier_type = 'svm'
 feature_type = 'rwe'
 
 #
@@ -49,12 +49,12 @@ epochs = 10
 n_categories = 6
 
 # Cross fold validation variables
-cross_fold_validation = False
+cross_fold_validation = True
 cfv_groups = 5
 n_jobs = 10
 
 # ROC Curves - only works for SciKit Learn models right now
-generate_roc_curves=True
+generate_roc_curves=False
 
 # KNN params
 knn_neighbors = 1
@@ -72,7 +72,7 @@ ovr_base_estimator = ML.build_svm_static(kernel='rbf')
 
 # Set this to the percentage for test size, 
 # 0 makes the train and test set be the whole data set
-test_percent = 0.2
+test_percent = 0.1
 # Make the whole data set for training if we are doing cross fold validation
 if cross_fold_validation is True:
     test_percent = 0
