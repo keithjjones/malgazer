@@ -334,14 +334,16 @@ class ML(object):
         return self.classifier.predict(X)
 
     @staticmethod
-    def build_ann_static(input, outputs=9):
+    def build_ann_static(input, outputs):
         """
         Create a generic ANN.
 
         :param input:  The input to the ANN, used to find input shape.
+        :param outputs:  The output to the ANN, used to find the output shape.
         :return:  The classifier.
         """
         datapoints = input.shape[1]
+        output_shape = outputs.shape[1]
         classifier = Sequential()
         classifier.add(Dense(units=datapoints, kernel_initializer='uniform',
                              activation='relu', input_dim=datapoints))
@@ -351,7 +353,7 @@ class ML(object):
         classifier.add(Dense(units=100,
                              kernel_initializer='uniform',
                              activation='relu'))
-        classifier.add(Dense(units=outputs,
+        classifier.add(Dense(units=output_shape,
                              kernel_initializer='uniform',
                              activation='softmax'))
         classifier.compile(optimizer='adam',
@@ -359,11 +361,12 @@ class ML(object):
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_ann(self, input, outputs=9):
+    def build_ann(self, input, outputs):
         """
         Create a generic ANN.
 
         :param input:  The input to the ANN, used to find input shape.
+        :param outputs:  The output to the ANN, used to find the output shape.
         :return:  The classifier.
         """
         self.classifier_type = 'ann'
@@ -372,15 +375,19 @@ class ML(object):
         return self.classifier
 
     @staticmethod
-    def build_cnn_static(input, outputs=9):
+    def build_cnn_static(input, outputs):
         """
         Create a generic CNN.
 
         :param input:  The input to the CNN, used to find input shape.
+        :param outputs:  The output to the CNN, used to find the output shape.
         :return:  The classifier.
         """
+        datapoints = input.shape[1:]
+        output_shape = outputs.shape[1]
         classifier = Sequential()
-        classifier.add(InputLayer(input_shape=input.shape[1:]))
+        # classifier.add(InputLayer(input_shape=input.shape[1:]))
+        classifier.add(InputLayer(input_shape=datapoints))
         classifier.add(Conv1D(filters=100, kernel_size=100, activation='relu'))
         classifier.add(MaxPooling1D(pool_size=16))
         classifier.add(Conv1D(filters=100, kernel_size=20, activation='relu'))
@@ -391,16 +398,17 @@ class ML(object):
         classifier.add(Dense(units=700, activation='relu'))
         classifier.add(Dense(units=250, activation='relu'))
         classifier.add(Dense(units=50, activation='relu'))
-        classifier.add(Dense(units=outputs, activation='softmax'))
+        classifier.add(Dense(units=output_shape, activation='softmax'))
         classifier.compile(optimizer='adam', loss='categorical_crossentropy',
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_cnn(self, input, outputs=9):
+    def build_cnn(self, input, outputs):
         """
         Create a generic CNN.
 
         :param input:  The input to the CNN, used to find input shape.
+        :param outputs:  The output to the CNN, used to find the output shape.
         :return:  The classifier.
         """
         self.classifier_type = 'cnn'

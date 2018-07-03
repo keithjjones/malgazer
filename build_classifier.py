@@ -147,10 +147,9 @@ if build_classifier:
     if classifier_type.lower() == 'cnn':    
         Xt = np.expand_dims(X_train, axis=2)
         yt = y_train
-        outputs = yt.shape[1]
         if cross_fold_validation is False:
             # Create the CNN
-            classifier = ml.build_cnn(Xt, outputs)
+            classifier = ml.build_cnn(Xt, yt)
 
             # Train the CNN
             start_time = time.time()
@@ -171,7 +170,7 @@ if build_classifier:
         else:        
             # Cross Fold Validation
             def model():
-                return ML.build_cnn_static(Xt, outputs)
+                return ML.build_cnn_static(Xt, yt)
             start_time = time.time()
             accuracies, mean, variance = ml.cross_fold_validation_keras(model,
                                                                         Xt, yt, 
@@ -207,7 +206,7 @@ if build_classifier:
         else:
             # Cross Fold Validation
             def model():
-                return ML.build_ann_static(datapoints, outputs)
+                return ML.build_ann_static(X_train, outputs)
             start_time = time.time()
             accuracies, mean, variance = ml.cross_fold_validation_keras(model,
                                                                         X_train, y_train, 
@@ -286,6 +285,6 @@ if build_classifier:
         ml.save_classifier(path, "classifier")
         if classifier_type.lower() == 'dt':
             tree.export_graphviz(classifier, out_file=os.path.join(path, 'tree.dot'))
-        if classifier_type.lower() != 'ann' and classifier_type.lower()() != 'cnn':
+        if classifier_type.lower() != 'ann' and classifier_type.lower() != 'cnn':
             pickle.dump(ml, open(os.path.join(path, 'ml.pickle'), 'wb'))
             dill.dump(ml, open(os.path.join(path, 'ml.dill'), 'wb'))
