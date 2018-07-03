@@ -1,5 +1,6 @@
 # Entropy Module
 import math
+import torch
 import sqlite3
 import os
 import json
@@ -95,6 +96,92 @@ class RunningEntropy(object):
 
             # Add entropy value to output
             entropy_list.append(current_entropy)
+
+        # Normalize if desired
+        self.normalize[window] = normalize
+        if normalize is True:
+            self.entropy_data[window] = [i/8 for i in entropy_list]
+        else:
+            self.entropy_data[window] = entropy_list
+
+        end_time = time.time()
+        self.calctime[window] = end_time - start_time
+
+        # Return the data
+        return self.entropy_data[window]
+
+    def calculate_torch(self, inputbytes, window=256, normalize=True):
+        """
+        Calculates the running entropy of inputbytes with the window size.
+        This uses PyTorch for the calculations and is not optimized like "calculate".
+
+        :param inputbytes: A list of values representing bytes.
+        :param window:  The size, in bytes, of the window to calculate for
+            running entropy.  Must be larger than one.
+        :param normalize:  If True, will normalize the entropy between 0 and 1.
+        :return: A list of entropy values for the running window, None on error.
+        """
+        if window < 2:
+            raise ValueError
+
+        if len(inputbytes) < window:
+            return None
+
+        # Capture the running time
+        start_time = time.time()
+
+        # The counts
+        bytescounter = torch.zeros(256, dtype=torch.float)
+        # The current window for calculations
+        byteswindow = deque()
+        # The data to calculate
+        inputbytesqueue = deque(inputbytes)
+
+        entropy_list = list()
+
+        # Initially fill up the window
+        for i in range(0, window):
+            currchar = inputbytesqueue.popleft()
+            byteswindow.append(currchar)
+            bytescounter[currchar] += 1
+
+        # Calculate the initial entropy
+        current_entropy = (bytescounter/window) * torch.log2((bytescounter/window))
+        current_entropy = current_entropy[current_entropy == current_entropy]
+        current_entropy = -current_entropy.sum()
+
+        # Add entropy value to output
+        entropy_list.append(float(current_entropy))
+
+        while True:
+            # If there is no more input, break
+            try:
+                currchar = inputbytesqueue.popleft()
+            except IndexError:
+                break
+
+            sums = torch.zeros(4, dtype=torch.float)
+
+            # Remove the old byte from current window and calculate
+            oldchar = byteswindow.popleft()
+            sums[0] = bytescounter[oldchar]
+            bytescounter[oldchar] -= 1
+            sums[1] = bytescounter[oldchar]
+
+            # Calculate the newest added byte to the window
+            byteswindow.append(currchar)
+            sums[2] = bytescounter[currchar]
+            bytescounter[currchar] += 1
+            sums[3] = bytescounter[currchar]
+
+            corrections = (sums / window) * torch.log2((sums / window))
+            corrections[corrections != corrections] = 0
+            corrections = corrections * torch.tensor([1, -1, 1, -1], dtype=torch.float)
+            correction = float(corrections.sum())
+            current_entropy += correction
+
+            # Add entropy value to output
+            entropy_list.append(float(current_entropy))
 
         # Normalize if desired
         self.normalize[window] = normalize

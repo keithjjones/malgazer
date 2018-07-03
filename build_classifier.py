@@ -23,7 +23,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'cnn'
+classifier_type = 'ann'
 feature_type = 'rwe'
 
 #
@@ -51,7 +51,7 @@ cfv_groups = 5
 n_jobs = 10
 
 # ROC Curves - only works for SciKit Learn models right now
-generate_roc_curves = False
+generate_roc_curves = True
 
 # KNN params
 knn_neighbors = 1
@@ -169,6 +169,9 @@ if build_classifier:
             print(cm)
             print("Accuracy:")
             print(accuracy)
+
+            if generate_roc_curves:
+                ml.plot_roc_curves(y_test, y_pred, n_categories)
         else:        
             # Cross Fold Validation
             def model():
@@ -184,10 +187,9 @@ if build_classifier:
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
     elif classifier_type.lower() == 'ann':
-        outputs = y_train.shape[1]
-        if cross_fold_validation is False:        
+        if cross_fold_validation is False:
             # Create the ANN
-            classifier = ml.build_ann(X_train, outputs)
+            classifier = ml.build_ann(X_train, y_train)
 
             # Train the NN
             start_time = time.time()
@@ -205,10 +207,13 @@ if build_classifier:
             print(cm)
             print("Accuracy:")
             print(accuracy)
+
+            if generate_roc_curves:
+                ml.plot_roc_curves(y_test, y_pred, n_categories)
         else:
             # Cross Fold Validation
             def model():
-                return ML.build_ann_static(X_train, outputs)
+                return ML.build_ann_static(X_train, y_train)
             start_time = time.time()
             accuracies, mean, variance = ml.cross_fold_validation_keras(model,
                                                                         X_train, y_train, 
