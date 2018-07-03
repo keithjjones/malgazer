@@ -680,7 +680,7 @@ class ML(object):
         accuracy, cm = ML.confusion_matrix(Y_test, y_pred, categorical)
         return_dict = {'classifier': classifier, 'cm': cm, 'accuracy': accuracy,
                        'y_test': np.array(Y_test), 'y_train': np.array(Y_train),
-                       'y_pred': np.array(y_pred), 'probas': probas,
+                       'y_pred': np.array(y_pred), 'probas': np.array(probas),
                        'X_test': np.array(X_test), 'X_train': np.array(X_train),
                        'type': 'sklearn'}
         if batch_size or epochs:

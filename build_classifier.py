@@ -22,7 +22,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'dt'
+classifier_type = 'ann'
 feature_type = 'rwe'
 
 #
@@ -45,7 +45,7 @@ epochs = 10
 n_categories = 6
 
 # Cross fold validation variables
-cross_fold_validation = False
+cross_fold_validation = True
 cfv_groups = 5
 n_jobs = 10
 
@@ -260,10 +260,11 @@ if build_classifier:
             classifier = ml.train(X_train, y_train)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             y_pred = ml.predict(X_test)
+            # probas = ml.classifier.predict_proba(X_test)
     
             # Making the Confusion Matrix
             accuracy, cm = ml.confusion_matrix_scikitlearn(y_test, y_pred)
-    
+
             print("Confusion Matrix:")
             print(cm)
             print("Accuracy:")
