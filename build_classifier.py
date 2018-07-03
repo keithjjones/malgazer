@@ -12,10 +12,6 @@ import os
 import pickle
 import dill
 from sklearn import tree
-from sklearn.metrics import roc_curve, auc
-from sklearn.preprocessing import label_binarize
-from scipy import interp
-import matplotlib.pyplot as plt
 
 
 pd.set_option('max_colwidth', 64)
@@ -38,7 +34,6 @@ source_dir = '/Volumes/JONES/Focused Set May 2018/Binaries'
 datapoints = 1024
 windowsize = 256
 number_of_jobs = 50
-#datadir = os.path.join('/Volumes/JONES/Focused Set May 2018', 'data_vt_window_{0}_samples_{1}'.format(windowsize, datapoints))
 if feature_type == 'rwe':
     datadir = '/Volumes/JONES/Focused Set May 2018/RWE'
 elif feature_type == 'gist':
