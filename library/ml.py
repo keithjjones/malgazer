@@ -574,14 +574,16 @@ class ML(object):
                                                             stratify=y)
         return X_train, X_test, y_train, y_test
 
-    def cross_fold_validation_scikitlearn(self, classifier, X, y, cv=10):
+    def cross_fold_validation(self, classifier, X, y, cv=10, batch_size=None, epochs=None):
         """
-        Calculates the cross fold validation mean and variance of Scikit Learn models.
+        Calculates the cross fold validation mean and variance of models.
 
         :param classifier:  The function that builds the classifier.
         :param X:  The X training data.
         :param y:  The y training data.
         :param cv:  The number of cfv groups.
+        :param batch_size:  The batch size for Keras classifiers.
+        :param epochs:  The number of epochs for Keras classifiers.
         :return:  A tuple of mean, variance, classifiers (dict).
         """
         cvkfold = StratifiedKFold(n_splits=cv)
@@ -589,7 +591,11 @@ class ML(object):
         # Maybe max instead?
         n_classes = len(np.unique(y))
 
-        Y = column_or_1d(y)
+        # Detect if this is scikit learn or Keras by the extra arguments.
+        if batch_size is None and epochs is None:
+            Y = column_or_1d(y)
+        else:
+            Y = y.argmax(1)
 
         fold = 0
         saved_futures = {}
@@ -599,10 +605,11 @@ class ML(object):
             for train, test in cvkfold.split(X, Y.tolist()):
                 fold += 1
                 print("\tCalculating fold: {0}".format(fold))
-                future = executor.submit(ML._cfv_skl_runner,
+                future = executor.submit(ML._cfv_runner,
                                          X[train], Y[train].tolist(),
                                          X[test], Y[test].tolist(),
-                                         classifier)
+                                         classifier,
+                                         batch_size=batch_size, epochs=epochs)
                 saved_futures[future] = fold
             for future in as_completed(saved_futures):
                 print("\tFinished calculating fold: {0}".format(saved_futures[future]))
@@ -615,23 +622,37 @@ class ML(object):
         return mean, variance, classifiers
 
     @staticmethod
-    def _cfv_skl_runner(X_train, Y_train, X_test, Y_test, classifier):
+    def _cfv_runner(X_train, Y_train, X_test, Y_test, classifier, batch_size=None, epochs=None, **kwargs):
         """
-        Internal method for multi-processing to calculate the CFV of a Scikit Learn classifier.
+        Internal method for multi-processing to calculate the CFV of a model.
 
         :param X_train:  The X training set.
         :param Y_train:  The Y training set.
         :param X_test:  The X testing set.
         :param Y_test:  The X testing set.
-        :param classifier:  A function that builds a classifier from Scikit learn.
+        :param classifier:  A function that builds a classifier from Scikit learn or Keras.
+        :param batch_size:  The batch size for Keras classifiers.
+        :param epochs:  The number of epochs for Keras classifiers.
         :return:  A dictionary with the results.
         """
-        my_classifier = classifier.fit(X_train, Y_train)
-        y_pred = my_classifier.predict(X_test)
+        if batch_size or epochs:
+            classifier = KerasClassifier(build_fn=classifier,
+                                         batch_size=batch_size,
+                                         epochs=epochs)
+            my_classifier = classifier.fit(X_train, Y_train, batch_size=batch_size, epochs=epochs, **kwargs)
+        else:
+            my_classifier = classifier.fit(X_train, Y_train, **kwargs)
+        y_pred = my_classifier.predict(X_test, **kwargs)
         accuracy, cm = ML.confusion_matrix_scikitlearn(Y_test, y_pred)
         return_dict = {'classifier': my_classifier, 'cm': cm,
                        'accuracy': accuracy, 'y_test': np.array(Y_test),
-                       'y_pred': np.array(y_pred)}
+                       'y_pred': np.array(y_pred), 'type': 'sklearn'}
+        if batch_size or epochs:
+            classifier_dict = {}
+            classifier_dict['json'] = my_classifier.to_json()
+            classifier_dict['weights'] = my_classifier.get_weights()
+            return_dict['type'] = 'keras'
+            return_dict['classifier'] = classifier_dict
         return return_dict
 
     def set_classifier_by_fold(self, fold):
@@ -646,33 +667,6 @@ class ML(object):
             self.classifier = self.classifiers[fold]['classifier']
         else:
             raise AttributeError("Must use CFV before there are classifiers to set.")
-
-    def cross_fold_validation_keras(self, classifier_fn, X, y,
-                                    batch_size = 10, epochs=100,
-                                    cv=10, n_jobs=-1):
-        """
-        Calculates the cross fold validation mean and variance of Keras models.
-
-        :param classifier_fn:  The function that builds the classifier.
-        :param X:  The X training data.
-        :param y:  The y training data.
-        :param batch_size:  The batch size.
-        :param epochs:  The number of epochs.
-        :param cv:  The number of cfv groups.
-        :param n_jobs:  The number of jobs.  Use -1 to use all CPU cores.
-        :return:  A tuple of accuracies, mean, and variance.
-        """
-        keras_classifier = KerasClassifier(build_fn=classifier_fn,
-                                     batch_size=batch_size,
-                                     epochs=epochs)
-        accuracies = cross_val_score(estimator=keras_classifier,
-                                     X=X,
-                                     y=y,
-                                     cv=cv,
-                                     n_jobs=n_jobs)
-        mean = accuracies.mean()
-        variance = accuracies.std()
-        return accuracies, mean, variance
 
     def plot_roc_curves(self, y_test, y_pred, n_categories=6, fold=None):
         """

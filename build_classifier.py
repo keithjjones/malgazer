@@ -46,12 +46,12 @@ epochs = 10
 n_categories = 6
 
 # Cross fold validation variables
-cross_fold_validation = False
+cross_fold_validation = True
 cfv_groups = 5
 n_jobs = 10
 
 # ROC Curves - only works for SciKit Learn models right now
-generate_roc_curves = True
+generate_roc_curves = False
 
 # KNN params
 knn_neighbors = 1
@@ -173,16 +173,15 @@ if build_classifier:
             if generate_roc_curves:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
         else:        
-            # Cross Fold Validation
+            #Cross Fold Validation
             def model():
                 return ML.build_cnn_static(Xt, yt)
             start_time = time.time()
-            accuracies, mean, variance = ml.cross_fold_validation_keras(model,
-                                                                        Xt, yt, 
-                                                                        batch_size=batch_size, 
-                                                                        epochs=epochs, 
-                                                                        cv=cfv_groups, 
-                                                                        n_jobs=n_jobs)
+            mean, variance, classifiers = ml.cross_fold_validation(model,
+                                                                   Xt, yt,
+                                                                   batch_size=batch_size,
+                                                                   epochs=epochs,
+                                                                   cv=cfv_groups)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
@@ -215,12 +214,11 @@ if build_classifier:
             def model():
                 return ML.build_ann_static(X_train, y_train)
             start_time = time.time()
-            accuracies, mean, variance = ml.cross_fold_validation_keras(model,
-                                                                        X_train, y_train, 
-                                                                        batch_size=batch_size, 
-                                                                        epochs=epochs, 
-                                                                        cv=cfv_groups, 
-                                                                        n_jobs=n_jobs)
+            mean, variance, classifiers = ml.cross_fold_validation(model,
+                                                                   X_train, y_train,
+                                                                   cv=cfv_groups,
+                                                                   batch_size=batch_size,
+                                                                   epochs=epochs)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
@@ -261,9 +259,9 @@ if build_classifier:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
         else:
             # Cross Fold Validation
-            mean, variance, classifiers = ml.cross_fold_validation_scikitlearn(classifier,
-                                                                               X_train, y_train, 
-                                                                               cv=cfv_groups)
+            mean, variance, classifiers = ml.cross_fold_validation(classifier,
+                                                                   X_train, y_train,
+                                                                   cv=cfv_groups)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
