@@ -104,7 +104,7 @@ class ML(object):
         :param filename: Base file name of the classifier (without extensions)
         :return: Nothing
         """
-        if self.classifer and (self.classifier_type == 'ann' or self.classifier_type == 'cnn'):
+        if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
             with open(os.path.join(directory, filename+".json"), 'w') as file:
                 file.write(self.classifier.to_json())
             self.classifier.save_weights(os.path.join(directory, filename+'.h5'))
@@ -118,8 +118,10 @@ class ML(object):
 
         :param directory:  Directory containing the classifier.
         :param filename:  Base file name of the classifier (without extensions)
+        :param classifier_type:  The classifier type to load.
         :return:  The classifier
         """
+        self.classifier_type = classifier_type.lower()
         if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
             with open(os.path.join(directory, filename + ".json"), 'r') as file:
                 self.classifer = model_from_json(file.read())
