@@ -24,7 +24,7 @@ assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
 classifier_type = 'svm'
-feature_type = 'rwe'
+feature_type = 'gist'
 
 #
 # Calculate features
@@ -49,7 +49,7 @@ cfv_groups = 5
 n_jobs = 10
 
 # ROC Curves - only works for SciKit Learn models right now
-generate_roc_curves=False
+generate_roc_curves = False
 
 # KNN params
 knn_neighbors = 1

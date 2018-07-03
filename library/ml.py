@@ -96,19 +96,6 @@ class ML(object):
             y = self.decode_classifications(self.predict(gist))
             return y[0]
 
-    def set_classifier_by_fold(self, fold):
-        """
-        Sets the classifier.  This is useful after picking the best cross fold
-        validated classifier, for example.
-
-        :param fold:  The classifier fold number.
-        :return: Nothing.
-        """
-        if self.classifiers:
-            self.classifier = self.classifiers[fold]['classifier']
-        else:
-            raise AttributeError("Must use CFV before there are classifiers to set.")
-
     def save_classifier(self, directory, filename):
         """
         Saves the classifier in directory with file name.
@@ -615,6 +602,19 @@ class ML(object):
                        'accuracy': accuracy, 'y_test': np.array(Y_test),
                        'y_pred': np.array(y_pred)}
         return return_dict
+
+    def set_classifier_by_fold(self, fold):
+        """
+        Sets the classifier.  This is useful after picking the best cross fold
+        validated classifier, for example.
+
+        :param fold:  The classifier fold number.
+        :return: Nothing.
+        """
+        if self.classifiers:
+            self.classifier = self.classifiers[fold]['classifier']
+        else:
+            raise AttributeError("Must use CFV before there are classifiers to set.")
 
     def cross_fold_validation_keras(self, classifier_fn, X, y,
                                     batch_size = 10, epochs=100,
