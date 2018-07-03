@@ -162,7 +162,7 @@ if build_classifier:
             y_pred = ml.predict(Xtest)
             
             # Making the Confusion Matrix
-            accuracy, cm = ml.confusion_matrix_nn(y_test, y_pred)
+            accuracy, cm = ml.confusion_matrix_categorical(y_test, y_pred)
             
             print("Confusion Matrix:")
             print(cm)
@@ -207,7 +207,7 @@ if build_classifier:
             y_pred = ml.predict(X_test)
             
             # Making the Confusion Matrix
-            accuracy, cm = ml.confusion_matrix_nn(y_test, y_pred)
+            accuracy, cm = ml.confusion_matrix_categorical(y_test, y_pred)
             
             print("Confusion Matrix:")
             print(cm)
@@ -263,7 +263,7 @@ if build_classifier:
             # probas = ml.classifier.predict_proba(X_test)
     
             # Making the Confusion Matrix
-            accuracy, cm = ml.confusion_matrix_scikitlearn(y_test, y_pred)
+            accuracy, cm = ml.confusion_matrix_noncategorical(y_test, y_pred)
 
             print("Confusion Matrix:")
             print(cm)

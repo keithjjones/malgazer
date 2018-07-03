@@ -477,31 +477,31 @@ class ML(object):
         :param categorical:  Set to True if you are using categorical/one hot encoding.
         :return:  The accuracy,confusion_matrix, as a tuple.
         """
-        if isinstance(y_test, list):
-            y_test = np.array(y_test)
-        if isinstance(y_pred, list):
-            y_pred = np.array(y_pred)
         if categorical:
-            return ML.confusion_matrix_nn(y_test, y_pred)
+            return ML.confusion_matrix_categorical(y_test, y_pred)
         else:
-            return ML.confusion_matrix_scikitlearn(y_test, y_pred)
+            return ML.confusion_matrix_noncategorical(y_test, y_pred)
 
     @staticmethod
-    def confusion_matrix_nn(y_test, y_pred):
+    def confusion_matrix_categorical(y_test, y_pred):
         """
-        Calculates the confusion matrix for neural network predictions.
+        Calculates the confusion matrix for categorical data (Keras).
 
         :param y_test:  The y testing data.
         :param y_pred:  The y predicted data.
         :return:  The accuracy,confusion_matrix, as a tuple.
         """
+        if isinstance(y_test, list):
+            y_test = np.array(y_test)
+        if isinstance(y_pred, list):
+            y_pred = np.array(y_pred)
         cm = confusion_matrix(y_test.argmax(1), y_pred.argmax(1))
         return ML._calculate_confusion_matrix(cm)
 
     @staticmethod
-    def confusion_matrix_scikitlearn(y_test, y_pred):
+    def confusion_matrix_noncategorical(y_test, y_pred):
         """
-        Calculates the standard confusion matrix for predictions.
+        Calculates the standard confusion matrix for non categorical data (SciKit Learn).
 
         :param y_test:  The y testing data.
         :param y_pred:  The y predicted data.
@@ -671,7 +671,7 @@ class ML(object):
             classifier.fit(X_train, Y_train, batch_size=batch_size, epochs=epochs, **kwargs)
         else:
             classifier.fit(X_train, Y_train, **kwargs)
-        probas = classifier.predict_proba(X_test)
+        # probas = classifier.predict_proba(X_test)
         y_pred = classifier.predict(X_test, **kwargs)
         if batch_size or epochs:
             categorical = True
@@ -680,7 +680,7 @@ class ML(object):
         accuracy, cm = ML.confusion_matrix(Y_test, y_pred, categorical)
         return_dict = {'classifier': classifier, 'cm': cm, 'accuracy': accuracy,
                        'y_test': np.array(Y_test), 'y_train': np.array(Y_train),
-                       'y_pred': np.array(y_pred), 'probas': np.array(probas),
+                       'y_pred': np.array(y_pred),
                        'X_test': np.array(X_test), 'X_train': np.array(X_train),
                        'type': 'sklearn'}
         if batch_size or epochs:
