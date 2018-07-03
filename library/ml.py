@@ -605,13 +605,21 @@ class ML(object):
         print("Start Cross Fold Validation...")
         with ProcessPoolExecutor(max_workers=cv) as executor:
             for train, test in cvkfold.split(X, Y.tolist()):
+                X_train = X[train]
+                X_test = X[test]
+                if batch_size is None and epochs is None:
+                    y_train = Y[train]
+                    y_test = Y[test]
+                else:
+                    y_train = y[train]
+                    y_test = y[test]
                 fold += 1
                 print("\tCalculating fold: {0}".format(fold))
                 future = executor.submit(ML._cfv_runner,
-                                         X[train], Y[train].tolist(),
-                                         X[test], Y[test].tolist(),
-                                         classifier,
-                                         batch_size=batch_size, epochs=epochs)
+                                     X_train, y_train.tolist(),
+                                     X_test, y_test.tolist(),
+                                     classifier,
+                                     batch_size=batch_size, epochs=epochs)
                 saved_futures[future] = fold
             for future in as_completed(saved_futures):
                 print("\tFinished calculating fold: {0}".format(saved_futures[future]))

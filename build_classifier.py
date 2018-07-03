@@ -51,7 +51,7 @@ cfv_groups = 5
 n_jobs = 10
 
 # ROC Curves - only works for SciKit Learn models right now
-generate_roc_curves = False
+generate_roc_curves = True
 
 # KNN params
 knn_neighbors = 1
