@@ -3,7 +3,7 @@
 #plaidml.keras.install_backend()
 
 from library.utils import Utils
-from library.ml import ML
+from library.ml import ML, column_or_1d
 from sklearn.utils.validation import column_or_1d
 import pandas as pd
 import numpy as np
@@ -12,7 +12,6 @@ import os
 import pickle
 import dill
 from sklearn import tree
-
 
 pd.set_option('max_colwidth', 64)
 
@@ -23,7 +22,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'ann'
+classifier_type = 'dt'
 feature_type = 'rwe'
 
 #
@@ -46,7 +45,7 @@ epochs = 10
 n_categories = 6
 
 # Cross fold validation variables
-cross_fold_validation = True
+cross_fold_validation = False
 cfv_groups = 5
 n_jobs = 10
 
@@ -138,8 +137,8 @@ if build_classifier:
         X_test = X
         y_test = y
 
-    ytr = ml.decode_classifications(y_train, categorical)
-    yte = ml.decode_classifications(y_test, categorical)
+    ytr = ml.decode_classifications(y_train.tolist(), categorical)
+    yte = ml.decode_classifications(y_test.tolist(), categorical)
 
     print("Training Class Count: \n{0}".format(pd.DataFrame(ytr)[0].value_counts()))
     print("Testing Class Count: \n{0}".format(pd.DataFrame(yte)[0].value_counts()))

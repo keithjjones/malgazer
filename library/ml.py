@@ -477,6 +477,10 @@ class ML(object):
         :param categorical:  Set to True if you are using categorical/one hot encoding.
         :return:  The accuracy,confusion_matrix, as a tuple.
         """
+        if isinstance(y_test, list):
+            y_test = np.array(y_test)
+        if isinstance(y_pred, list):
+            y_pred = np.array(y_pred)
         if categorical:
             return ML.confusion_matrix_nn(y_test, y_pred)
         else:
@@ -667,15 +671,18 @@ class ML(object):
             classifier.fit(X_train, Y_train, batch_size=batch_size, epochs=epochs, **kwargs)
         else:
             classifier.fit(X_train, Y_train, **kwargs)
+        probas = classifier.predict_proba(X_test)
         y_pred = classifier.predict(X_test, **kwargs)
         if batch_size or epochs:
             categorical = True
         else:
             categorical = False
         accuracy, cm = ML.confusion_matrix(Y_test, y_pred, categorical)
-        return_dict = {'classifier': classifier, 'cm': cm,
-                       'accuracy': accuracy, 'y_test': np.array(Y_test),
-                       'y_pred': np.array(y_pred), 'type': 'sklearn'}
+        return_dict = {'classifier': classifier, 'cm': cm, 'accuracy': accuracy,
+                       'y_test': np.array(Y_test), 'y_train': np.array(Y_train),
+                       'y_pred': np.array(y_pred), 'probas': probas,
+                       'X_test': np.array(X_test), 'X_train': np.array(X_train),
+                       'type': 'sklearn'}
         if batch_size or epochs:
             classifier_dict = {}
             classifier_dict['json'] = classifier.model.to_json()
@@ -723,9 +730,10 @@ class ML(object):
             yp = label_binarize(y_pred.tolist(), classes=n_classes)
         fpr = dict()
         tpr = dict()
+        thresholds = dict()
         roc_auc = dict()
         for i in n_classes:
-            fpr[i], tpr[i], _ = roc_curve(yt[:, i], yp[:, i])
+            fpr[i], tpr[i], thresholds[i] = roc_curve(yt[:, i], yp[:, i])
             roc_auc[i] = auc(fpr[i], tpr[i])
 
         # Compute micro-average ROC curve and ROC area
