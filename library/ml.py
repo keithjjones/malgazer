@@ -688,8 +688,12 @@ class ML(object):
         n_classes = range(n_categories)
 
         # Compute micro-average ROC curve and ROC area
-        yt = label_binarize(y_test.tolist(), classes=n_classes)
-        yp = label_binarize(y_pred.tolist(), classes=n_classes)
+        if self.categorical:
+            yt = y_test
+            yp = y_pred
+        else:
+            yt = label_binarize(y_test.tolist(), classes=n_classes)
+            yp = label_binarize(y_pred.tolist(), classes=n_classes)
         fpr = dict()
         tpr = dict()
         roc_auc = dict()
@@ -718,7 +722,11 @@ class ML(object):
         for i, color in zip(n_classes,
                             ['aqua', 'darkorange', 'cornflowerblue', 'red',
                              'green', 'yellow']):
-            class_name = self.decode_classifications([i])[0]
+            if self.categorical:
+                cn = label_binarize([i], classes=n_classes)
+                class_name = self.decode_classifications(cn)[0]
+            else:
+                class_name = self.decode_classifications([i])[0]
             plt.plot(fpr[i], tpr[i], color=color, lw=lw,
                      label='ROC curve for class {0} (area = {1:0.2f})'.format(class_name, roc_auc[i]))
         plt.plot(fpr["micro"], tpr["micro"], color='darkmagenta',
