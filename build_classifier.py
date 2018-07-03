@@ -23,7 +23,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'svm'
+classifier_type = 'ann'
 feature_type = 'gist'
 
 #
@@ -44,7 +44,7 @@ epochs = 10
 n_categories = 6
 
 # Cross fold validation variables
-cross_fold_validation = True
+cross_fold_validation = False
 cfv_groups = 5
 n_jobs = 10
 
@@ -183,7 +183,7 @@ if build_classifier:
         outputs = y_train.shape[1]
         if cross_fold_validation is False:        
             # Create the ANN
-            classifier = ml.build_ann(datapoints, outputs)
+            classifier = ml.build_ann(X_train, outputs)
 
             # Train the NN
             start_time = time.time()
@@ -283,5 +283,6 @@ if build_classifier:
         ml.save_classifier(path, "classifier")
         if classifier_type.lower() == 'dt':
             tree.export_graphviz(classifier, out_file=os.path.join(path, 'tree.dot'))
-        pickle.dump(ml, open(os.path.join(path, 'ml.pickle'), 'wb'))
-        dill.dump(ml, open(os.path.join(path, 'ml.dill'), 'wb'))
+        if classifier_type.lower() != 'ann' and classifier_type.lower()() != 'cnn':
+            pickle.dump(ml, open(os.path.join(path, 'ml.pickle'), 'wb'))
+            dill.dump(ml, open(os.path.join(path, 'ml.dill'), 'wb'))
