@@ -25,7 +25,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'ann'
+classifier_type = 'cnn'
 feature_type = 'rwe'
 
 #
@@ -48,7 +48,7 @@ epochs = 1
 n_categories = 6
 
 # Cross fold validation variables
-cross_fold_validation = False
+cross_fold_validation = True
 cfv_groups = 5
 n_jobs = 10
 
@@ -146,7 +146,7 @@ if build_classifier:
             y_pred = ml.predict(X_test)
 
             # Making the Confusion Matrix
-            accuracy, cm = ml.confusion_matrix_categorical(y_test, y_pred)
+            accuracy, cm = ml.confusion_matrix(y_test, y_pred)
 
             print("Confusion Matrix:")
             print(cm)
