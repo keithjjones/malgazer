@@ -25,7 +25,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'gridsearch'
+classifier_type = 'dt'
 feature_type = 'rwe'
 
 #
@@ -313,20 +313,11 @@ if build_classifier:
     # Save the classifier
     if cross_fold_validation is False and classifier_type.lower() != 'gridsearch':
         print("Saving the classifier...")
-        if feature_type == 'rwe':
-            path = os.path.join(datadir,
-                                 '{0}_window_{1}_datapoints'.format(windowsize, datapoints),
-                                 classifier_type.lower())
-        elif feature_type == 'gist':
-            path = os.path.join(datadir, 'gist', classifier_type.lower())
-
+        path = os.path.join(datadir, feature_type, classifier_type.lower())
         try:
             os.stat(path)
         except:
             os.makedirs(path)
-        ml.save_classifier(path, "classifier")
+        ml.save_classifier(path)
         if classifier_type.lower() == 'dt':
             tree.export_graphviz(classifier, out_file=os.path.join(path, 'tree.dot'))
-        if classifier_type.lower() != 'ann' and classifier_type.lower() != 'cnn':
-            pickle.dump(ml, open(os.path.join(path, 'ml.pickle'), 'wb'))
-            dill.dump(ml, open(os.path.join(path, 'ml.dill'), 'wb'))

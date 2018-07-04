@@ -108,13 +108,14 @@ class ML(object):
         :param filename: Base file name of the classifier (without extensions)
         :return: Nothing
         """
-        if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
+        if self.classifier_type in ['ann', 'cnn']:
             with open(os.path.join(directory, "nn.json"), 'w') as file:
                 file.write(self.classifier.to_json())
             self.classifier.save_weights(os.path.join(directory, 'nn.h5'))
-        else:
-            with open(os.path.join(directory, "ml.dill"), 'wb') as file:
-                dill.dump(self, file)
+            self.classifier = None
+            self.classifiers = None
+        with open(os.path.join(directory, "ml.dill"), 'wb') as file:
+            dill.dump(self, file)
 
     @staticmethod
     def load_classifier(directory):
@@ -125,17 +126,13 @@ class ML(object):
         :param filename:  Base file name of the classifier (without extensions)
         :return:  The classifier
         """
-        try:
+        with open(os.path.join(directory, "ml.dill"), 'rb') as file:
+            myself = dill.load(file)
+        if myself.classifier_type in ['ann', 'cnn']:
             with open(os.path.join(directory, "nn.json"), 'r') as file:
-                model = model_from_json(file.read())
-                model.load_weights(os.path.join(directory, 'nn.h5'))
-            return model
-        except:
-            try:
-                with open(os.path.join(directory, "ml.dill"), 'rb') as file:
-                    return dill.load(file)
-            except:
-                return None
+                myself.classifier = model_from_json(file.read())
+            myself.classifier.load_weights(os.path.join(directory, 'nn.h5'))
+        return myself
 
     def preprocess_data(self, X, y):
         """
