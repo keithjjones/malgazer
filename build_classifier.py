@@ -25,7 +25,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'gridsearch'
+classifier_type = 'cnn'
 feature_type = 'rwe'
 
 #
@@ -48,7 +48,7 @@ epochs = 1
 n_categories = 6
 
 # Cross fold validation variables
-cross_fold_validation = False
+cross_fold_validation = True
 cfv_groups = 5
 n_jobs = 10
 
@@ -81,23 +81,11 @@ test_percent = 0.5
 if cross_fold_validation is True or classifier_type.lower() == 'gridsearch':
     test_percent = 0
 
-# We don't need categorial translation for some models
-if classifier_type.lower() in ['ann', 'cnn']:
-    categorical = True
-else:
-    categorical = False
-
 # Put the data together and save hashes used for training
 if assemble_preprocessed_data:
     # Load data
-    if feature_type == 'rwe':
-        raw_data_tmp, classifications_tmp = Utils.load_rwe_features(datadir, windowsize=windowsize, datapoints=datapoints)
-    elif feature_type == 'gist':
-        raw_data_tmp, classifications_tmp = Utils.load_gist_features(datadir)
+    all_data, raw_data, classifications = Utils.load_features(datadir, feature_type, windowsize=windowsize, datapoints=datapoints)
 
-    # Make sure data lines up
-    all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
-    
     # Pick 60k samples, 10k from each classification
     trimmed_data = all_data.groupby('classification').head(10000)
     # trimmed_data.to_csv(os.path.join(datadir, 'data.csv'))
@@ -113,30 +101,21 @@ if build_classifier:
     print("Loading data...")
     
     # Load data
-    if feature_type == 'rwe':
-        raw_data_tmp, classifications_tmp = Utils.load_rwe_features(datadir, windowsize=windowsize, datapoints=datapoints)
-    elif feature_type == 'gist':
-        raw_data_tmp, classifications_tmp = Utils.load_gist_features(datadir)
-    
-    # Make sure data lines up
-    all_data, raw_data, classifications = Utils.sanity_check_classifications(raw_data_tmp, classifications_tmp)
-    
+    all_data, raw_data, classifications = Utils.load_features(datadir, feature_type, windowsize=windowsize, datapoints=datapoints)
+
     # Pull the hashes we care about
     hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:, 0]
     data = Utils.filter_hashes(all_data, hashes)
-#    data.to_csv(os.path.join(datadir, 'data.csv'))
-        
+
     print("Test percent: {0}".format(test_percent))
     
-    # Read in the final training data
-    #data = pd.read_csv(os.path.join(datadir, 'data.csv'), index_col=0)
+    # Assemble the final training data
     X = data.drop('classification', axis=1).values.copy()
     y = pd.DataFrame(data['classification']).values.copy()
     
     # Make the classifier
     ml = ML(feature_type=feature_type, classifier_type=classifier_type, rwe_windowsize=windowsize, datapoints=datapoints)
-    y, y_encoder = ml.encode_classifications(y, categorical=categorical)
-    X, X_scaler = ml.scale_features(X)
+    X, y = ml.preprocess_data(X, y)
     if test_percent > 0:
         X_train, X_test, y_train, y_test = ml.train_test_split(X, y, test_percent=test_percent)
     else:
@@ -145,33 +124,31 @@ if build_classifier:
         X_test = X
         y_test = y
 
-    ytr = ml.decode_classifications(y_train.tolist(), categorical)
-    yte = ml.decode_classifications(y_test.tolist(), categorical)
+    ytr = ml.decode_classifications(y_train.tolist())
+    yte = ml.decode_classifications(y_test.tolist())
 
     print("Training Class Count: \n{0}".format(pd.DataFrame(ytr)[0].value_counts()))
     print("Testing Class Count: \n{0}".format(pd.DataFrame(yte)[0].value_counts()))
 
     print("Beginning training...")
 
-    if classifier_type.lower() == 'cnn':    
-        Xt = np.expand_dims(X_train, axis=2)
-        yt = y_train
+    if classifier_type.lower() == 'cnn':
         if cross_fold_validation is False:
             # Create the CNN
-            classifier = ml.build_cnn(Xt, yt)
+            classifier = ml.build_cnn(X_train, y_train)
 
             # Train the CNN
             start_time = time.time()
-            classifier = ml.train(Xt, yt, batch_size=batch_size, epochs=epochs)
+            classifier = ml.train(X_train, y_train, batch_size=batch_size, epochs=epochs)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-            
+
             # Predict the results
-            Xtest = np.expand_dims(X_test, axis=2)
-            y_pred = ml.predict(Xtest)
-            
+            # Xtest = np.expand_dims(X_test, axis=2)
+            y_pred = ml.predict(X_test)
+
             # Making the Confusion Matrix
             accuracy, cm = ml.confusion_matrix_categorical(y_test, y_pred)
-            
+
             print("Confusion Matrix:")
             print(cm)
             print("Accuracy:")
@@ -179,13 +156,10 @@ if build_classifier:
 
             if generate_roc_curves:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
-        else:        
+        else:
             # Cross Fold Validation
-            def model():
-                return ML.build_cnn_static(Xt, yt)
             start_time = time.time()
-            mean, variance, classifiers = ml.cross_fold_validation(model,
-                                                                   Xt, yt,
+            mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
                                                                    batch_size=batch_size,
                                                                    epochs=epochs,
                                                                    cv=cfv_groups)
@@ -208,15 +182,15 @@ if build_classifier:
             # Train the NN
             start_time = time.time()
             classifier = ml.train(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=False)
-            print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))                
+            print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
 
             # Predict the results
             Xtest = np.expand_dims(X_test, axis=2)
             y_pred = ml.predict(X_test)
-            
+
             # Making the Confusion Matrix
             accuracy, cm = ml.confusion_matrix_categorical(y_test, y_pred)
-            
+
             print("Confusion Matrix:")
             print(cm)
             print("Accuracy:")
@@ -344,7 +318,7 @@ if build_classifier:
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             y_pred = ml.predict(X_test)
             # probas = ml.classifier.predict_proba(X_test)
-    
+
             # Making the Confusion Matrix
             accuracy, cm = ml.confusion_matrix_noncategorical(y_test, y_pred)
 

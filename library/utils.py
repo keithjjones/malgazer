@@ -738,6 +738,23 @@ class Utils(object):
         return cls
 
     @staticmethod
+    def load_features(datadir, feature_type='rwe', *args, **kwargs):
+        """
+        Loads data from datadir, for feature_type, and sanity checks the data sets.
+
+        :param datadir:  The data dir to load from.
+        :param feature_type:   The feature type:  'rwe' or 'gist'.  'rwe' requires a datapoints and windowsize named
+        argument.
+        :return:  A 3-tuple of all_data, raw_data, and classifications where all_data is the assembly of raw_data and
+        classifications.
+        """
+        if feature_type.lower() == 'rwe':
+            raw_data, classification_data = Utils.load_rwe_features(datadir, kwargs.get('windowsize', 256), kwargs.get('datapoints', 1024))
+        if feature_type.lower() == 'gist':
+            raw_data, classification_data = Utils.load_gist_features(datadir)
+        return Utils.sanity_check_classifications(raw_data, classification_data)
+
+    @staticmethod
     def load_rwe_features(datadir, windowsize=256, datapoints=512):
         """
         Loads the data saved from preprocessing.

@@ -35,7 +35,7 @@ from .entropy import resample
 
 
 class ML(object):
-    def __init__(self, feature_type='rwe', *args, **kwargs):
+    def __init__(self, feature_type='rwe', classifier_type='dt', gridsearch_type=None, *args, **kwargs):
         """
         A machine learning class to hold information about classifiers.
 
@@ -43,9 +43,17 @@ class ML(object):
         """
         super(ML, self).__init__()
         self.classifer = None
-        self.classifier_type = kwargs.get('classifier_type', None)
+        self.classifier_type = classifier_type
         if self.classifier_type:
             self.classifier_type = self.classifier_type.lower()
+        if self.classifier_type in ['ann', 'cnn']:
+            self.categorical = True
+        else:
+            self.categorical = False
+        if self.classifier_type in ['gridsearch']:
+            self.gridsearch_type = gridsearch_type
+        else:
+            self.gridsearch_type = None
         self.classifiers = None
         # X scaler
         self.X_sc = None
@@ -134,6 +142,56 @@ class ML(object):
         else:
             with open(os.path.join(directory, filename+".pickle"), 'rb') as file:
                 return pickle.load(file)
+
+    def preprocess_data(self, X, y):
+        """
+        Pre processes data with label encoding and scaling.
+
+        :param X:  The X input.
+        :param y:  The y input.
+        :return: A 2-tuple of X,y after encoding and scaling.
+        """
+        if self.classifier_type != 'gridsearch':
+            X_in, y_in = self._set_XY_data(self.classifier_type, X, y)
+        else:
+            X_in, y_in = self._set_XY_data(self.gridsearch_type, X, y)
+
+        y_out, y_encoder = self.encode_classifications(y_in, categorical=self.categorical)
+        X_out, X_scaler = self.scale_features(X_in)
+        return X_out, y_out
+
+    def _set_XY_data(self, classifier_type, X, y):
+        if classifier_type == 'cnn':
+            X_in = X
+            y_in = y
+        elif classifier_type == 'ann':
+            X_in = X
+            y_in = y
+        elif classifier_type == 'dt':
+            X_in = X
+            y_in = y
+        elif classifier_type == 'svm':
+            X_in = X
+            y_in = y
+        elif classifier_type == 'nb':
+            X_in = X
+            y_in = y
+        elif classifier_type == 'rf':
+            X_in = X
+            y_in = y
+        elif classifier_type == 'knn':
+            X_in = X
+            y_in = y
+        elif classifier_type == 'nc':
+            X_in = X
+            y_in = y
+        elif classifier_type == 'adaboost':
+            X_in = X
+            y_in = y
+        elif classifier_type == 'ovr':
+            X_in = X
+            y_in = y
+        return X_in, y_in
 
     @staticmethod
     def build_gridsearch_static(*args, **kwargs):
@@ -400,7 +458,6 @@ class ML(object):
         """
         datapoints = input.shape[1:]
         input_dim = datapoints[0]
-        print(input.shape)
         output_shape = outputs.shape[1]
         classifier = Sequential()
         classifier.add(InputLayer(input_shape=datapoints))
@@ -427,8 +484,12 @@ class ML(object):
         :param outputs:  The output to the CNN, used to find the output shape.
         :return:  The classifier.
         """
+        if len(input.shape) != 3:
+            X_in = np.expand_dims(input, axis=2)
+        else:
+            X_in = input
         self.classifier_type = 'cnn'
-        self.classifier = ML.build_cnn_static(input, outputs)
+        self.classifier = ML.build_cnn_static(X_in, outputs)
         self.classifier.summary()
         return self.classifier
 
@@ -447,21 +508,24 @@ class ML(object):
         data in the local directory under ./Graph
         :return: The classifier after training.
         """
+        if len(X_train.shape) != 3 and self.classifier_type == 'cnn':
+            X_in = np.expand_dims(X_train, axis=2)
+        else:
+            X_in = X_train
         if tensorboard is True:
             tb = keras.callbacks.TensorBoard(log_dir='Graph',
                                              histogram_freq=0,
                                              write_grads=True,
                                              write_graph=True,
                                              write_images=True)
-            self.classifier.fit(X_train, y_train,
+            self.classifier.fit(X_in, y_train,
                                 batch_size=batch_size,
                                 epochs=epochs,
                                 callbacks=[tb])
         else:
-            self.classifier.fit(X_train, y_train,
+            self.classifier.fit(X_in, y_train,
                                 batch_size=batch_size,
                                 epochs=epochs)
-
         return self.classifier
 
     def predict_nn(self, X_test):
@@ -471,7 +535,11 @@ class ML(object):
         :param X_test:  The X testing data for the prediction.
         :return:  The predictions.
         """
-        y_pred = self.classifier.predict(X_test)
+        if len(X_test.shape) != 3 and self.classifier_type == 'cnn':
+            X_in = np.expand_dims(X_test, axis=2)
+        else:
+            X_in = X_test
+        y_pred = self.classifier.predict(X_in)
         # Pick the best match
         for i in range(0, len(y_pred)):
             row = y_pred[i]
@@ -612,11 +680,10 @@ class ML(object):
                                                             stratify=y)
         return X_train, X_test, y_train, y_test
 
-    def cross_fold_validation(self, classifier, X, y, cv=10, batch_size=None, epochs=None):
+    def cross_fold_validation(self, X, y, cv=10, batch_size=None, epochs=None):
         """
         Calculates the cross fold validation mean and variance of models.
 
-        :param classifier:  The function that builds the classifier.
         :param X:  The X training data.
         :param y:  The y training data.
         :param cv:  The number of cfv groups.
@@ -629,11 +696,14 @@ class ML(object):
         # Maybe max instead?
         n_classes = len(np.unique(y))
 
-        # Detect if this is scikit learn or Keras by the extra arguments.
-        if batch_size is None and epochs is None:
-            Y = column_or_1d(y)
-        else:
-            Y = y.argmax(1)
+        Y = y.argmax(1)
+
+        # # Detect if this is scikit learn or Keras by the extra arguments.
+        # if self.classifier_type in ['ann', 'cnn']:
+        #     # Y = column_or_1d(y)
+        #     Y = y.argmax(1)
+        # else:
+        #     Y = y.argmax(1)
 
         fold = 0
         saved_futures = {}
@@ -651,10 +721,9 @@ class ML(object):
                     y_test = y[test]
                 fold += 1
                 print("\tCalculating fold: {0}".format(fold))
-                future = executor.submit(ML._cfv_runner,
-                                     X_train, y_train.tolist(),
-                                     X_test, y_test.tolist(),
-                                     classifier,
+                future = executor.submit(self._cfv_runner,
+                                     X_train, y_train,
+                                     X_test, y_test,
                                      batch_size=batch_size, epochs=epochs)
                 saved_futures[future] = fold
             for future in as_completed(saved_futures):
@@ -667,45 +736,55 @@ class ML(object):
         variance = accuracies.std()
         return mean, variance, classifiers
 
-    @staticmethod
-    def _cfv_runner(X_train, Y_train, X_test, Y_test, classifier, batch_size=None, epochs=None, **kwargs):
+    def _cfv_runner(self, X_train, y_train, X_test, y_test, batch_size=None, epochs=None, **kwargs):
         """
         Internal method for multi-processing to calculate the CFV of a model.
 
         :param X_train:  The X training set.
-        :param Y_train:  The Y training set.
+        :param y_train:  The Y training set.
         :param X_test:  The X testing set.
-        :param Y_test:  The X testing set.
-        :param classifier:  A function that builds a classifier from Scikit learn or Keras.
+        :param y_test:  The X testing set.
         :param batch_size:  The batch size for Keras classifiers.
         :param epochs:  The number of epochs for Keras classifiers.
         :return:  A dictionary with the results.
         """
-        if batch_size or epochs:
-            classifier = KerasClassifier(build_fn=classifier,
+        if self.classifier_type in ['ann', 'cnn']:
+            if self.classifier_type == 'cnn':
+                X_train_in = np.expand_dims(X_train, axis=2)
+            else:
+                X_train_in = X_train
+
+            def create_model():
+                if self.classifier_type == 'cnn':
+                    return ML.build_cnn_static(X_train_in, y_train)
+                else:
+                    return ML.build_ann_static(X_train, y_train)
+            categorical = True
+            classifier = KerasClassifier(build_fn=create_model,
                                          batch_size=batch_size,
                                          epochs=epochs)
-            classifier.fit(X_train, Y_train, batch_size=batch_size, epochs=epochs, **kwargs)
-        else:
-            classifier.fit(X_train, Y_train, **kwargs)
-        # probas = classifier.predict_proba(X_test)
-        y_pred = classifier.predict(X_test, **kwargs)
-        if batch_size or epochs:
-            categorical = True
+            classifier.fit(X_train_in, y_train, batch_size=batch_size, epochs=epochs, **kwargs)
         else:
             categorical = False
-        accuracy, cm = ML.confusion_matrix(Y_test, y_pred, categorical)
+            classifier = self.classifier
+            classifier.fit(X_train, y_train, **kwargs)
+        # probas = classifier_type.predict_proba(X_test)
+        if self.classifier_type == 'cnn':
+            X_test_in = np.expand_dims(X_train, axis=2)
+            y_pred = classifier.predict(X_test_in, **kwargs)
+        else:
+            y_pred = classifier.predict(X_test, **kwargs)
+        accuracy, cm = ML.confusion_matrix(y_test, y_pred, categorical)
         return_dict = {'classifier': classifier, 'cm': cm, 'accuracy': accuracy,
-                       'y_test': np.array(Y_test),
-                       # 'y_train': np.array(Y_train),
+                       'y_test': np.array(y_test),
+                       # 'y_train': np.array(y_train),
                        'y_pred': np.array(y_pred),
                        # 'X_test': np.array(X_test), 'X_train': np.array(X_train),
-                       'type': 'sklearn'}
-        if batch_size or epochs:
+                       'type': self.classifier_type}
+        if self.classifier_type in ['ann', 'cnn']:
             classifier_dict = {}
             classifier_dict['json'] = classifier.model.to_json()
             classifier_dict['weights'] = classifier.model.get_weights()
-            return_dict['type'] = 'keras'
             return_dict['classifier'] = classifier_dict
         return return_dict
 
@@ -743,13 +822,6 @@ class ML(object):
             y_test = np.array(y_test)
         if isinstance(y_pred, list):
             y_pred = np.array(y_pred)
-
-        print(y_test)
-        print(type(y_test))
-        print(y_test.shape)
-        print(y_pred)
-        print(type(y_pred))
-        print(y_pred.shape)
 
         # Compute micro-average ROC curve and ROC area
         if self.categorical:
