@@ -12,6 +12,7 @@ import os
 import pickle
 import dill
 from sklearn import tree
+from keras.wrappers.scikit_learn import KerasClassifier
 
 pd.set_option('max_colwidth', 64)
 
@@ -53,9 +54,9 @@ n_jobs = 10
 generate_roc_curves = False
 
 # Grid search params
-gridsearch_estimator = ML.build_dt_static()
+gridsearch_type = 'dt'
 gridsearch_params = {'criterion': ['gini', 'entropy']}
-gridsearch_njobs = 2
+gridsearch_njobs = -1
 
 # KNN params
 knn_neighbors = 1
@@ -75,7 +76,7 @@ ovr_base_estimator = ML.build_svm_static(kernel='rbf')
 # 0 makes the train and test set be the whole data set
 test_percent = 0.5
 # Make the whole data set for training if we are doing cross fold validation
-if cross_fold_validation is True:
+if cross_fold_validation is True or classifier_type.lower() == 'gridsearch':
     test_percent = 0
 
 # We don't need categorial translation for some models
@@ -242,7 +243,35 @@ if build_classifier:
                     y_pred = ml.classifiers[fold+1]['y_pred']
                     ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1)
     elif classifier_type.lower() == 'gridsearch':
-        classifier = ml.build_gridsearch(estimator=gridsearch_estimator, param_grid=gridsearch_params,
+        if gridsearch_type.lower() == 'ann':
+            def create_model(X, y):
+                return ML.build_ann_static(X, y)
+            classifier = KerasClassifier(build_fn=create_model, X=X_train, y=y_train)
+        elif gridsearch_type.lower() == 'cnn':
+            def create_model(X, y):
+                return ML.build_cnn_static(X, y)
+            Xt = np.expand_dims(X_train, axis=2)
+            yt = y_train
+            classifier = KerasClassifier(build_fn=create_model, X=Xt, y=yt)
+        elif gridsearch_type.lower() == 'dt':
+            classifier = ml.build_dt()
+        elif gridsearch_type.lower() == 'svm':
+            classifier = ml.build_svm()
+        elif gridsearch_type.lower() == 'nb':
+            classifier = ml.build_nb()
+        elif gridsearch_type.lower() == 'rf':
+            classifier = ml.build_rf()
+        elif gridsearch_type.lower() == 'knn':
+            classifier = ml.build_knn()
+        elif gridsearch_type.lower() == 'nc':
+            classifier = ml.build_nc()
+        elif gridsearch_type.lower() == 'adaboost':
+            classifier = ml.build_adaboost()
+        elif gridsearch_type.lower() == 'ovr':
+            classifier = ml.build_ovr()
+
+        classifier = ml.build_gridsearch(estimator=classifier,
+                                         param_grid=gridsearch_params,
                                          cv=cfv_groups, n_jobs=gridsearch_njobs)
         start_time = time.time()
 
@@ -283,9 +312,6 @@ if build_classifier:
             classifier = ml.build_adaboost(n_estimators=n_estimators, base_estimator=base_estimator, algorithm='SAMME')
         elif classifier_type.lower() == 'ovr':
             classifier = ml.build_ovr(ovr_base_estimator)
-        elif classifier_type.lower() == 'gridsearch':
-            classifier = ml.build_gridsearch(estimator=gridsearch_estimator, param_grid=gridsearch_params,
-                                             cv=cfv_groups, n_jobs=gridsearch_njobs)
 
         start_time = time.time()
         if cross_fold_validation is False:
