@@ -648,21 +648,7 @@ class ML(object):
         """
         cvkfold = StratifiedKFold(n_splits=cv)
 
-        if len(y.shape) == 2 and y.shape[1] > 1:
-            Y = y.argmax(1)
-        # else:
-        #     Y = column_or_1d(y).tolist()
-
-        # print(Y)
-        # print(type(Y))
-        # print(Y.shape)
-
-        # # Detect if this is scikit learn or Keras by the extra arguments.
-        # if self.classifier_type in ['ann', 'cnn']:
-        #     # Y = column_or_1d(y)
-        #     Y = y.argmax(1)
-        # else:
-        #     Y = y.argmax(1)
+        Y = y.argmax(1)
 
         fold = 0
         saved_futures = {}
