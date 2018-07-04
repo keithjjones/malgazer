@@ -25,7 +25,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'dt'
+classifier_type = 'adaboost'
 feature_type = 'rwe'
 
 #
@@ -48,7 +48,7 @@ epochs = 1
 n_categories = 6
 
 # Cross fold validation variables
-cross_fold_validation = True
+cross_fold_validation = False
 cfv_groups = 5
 n_jobs = 10
 
@@ -68,10 +68,12 @@ knn_weights = 'distance'
 shrink_threshold = 0.2
 
 # Adaboost params
-n_estimators = 200
-base_estimator = ML.build_svm_static(kernel='rbf')
+adaboost_type = 'svm'
+adaboost_n_estimators = 200
+adaboost_base_estimator = ML.build_svm_static(kernel='rbf')
 
 # OneVRest params
+ovr_type = 'svm'
 ovr_base_estimator = ML.build_svm_static(kernel='rbf')
 
 # Set this to the percentage for test size,
@@ -289,9 +291,9 @@ if build_classifier:
         elif classifier_type.lower() == 'nc':
             classifier = ml.build_nc(shrink_threshold=shrink_threshold)
         elif classifier_type.lower() == 'adaboost':
-            classifier = ml.build_adaboost(n_estimators=n_estimators, base_estimator=base_estimator, algorithm='SAMME')
+            classifier = ml.build_adaboost(adaboost_type=adaboost_type, n_estimators=adaboost_n_estimators, base_estimator=adaboost_base_estimator, algorithm='SAMME')
         elif classifier_type.lower() == 'ovr':
-            classifier = ml.build_ovr(ovr_base_estimator)
+            classifier = ml.build_ovr(ovr_type=ovr_type, estimator=ovr_base_estimator)
 
         start_time = time.time()
         if cross_fold_validation is False:

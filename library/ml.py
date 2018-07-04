@@ -35,7 +35,7 @@ from .entropy import resample
 
 
 class ML(object):
-    def __init__(self, feature_type='rwe', classifier_type='dt', n_classes=6, gridsearch_type=None, *args, **kwargs):
+    def __init__(self, feature_type='rwe', classifier_type='dt', n_classes=6, *args, **kwargs):
         """
         A machine learning class to hold information about classifiers.
 
@@ -46,10 +46,6 @@ class ML(object):
         self.classifier_type = classifier_type
         if self.classifier_type:
             self.classifier_type = self.classifier_type.lower()
-        if self.classifier_type in ['gridsearch']:
-            self.gridsearch_type = gridsearch_type
-        else:
-            self.gridsearch_type = None
         self.n_classes = n_classes
         self.classifiers = None
         # X scaler
@@ -146,47 +142,9 @@ class ML(object):
         :param y:  The y input.
         :return: A 2-tuple of X,y after encoding and scaling.
         """
-        if self.classifier_type != 'gridsearch':
-            X_in, y_in = self._set_XY_data(self.classifier_type, X, y)
-        else:
-            X_in, y_in = self._set_XY_data(self.gridsearch_type, X, y)
-
-        y_out, y_encoder = self.encode_classifications(y_in)
-        X_out, X_scaler = self.scale_features(X_in)
+        y_out, y_encoder = self.encode_classifications(y)
+        X_out, X_scaler = self.scale_features(X)
         return X_out, y_out
-
-    def _set_XY_data(self, classifier_type, X, y):
-        if classifier_type == 'cnn':
-            X_in = X
-            y_in = y
-        elif classifier_type == 'ann':
-            X_in = X
-            y_in = y
-        elif classifier_type == 'dt':
-            X_in = X
-            y_in = y
-        elif classifier_type == 'svm':
-            X_in = X
-            y_in = y
-        elif classifier_type == 'nb':
-            X_in = X
-            y_in = y
-        elif classifier_type == 'rf':
-            X_in = X
-            y_in = y
-        elif classifier_type == 'knn':
-            X_in = X
-            y_in = y
-        elif classifier_type == 'nc':
-            X_in = X
-            y_in = y
-        elif classifier_type == 'adaboost':
-            X_in = X
-            y_in = y
-        elif classifier_type == 'ovr':
-            X_in = X
-            y_in = y
-        return X_in, y_in
 
     @staticmethod
     def build_gridsearch_static(*args, **kwargs):
@@ -218,13 +176,14 @@ class ML(object):
         classifier = OneVsRestClassifier(*args, **kwargs)
         return classifier
 
-    def build_ovr(self, *args, **kwargs):
+    def build_ovr(self, ovr_type, *args, **kwargs):
         """
         Builds a OneVRest classifier.
 
         :return:  The classifier
         """
         self.classifier_type = 'ovr'
+        self.base_classifier_type = ovr_type
         self.classifier = ML.build_ovr_static(*args, **kwargs)
         return self.classifier
 
@@ -238,13 +197,15 @@ class ML(object):
         classifier = AdaBoostClassifier(*args, **kwargs)
         return classifier
 
-    def build_adaboost(self, *args, **kwargs):
+    def build_adaboost(self, adaboost_type, *args, **kwargs):
         """
         Builds an AdaBoost classifier.
 
+        :param adaboost_type:  The type of the base estimator.
         :return:  The classifier
         """
         self.classifier_type = 'adaboost'
+        self.base_classifier_type = adaboost_type
         self.classifier = ML.build_adaboost_static(*args, **kwargs)
         return self.classifier
 
@@ -378,7 +339,14 @@ class ML(object):
         :param y:  The y classifications
         :return:  The classifier
         """
-        self.classifier.fit(X, y)
+        if self.classifier_type in ['svm', 'nb', 'nc']:
+            Y = y.argmax(1)
+        elif self.classifier_type in ['adaboost', 'ovr', 'gridsearch']:
+            if self.base_classifier_type in ['svm', 'nb', 'nc']:
+                Y = y.argmax(1)
+        else:
+            Y = y
+        self.classifier.fit(X, Y)
         return self.classifier
 
     def predict_scikitlearn(self, X):
