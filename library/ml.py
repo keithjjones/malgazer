@@ -31,6 +31,7 @@ import keras.backend as K
 import keras.callbacks
 import os
 import pickle
+import dill
 from .entropy import resample
 
 
@@ -99,7 +100,7 @@ class ML(object):
             y = self.decode_classifications(self.predict(gist))
             return y[0]
 
-    def save_classifier(self, directory, filename):
+    def save_classifier(self, directory):
         """
         Saves the classifier in directory with file name.
 
@@ -108,31 +109,33 @@ class ML(object):
         :return: Nothing
         """
         if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
-            with open(os.path.join(directory, filename+".json"), 'w') as file:
+            with open(os.path.join(directory, "nn.json"), 'w') as file:
                 file.write(self.classifier.to_json())
-            self.classifier.save_weights(os.path.join(directory, filename+'.h5'))
+            self.classifier.save_weights(os.path.join(directory, 'nn.h5'))
         else:
-            with open(os.path.join(directory, filename+".pickle"), 'wb') as file:
-                pickle.dump(self.classifier, file)
+            with open(os.path.join(directory, "ml.dill"), 'wb') as file:
+                dill.dump(self, file)
 
-    def load_classifier(self, directory, filename, classifier_type):
+    @staticmethod
+    def load_classifier(directory):
         """
         Load a classifier from JSON and H5 files.
 
         :param directory:  Directory containing the classifier.
         :param filename:  Base file name of the classifier (without extensions)
-        :param classifier_type:  The classifier type to load.
         :return:  The classifier
         """
-        self.classifier_type = classifier_type.lower()
-        if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
-            with open(os.path.join(directory, filename + ".json"), 'r') as file:
-                self.classifer = model_from_json(file.read())
-            self.classifer.load_weights(os.path.join(directory, filename + '.h5'))
-            return self.classifer
-        else:
-            with open(os.path.join(directory, filename+".pickle"), 'rb') as file:
-                return pickle.load(file)
+        try:
+            with open(os.path.join(directory, "nn.json"), 'r') as file:
+                model = model_from_json(file.read())
+                model.load_weights(os.path.join(directory, 'nn.h5'))
+            return model
+        except:
+            try:
+                with open(os.path.join(directory, "ml.dill"), 'rb') as file:
+                    return dill.load(file)
+            except:
+                return None
 
     def preprocess_data(self, X, y):
         """
