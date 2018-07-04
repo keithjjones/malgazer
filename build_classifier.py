@@ -25,7 +25,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'cnn'
+classifier_type = 'dt'
 feature_type = 'rwe'
 
 #
