@@ -156,13 +156,14 @@ class ML(object):
         classifier = GridSearchCV(*args, **kwargs)
         return classifier
 
-    def build_gridsearch(self, *args, **kwargs):
+    def build_gridsearch(self, gridsearch_type, *args, **kwargs):
         """
         Builds a Grid Search classifier.
 
         :return: The classifier.
         """
         self.classifier_type = 'gridsearch'
+        self.base_classifier_type = gridsearch_type.lower()
         self.classifier = ML.build_gridsearch_static(*args, **kwargs)
         return self.classifier
 
@@ -183,7 +184,7 @@ class ML(object):
         :return:  The classifier
         """
         self.classifier_type = 'ovr'
-        self.base_classifier_type = ovr_type
+        self.base_classifier_type = ovr_type.lower()
         self.classifier = ML.build_ovr_static(*args, **kwargs)
         return self.classifier
 
@@ -205,7 +206,7 @@ class ML(object):
         :return:  The classifier
         """
         self.classifier_type = 'adaboost'
-        self.base_classifier_type = adaboost_type
+        self.base_classifier_type = adaboost_type.lower()
         self.classifier = ML.build_adaboost_static(*args, **kwargs)
         return self.classifier
 
@@ -344,6 +345,8 @@ class ML(object):
         elif self.classifier_type in ['adaboost', 'ovr', 'gridsearch']:
             if self.base_classifier_type in ['svm', 'nb', 'nc']:
                 Y = y.argmax(1)
+            else:
+                Y = y
         else:
             Y = y
         self.classifier.fit(X, Y)

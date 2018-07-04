@@ -25,7 +25,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'adaboost'
+classifier_type = 'gridsearch'
 feature_type = 'rwe'
 
 #
@@ -58,6 +58,7 @@ generate_roc_curves = False
 # Grid search params
 gridsearch_type = 'ann'
 gridsearch_params = {'epochs': [1, 2], 'batch_size': [100, 200]}
+# gridsearch_params = {'criterion': ['gini', 'entropy']}
 gridsearch_njobs = -1
 
 # KNN params
@@ -216,52 +217,34 @@ if build_classifier:
                     y_pred = ml.classifiers[fold+1]['y_pred']
                     ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1)
     elif classifier_type.lower() == 'gridsearch':
+        Xt = X_train
+        yt = y_train
         if gridsearch_type.lower() == 'ann':
-            Xt = X_train
-            yt = label_binarize(y_train.tolist(), classes=range(n_categories))
             def create_model():
                 return ML.build_ann_static(Xt, yt)
             classifier = KerasClassifier(build_fn=create_model)
         elif gridsearch_type.lower() == 'cnn':
-            Xt = np.expand_dims(X_train, axis=2)
-            yt = label_binarize(y_train.tolist(), classes=range(n_categories))
             def create_model():
                 return ML.build_cnn_static(Xt, yt)
             classifier = KerasClassifier(build_fn=create_model)
         elif gridsearch_type.lower() == 'dt':
             classifier = ml.build_dt()
-            Xt = X_train
-            yt = y_train
         elif gridsearch_type.lower() == 'svm':
             classifier = ml.build_svm()
-            Xt = X_train
-            yt = y_train
         elif gridsearch_type.lower() == 'nb':
             classifier = ml.build_nb()
-            Xt = X_train
-            yt = y_train
         elif gridsearch_type.lower() == 'rf':
             classifier = ml.build_rf()
-            Xt = X_train
-            yt = y_train
         elif gridsearch_type.lower() == 'knn':
             classifier = ml.build_knn()
-            Xt = X_train
-            yt = y_train
         elif gridsearch_type.lower() == 'nc':
             classifier = ml.build_nc()
-            Xt = X_train
-            yt = y_train
         elif gridsearch_type.lower() == 'adaboost':
             classifier = ml.build_adaboost()
-            Xt = X_train
-            yt = y_train
         elif gridsearch_type.lower() == 'ovr':
             classifier = ml.build_ovr()
-            Xt = X_train
-            yt = y_train
 
-        classifier = ml.build_gridsearch(estimator=classifier,
+        classifier = ml.build_gridsearch(gridsearch_type=gridsearch_type, estimator=classifier,
                                          param_grid=gridsearch_params,
                                          cv=cfv_groups, n_jobs=gridsearch_njobs)
         start_time = time.time()
