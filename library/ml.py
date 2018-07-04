@@ -35,7 +35,7 @@ from .entropy import resample
 
 
 class ML(object):
-    def __init__(self, feature_type='rwe', classifier_type='dt', gridsearch_type=None, *args, **kwargs):
+    def __init__(self, feature_type='rwe', classifier_type='dt', n_classes=6, gridsearch_type=None, *args, **kwargs):
         """
         A machine learning class to hold information about classifiers.
 
@@ -54,6 +54,7 @@ class ML(object):
             self.gridsearch_type = gridsearch_type
         else:
             self.gridsearch_type = None
+        self.n_classes = n_classes
         self.classifiers = None
         # X scaler
         self.X_sc = None
@@ -576,11 +577,15 @@ class ML(object):
             y_test = np.array(y_test)
         if isinstance(y_pred, list):
             y_pred = np.array(y_pred)
-
         if len(y_pred.shape) > 1 and y_pred.shape[1] > 1:
-            cm = confusion_matrix(column_or_1d(y_test.argmax(1)).tolist(), column_or_1d(y_pred.argmax(1)).tolist())
+            yp = column_or_1d(y_pred.argmax(1)).tolist()
         else:
-            cm = confusion_matrix(column_or_1d(y_test.argmax(1)).tolist(), column_or_1d(y_pred).tolist())
+            yp = column_or_1d(y_pred).tolist()
+        if len(y_test.shape) > 1 and y_test.shape[1] > 1:
+            yt = column_or_1d(y_test.argmax(1)).tolist()
+        else:
+            yt = column_or_1d(y_test).tolist()
+        cm = confusion_matrix(yt, yp)
         return ML._calculate_confusion_matrix(cm)
 
     @staticmethod
@@ -693,10 +698,10 @@ class ML(object):
         """
         cvkfold = StratifiedKFold(n_splits=cv)
 
-        # Maybe max instead?
-        n_classes = len(np.unique(y))
-
-        Y = y.argmax(1)
+        if len(y.shape) == 2 and y.shape[1] > 1:
+            Y = y.argmax(1)
+        else:
+            Y = y
 
         # # Detect if this is scikit learn or Keras by the extra arguments.
         # if self.classifier_type in ['ann', 'cnn']:
@@ -710,15 +715,11 @@ class ML(object):
         classifiers = {}
         print("Start Cross Fold Validation...")
         with ProcessPoolExecutor(max_workers=cv) as executor:
-            for train, test in cvkfold.split(X, Y.tolist()):
+            for train, test in cvkfold.split(X, Y):
                 X_train = X[train]
                 X_test = X[test]
-                if batch_size is None and epochs is None:
-                    y_train = Y[train]
-                    y_test = Y[test]
-                else:
-                    y_train = y[train]
-                    y_test = y[test]
+                y_train = y[train]
+                y_test = y[test]
                 fold += 1
                 print("\tCalculating fold: {0}".format(fold))
                 future = executor.submit(self._cfv_runner,
@@ -756,21 +757,21 @@ class ML(object):
 
             def create_model():
                 if self.classifier_type == 'cnn':
-                    return ML.build_cnn_static(X_train_in, y_train)
+                    return ML.build_cnn_static(X_train_in, label_binarize(y_train, classes=range(self.n_classes)))
                 else:
-                    return ML.build_ann_static(X_train, y_train)
+                    return ML.build_ann_static(X_train, label_binarize(y_train, classes=range(self.n_classes)))
             categorical = True
             classifier = KerasClassifier(build_fn=create_model,
                                          batch_size=batch_size,
                                          epochs=epochs)
-            classifier.fit(X_train_in, y_train, batch_size=batch_size, epochs=epochs, **kwargs)
+            classifier.fit(X_train_in, label_binarize(y_train, classes=range(self.n_classes)), batch_size=batch_size, epochs=epochs, **kwargs)
         else:
             categorical = False
             classifier = self.classifier
             classifier.fit(X_train, y_train, **kwargs)
         # probas = classifier_type.predict_proba(X_test)
         if self.classifier_type == 'cnn':
-            X_test_in = np.expand_dims(X_train, axis=2)
+            X_test_in = np.expand_dims(X_test, axis=2)
             y_pred = classifier.predict(X_test_in, **kwargs)
         else:
             y_pred = classifier.predict(X_test, **kwargs)

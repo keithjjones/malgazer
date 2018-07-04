@@ -76,10 +76,10 @@ ovr_base_estimator = ML.build_svm_static(kernel='rbf')
 
 # Set this to the percentage for test size, 
 # 0 makes the train and test set be the whole data set
-test_percent = 0.5
+test_percent = 0.9
 # Make the whole data set for training if we are doing cross fold validation
-if cross_fold_validation is True or classifier_type.lower() == 'gridsearch':
-    test_percent = 0
+# if cross_fold_validation is True or classifier_type.lower() == 'gridsearch':
+#     test_percent = 0
 
 # Put the data together and save hashes used for training
 if assemble_preprocessed_data:
@@ -114,7 +114,7 @@ if build_classifier:
     y = pd.DataFrame(data['classification']).values.copy()
     
     # Make the classifier
-    ml = ML(feature_type=feature_type, classifier_type=classifier_type, rwe_windowsize=windowsize, datapoints=datapoints)
+    ml = ML(feature_type=feature_type, classifier_type=classifier_type, n_classes=n_categories, rwe_windowsize=windowsize, datapoints=datapoints)
     X, y = ml.preprocess_data(X, y)
     if test_percent > 0:
         X_train, X_test, y_train, y_test = ml.train_test_split(X, y, test_percent=test_percent)
