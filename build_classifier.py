@@ -13,6 +13,8 @@ import pickle
 import dill
 from sklearn import tree
 from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.preprocessing import label_binarize
+
 
 pd.set_option('max_colwidth', 64)
 
@@ -54,8 +56,8 @@ n_jobs = 10
 generate_roc_curves = False
 
 # Grid search params
-gridsearch_type = 'dt'
-gridsearch_params = {'criterion': ['gini', 'entropy']}
+gridsearch_type = 'ann'
+gridsearch_params = {'epochs': [1, 2], 'batch_size': [100, 200]}
 gridsearch_njobs = -1
 
 # KNN params
@@ -244,38 +246,57 @@ if build_classifier:
                     ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1)
     elif classifier_type.lower() == 'gridsearch':
         if gridsearch_type.lower() == 'ann':
-            def create_model(X, y):
-                return ML.build_ann_static(X, y)
-            classifier = KerasClassifier(build_fn=create_model, X=X_train, y=y_train)
+            Xt = X_train
+            yt = label_binarize(y_train.tolist(), classes=range(n_categories))
+            def create_model():
+                return ML.build_ann_static(Xt, yt)
+            classifier = KerasClassifier(build_fn=create_model)
         elif gridsearch_type.lower() == 'cnn':
-            def create_model(X, y):
-                return ML.build_cnn_static(X, y)
             Xt = np.expand_dims(X_train, axis=2)
-            yt = y_train
-            classifier = KerasClassifier(build_fn=create_model, X=Xt, y=yt)
+            yt = label_binarize(y_train.tolist(), classes=range(n_categories))
+            def create_model():
+                return ML.build_cnn_static(Xt, yt)
+            classifier = KerasClassifier(build_fn=create_model)
         elif gridsearch_type.lower() == 'dt':
             classifier = ml.build_dt()
+            Xt = X_train
+            yt = y_train
         elif gridsearch_type.lower() == 'svm':
             classifier = ml.build_svm()
+            Xt = X_train
+            yt = y_train
         elif gridsearch_type.lower() == 'nb':
             classifier = ml.build_nb()
+            Xt = X_train
+            yt = y_train
         elif gridsearch_type.lower() == 'rf':
             classifier = ml.build_rf()
+            Xt = X_train
+            yt = y_train
         elif gridsearch_type.lower() == 'knn':
             classifier = ml.build_knn()
+            Xt = X_train
+            yt = y_train
         elif gridsearch_type.lower() == 'nc':
             classifier = ml.build_nc()
+            Xt = X_train
+            yt = y_train
         elif gridsearch_type.lower() == 'adaboost':
             classifier = ml.build_adaboost()
+            Xt = X_train
+            yt = y_train
         elif gridsearch_type.lower() == 'ovr':
             classifier = ml.build_ovr()
+            Xt = X_train
+            yt = y_train
 
         classifier = ml.build_gridsearch(estimator=classifier,
                                          param_grid=gridsearch_params,
                                          cv=cfv_groups, n_jobs=gridsearch_njobs)
         start_time = time.time()
 
-        classifier = ml.train(X_train, y_train)
+        classifier = ml.train(Xt, yt)
+        # classifier.fit(Xt, yt)
         print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
         # y_pred = ml.predict(X_test)
         # probas = ml.classifier.predict_proba(X_test)
@@ -290,6 +311,8 @@ if build_classifier:
 
         print("Best Score: {0}".format(classifier.best_score_))
         print("CV Results: {0}".format(classifier.cv_results_))
+        print("Params: {0}".format(classifier.cv_results_['params']))
+        print("Mean Test Score: {0}".format(classifier.cv_results_['mean_test_score']))
         print("Best Estimator: {0}".format(classifier.best_estimator_))
 
         # if generate_roc_curves:
@@ -352,7 +375,7 @@ if build_classifier:
                     ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1)
 
     # Save the classifier
-    if cross_fold_validation is False:
+    if cross_fold_validation is False and classifier_type.lower() != 'gridsearch':
         print("Saving the classifier...")
         if feature_type == 'rwe':
             path = os.path.join(datadir,

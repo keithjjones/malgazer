@@ -58,6 +58,8 @@ class ML(object):
     def train(self, *args, **kwargs):
         if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
             return self.train_nn(*args, **kwargs)
+        if self.classifier_type == 'gridsearch':
+            return self.train_gridsearch(*args, **kwargs)
         else:
             return self.train_scikitlearn(*args, **kwargs)
 
@@ -313,6 +315,17 @@ class ML(object):
         """
         self.classifier_type = 'svm'
         self.classifier = ML.build_svm_static(*args, **kwargs)
+        return self.classifier
+
+    def train_gridsearch(self, X, y):
+        """
+        Trains a Scikit Learn Gridsearch classifier.
+
+        :param X:  The X input
+        :param y:  The y classifications
+        :return:  The classifier
+        """
+        self.classifier.fit(X, y)
         return self.classifier
 
     def train_scikitlearn(self, X, y):
