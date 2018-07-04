@@ -49,8 +49,8 @@ n_categories = 6
 
 # Cross fold validation variables
 cross_fold_validation = False
+cross_fold_use_all_samples = False
 cfv_groups = 5
-n_jobs = 10
 
 # ROC Curves - only works for SciKit Learn models right now
 generate_roc_curves = False
@@ -63,13 +63,14 @@ gridsearch_njobs = -1
 # KNN params
 knn_neighbors = 1
 knn_weights = 'distance'
+knn_n_jobs = 10
 
 # Centroid params
-shrink_threshold = 0.2
+nc_shrink_threshold = 0.2
 
 # Adaboost params
 adaboost_type = 'svm'
-adaboost_n_estimators = 200
+adaboost_n_estimators = 10
 adaboost_base_estimator = ML.build_svm_static(kernel='rbf')
 
 # OneVRest params
@@ -80,8 +81,8 @@ ovr_base_estimator = ML.build_svm_static(kernel='rbf')
 # 0 makes the train and test set be the whole data set
 test_percent = 0.9
 # Make the whole data set for training if we are doing cross fold validation
-# if cross_fold_validation is True or classifier_type.lower() == 'gridsearch':
-#     test_percent = 0
+if (cross_fold_validation and cross_fold_use_all_samples) or classifier_type.lower() == 'gridsearch':
+    test_percent = 0
 
 # Put the data together and save hashes used for training
 if assemble_preprocessed_data:
@@ -287,9 +288,9 @@ if build_classifier:
         elif classifier_type.lower() == 'rf':
             classifier = ml.build_rf(n_estimators=10, criterion='entropy')
         elif classifier_type.lower() == 'knn':
-            classifier = ml.build_knn(n_neighbors=knn_neighbors, weights=knn_weights, n_jobs=n_jobs)
+            classifier = ml.build_knn(n_neighbors=knn_neighbors, weights=knn_weights, n_jobs=knn_n_jobs)
         elif classifier_type.lower() == 'nc':
-            classifier = ml.build_nc(shrink_threshold=shrink_threshold)
+            classifier = ml.build_nc(shrink_threshold=nc_shrink_threshold)
         elif classifier_type.lower() == 'adaboost':
             classifier = ml.build_adaboost(adaboost_type=adaboost_type, n_estimators=adaboost_n_estimators, base_estimator=adaboost_base_estimator, algorithm='SAMME')
         elif classifier_type.lower() == 'ovr':
