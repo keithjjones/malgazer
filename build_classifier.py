@@ -25,7 +25,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'cnn'
+classifier_type = 'ann'
 feature_type = 'rwe'
 
 #
@@ -139,11 +139,10 @@ if build_classifier:
 
             # Train the CNN
             start_time = time.time()
-            classifier = ml.train(X_train, y_train, batch_size=batch_size, epochs=epochs)
+            classifier = ml.train(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=False)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
 
             # Predict the results
-            # Xtest = np.expand_dims(X_test, axis=2)
             y_pred = ml.predict(X_test)
 
             # Making the Confusion Matrix
@@ -185,7 +184,6 @@ if build_classifier:
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
 
             # Predict the results
-            Xtest = np.expand_dims(X_test, axis=2)
             y_pred = ml.predict(X_test)
 
             # Making the Confusion Matrix
@@ -200,14 +198,11 @@ if build_classifier:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
         else:
             # Cross Fold Validation
-            def model():
-                return ML.build_ann_static(X_train, y_train)
             start_time = time.time()
-            mean, variance, classifiers = ml.cross_fold_validation(model,
-                                                                   X_train, y_train,
-                                                                   cv=cfv_groups,
+            mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
                                                                    batch_size=batch_size,
-                                                                   epochs=epochs)
+                                                                   epochs=epochs,
+                                                                   cv = cfv_groups)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
