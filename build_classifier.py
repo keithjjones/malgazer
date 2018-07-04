@@ -22,7 +22,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'dt'
+classifier_type = 'gridsearch'
 feature_type = 'rwe'
 
 #
@@ -45,12 +45,17 @@ epochs = 1
 n_categories = 6
 
 # Cross fold validation variables
-cross_fold_validation = True
+cross_fold_validation = False
 cfv_groups = 5
 n_jobs = 10
 
 # ROC Curves - only works for SciKit Learn models right now
-generate_roc_curves = True
+generate_roc_curves = False
+
+# Grid search params
+gridsearch_estimator = ML.build_dt_static()
+gridsearch_params = {'criterion': ['gini', 'entropy']}
+gridsearch_njobs = 2
 
 # KNN params
 knn_neighbors = 1
@@ -68,7 +73,7 @@ ovr_base_estimator = ML.build_svm_static(kernel='rbf')
 
 # Set this to the percentage for test size, 
 # 0 makes the train and test set be the whole data set
-test_percent = 0.1
+test_percent = 0.5
 # Make the whole data set for training if we are doing cross fold validation
 if cross_fold_validation is True:
     test_percent = 0
@@ -236,6 +241,30 @@ if build_classifier:
                     y_test = ml.classifiers[fold+1]['y_test']
                     y_pred = ml.classifiers[fold+1]['y_pred']
                     ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1)
+    elif classifier_type.lower() == 'gridsearch':
+        classifier = ml.build_gridsearch(estimator=gridsearch_estimator, param_grid=gridsearch_params,
+                                         cv=cfv_groups, n_jobs=gridsearch_njobs)
+        start_time = time.time()
+
+        classifier = ml.train(X_train, y_train)
+        print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+        # y_pred = ml.predict(X_test)
+        # probas = ml.classifier.predict_proba(X_test)
+
+        # Making the Confusion Matrix
+        # accuracy, cm = ml.confusion_matrix_noncategorical(y_test, y_pred)
+
+        # print("Confusion Matrix:")
+        # print(cm)
+        # print("Accuracy:")
+        # print(accuracy)
+
+        print("Best Score: {0}".format(classifier.best_score_))
+        print("CV Results: {0}".format(classifier.cv_results_))
+        print("Best Estimator: {0}".format(classifier.best_estimator_))
+
+        # if generate_roc_curves:
+        #     ml.plot_roc_curves(y_test, y_pred, n_categories)
     else:
         # This area is for scikit learn models
         if classifier_type.lower() == 'svm':
@@ -254,7 +283,10 @@ if build_classifier:
             classifier = ml.build_adaboost(n_estimators=n_estimators, base_estimator=base_estimator, algorithm='SAMME')
         elif classifier_type.lower() == 'ovr':
             classifier = ml.build_ovr(ovr_base_estimator)
-            
+        elif classifier_type.lower() == 'gridsearch':
+            classifier = ml.build_gridsearch(estimator=gridsearch_estimator, param_grid=gridsearch_params,
+                                             cv=cfv_groups, n_jobs=gridsearch_njobs)
+
         start_time = time.time()
         if cross_fold_validation is False:
             classifier = ml.train(X_train, y_train)
@@ -269,6 +301,11 @@ if build_classifier:
             print(cm)
             print("Accuracy:")
             print(accuracy)
+
+            if classifier_type.lower() == 'gridsearch':
+                print("Best Score: {0}".format(classifier.best_score_ ))
+                print("CV Results: {0}".format(classifier.cv_results_))
+                print("Best Estimator: {0}".format(classifier.best_estimator_))
 
             if generate_roc_curves:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
