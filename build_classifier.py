@@ -32,7 +32,7 @@ feature_type = 'rwe'
 # Calculate features
 #
 source_dir = '/Volumes/JONES/Focused Set May 2018/Binaries'
-    
+
 datapoints = 1024
 windowsize = 256
 number_of_jobs = 50
@@ -48,7 +48,7 @@ epochs = 1
 n_categories = 6
 
 # Cross fold validation variables
-cross_fold_validation = True
+cross_fold_validation = False
 cfv_groups = 5
 n_jobs = 10
 
@@ -74,7 +74,7 @@ base_estimator = ML.build_svm_static(kernel='rbf')
 # OneVRest params
 ovr_base_estimator = ML.build_svm_static(kernel='rbf')
 
-# Set this to the percentage for test size, 
+# Set this to the percentage for test size,
 # 0 makes the train and test set be the whole data set
 test_percent = 0.9
 # Make the whole data set for training if we are doing cross fold validation
@@ -90,7 +90,7 @@ if assemble_preprocessed_data:
     trimmed_data = all_data.groupby('classification').head(10000)
     # trimmed_data.to_csv(os.path.join(datadir, 'data.csv'))
     pd.DataFrame(trimmed_data.index).to_csv(os.path.join(datadir, 'hashes_60k.txt'), header=False, index=False)
-    
+
     # Pull the hashes we care about
     hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:,0]
     data = Utils.filter_hashes(all_data, hashes)
@@ -99,7 +99,7 @@ if assemble_preprocessed_data:
 # Build a classifier
 if build_classifier:
     print("Loading data...")
-    
+
     # Load data
     all_data, raw_data, classifications = Utils.load_features(datadir, feature_type, windowsize=windowsize, datapoints=datapoints)
 
@@ -108,11 +108,11 @@ if build_classifier:
     data = Utils.filter_hashes(all_data, hashes)
 
     print("Test percent: {0}".format(test_percent))
-    
+
     # Assemble the final training data
     X = data.drop('classification', axis=1).values.copy()
     y = pd.DataFrame(data['classification']).values.copy()
-    
+
     # Make the classifier
     ml = ML(feature_type=feature_type, classifier_type=classifier_type, n_classes=n_categories, rwe_windowsize=windowsize, datapoints=datapoints)
     X, y = ml.preprocess_data(X, y)
@@ -187,7 +187,7 @@ if build_classifier:
             y_pred = ml.predict(X_test)
 
             # Making the Confusion Matrix
-            accuracy, cm = ml.confusion_matrix_categorical(y_test, y_pred)
+            accuracy, cm = ml.confusion_matrix(y_test, y_pred)
 
             print("Confusion Matrix:")
             print(cm)
@@ -202,7 +202,7 @@ if build_classifier:
             mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
                                                                    batch_size=batch_size,
                                                                    epochs=epochs,
-                                                                   cv = cfv_groups)
+                                                                   cv=cfv_groups)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
@@ -265,18 +265,7 @@ if build_classifier:
         start_time = time.time()
 
         classifier = ml.train(Xt, yt)
-        # classifier.fit(Xt, yt)
         print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-        # y_pred = ml.predict(X_test)
-        # probas = ml.classifier.predict_proba(X_test)
-
-        # Making the Confusion Matrix
-        # accuracy, cm = ml.confusion_matrix_noncategorical(y_test, y_pred)
-
-        # print("Confusion Matrix:")
-        # print(cm)
-        # print("Accuracy:")
-        # print(accuracy)
 
         print("Best Score: {0}".format(classifier.best_score_))
         print("CV Results: {0}".format(classifier.cv_results_))
@@ -285,9 +274,6 @@ if build_classifier:
         print("Best Estimator: {0}".format(classifier.best_estimator_))
         best_param = classifier.cv_results_['params'][(classifier.cv_results_['mean_test_score'] == classifier.best_score_).argmax()]
         print("Best Params: {0}".format(best_param))
-
-        # if generate_roc_curves:
-        #     ml.plot_roc_curves(y_test, y_pred, n_categories)
     else:
         # This area is for scikit learn models
         if classifier_type.lower() == 'svm':
@@ -315,24 +301,18 @@ if build_classifier:
             # probas = ml.classifier.predict_proba(X_test)
 
             # Making the Confusion Matrix
-            accuracy, cm = ml.confusion_matrix_noncategorical(y_test, y_pred)
+            accuracy, cm = ml.confusion_matrix(y_test, y_pred)
 
             print("Confusion Matrix:")
             print(cm)
             print("Accuracy:")
             print(accuracy)
 
-            if classifier_type.lower() == 'gridsearch':
-                print("Best Score: {0}".format(classifier.best_score_ ))
-                print("CV Results: {0}".format(classifier.cv_results_))
-                print("Best Estimator: {0}".format(classifier.best_estimator_))
-
             if generate_roc_curves:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
         else:
             # Cross Fold Validation
-            mean, variance, classifiers = ml.cross_fold_validation(classifier,
-                                                                   X_train, y_train,
+            mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
                                                                    cv=cfv_groups)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print("CFV Mean: {0}".format(mean))

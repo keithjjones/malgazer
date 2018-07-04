@@ -46,10 +46,6 @@ class ML(object):
         self.classifier_type = classifier_type
         if self.classifier_type:
             self.classifier_type = self.classifier_type.lower()
-        if self.classifier_type in ['ann', 'cnn']:
-            self.categorical = True
-        else:
-            self.categorical = False
         if self.classifier_type in ['gridsearch']:
             self.gridsearch_type = gridsearch_type
         else:
@@ -67,8 +63,6 @@ class ML(object):
     def train(self, *args, **kwargs):
         if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
             return self.train_nn(*args, **kwargs)
-        if self.classifier_type == 'gridsearch':
-            return self.train_gridsearch(*args, **kwargs)
         else:
             return self.train_scikitlearn(*args, **kwargs)
 
@@ -157,7 +151,7 @@ class ML(object):
         else:
             X_in, y_in = self._set_XY_data(self.gridsearch_type, X, y)
 
-        y_out, y_encoder = self.encode_classifications(y_in, categorical=self.categorical)
+        y_out, y_encoder = self.encode_classifications(y_in)
         X_out, X_scaler = self.scale_features(X_in)
         return X_out, y_out
 
@@ -376,17 +370,6 @@ class ML(object):
         self.classifier = ML.build_svm_static(*args, **kwargs)
         return self.classifier
 
-    def train_gridsearch(self, X, y):
-        """
-        Trains a Scikit Learn Gridsearch classifier.
-
-        :param X:  The X input
-        :param y:  The y classifications
-        :return:  The classifier
-        """
-        self.classifier.fit(X, y)
-        return self.classifier
-
     def train_scikitlearn(self, X, y):
         """
         Trains a Scikit Learn classifier.
@@ -395,7 +378,7 @@ class ML(object):
         :param y:  The y classifications
         :return:  The classifier
         """
-        self.classifier.fit(X, column_or_1d(y).tolist())
+        self.classifier.fit(X, y)
         return self.classifier
 
     def predict_scikitlearn(self, X):
@@ -550,24 +533,9 @@ class ML(object):
         return y_pred
 
     @staticmethod
-    def confusion_matrix(y_test, y_pred, categorical=False):
+    def confusion_matrix(y_test, y_pred):
         """
-        Calculates the confusion matrix for neural network predictions.
-
-        :param y_test:  The y testing data.
-        :param y_pred:  The y predicted data.
-        :param categorical:  Set to True if you are using categorical/one hot encoding.
-        :return:  The accuracy,confusion_matrix, as a tuple.
-        """
-        if categorical:
-            return ML.confusion_matrix_categorical(y_test, y_pred)
-        else:
-            return ML.confusion_matrix_noncategorical(y_test, y_pred)
-
-    @staticmethod
-    def confusion_matrix_categorical(y_test, y_pred):
-        """
-        Calculates the confusion matrix for categorical data (Keras).
+        Calculates the confusion matrix.
 
         :param y_test:  The y testing data.
         :param y_pred:  The y predicted data.
@@ -586,18 +554,6 @@ class ML(object):
         else:
             yt = column_or_1d(y_test).tolist()
         cm = confusion_matrix(yt, yp)
-        return ML._calculate_confusion_matrix(cm)
-
-    @staticmethod
-    def confusion_matrix_noncategorical(y_test, y_pred):
-        """
-        Calculates the standard confusion matrix for non categorical data (SciKit Learn).
-
-        :param y_test:  The y testing data.
-        :param y_pred:  The y predicted data.
-        :return:  The accuracy,confusion_matrix, as a tuple.
-        """
-        cm = confusion_matrix(column_or_1d(y_test).tolist(), column_or_1d(y_pred).tolist())
         return ML._calculate_confusion_matrix(cm)
 
     @staticmethod
@@ -632,12 +588,11 @@ class ML(object):
         # y = y[:, 1:]
         return X_scaled, self.X_sc
 
-    def encode_classifications(self, y, categorical=True):
+    def encode_classifications(self, y):
         """
         Encodes the classifications.
 
         :param y:  The preprocessed data as a DataFrame.
-        :param categorical:  Set to true to run to_categorical.
         :return:  A tuple of the encoded data y and the encoder (for inverting)
         as y,encoder.
         """
@@ -646,23 +601,18 @@ class ML(object):
             y[:, 0] = self.y_labelencoder.fit_transform(y[:, 0])
         else:
             y[:, 0] = self.y_labelencoder.transform(y[:, 0])
-        if categorical:
-            y = to_categorical(y)
-        self.categorical = categorical
+        y = to_categorical(y)
         return y, self.y_labelencoder
 
-    def decode_classifications(self, y, categorical=False):
+    def decode_classifications(self, y):
         """
         Decodes the classifications.
 
         :param y:  The preprocessed data as a DataFrame.
-        :param categorical:  Set to True if categorical was used for encoding.
-        Leave false to use the value used for encoding.
         :return:  The decoded data y.
         """
         if self.y_labelencoder is not None:
-            if self.categorical or categorical:
-                y = np.argmax(y, axis=1)
+            y = np.argmax(y, axis=1)
             y_out = self.y_labelencoder.inverse_transform(y)
             return y_out
         else:
@@ -700,8 +650,12 @@ class ML(object):
 
         if len(y.shape) == 2 and y.shape[1] > 1:
             Y = y.argmax(1)
-        else:
-            Y = y
+        # else:
+        #     Y = column_or_1d(y).tolist()
+
+        # print(Y)
+        # print(type(Y))
+        # print(Y.shape)
 
         # # Detect if this is scikit learn or Keras by the extra arguments.
         # if self.classifier_type in ['ann', 'cnn']:
@@ -760,13 +714,11 @@ class ML(object):
                     return ML.build_cnn_static(X_train_in, label_binarize(y_train, classes=range(self.n_classes)))
                 else:
                     return ML.build_ann_static(X_train, label_binarize(y_train, classes=range(self.n_classes)))
-            categorical = True
             classifier = KerasClassifier(build_fn=create_model,
                                          batch_size=batch_size,
                                          epochs=epochs)
             classifier.fit(X_train_in, label_binarize(y_train, classes=range(self.n_classes)), batch_size=batch_size, epochs=epochs, **kwargs)
         else:
-            categorical = False
             classifier = self.classifier
             classifier.fit(X_train, y_train, **kwargs)
         # probas = classifier_type.predict_proba(X_test)
@@ -775,7 +727,7 @@ class ML(object):
             y_pred = classifier.predict(X_test_in, **kwargs)
         else:
             y_pred = classifier.predict(X_test, **kwargs)
-        accuracy, cm = ML.confusion_matrix(y_test, y_pred, categorical)
+        accuracy, cm = ML.confusion_matrix(y_test, y_pred)
         return_dict = {'classifier': classifier, 'cm': cm, 'accuracy': accuracy,
                        'y_test': np.array(y_test),
                        # 'y_train': np.array(y_train),
@@ -806,39 +758,31 @@ class ML(object):
         else:
             raise AttributeError("Must use CFV before there are classifiers to set.")
 
-    def plot_roc_curves(self, y_test, y_pred, n_categories=6, fold=None):
+    def plot_roc_curves(self, y_test, y_pred, fold=None):
         """
         Plot ROC curves for the data and classifier.
 
         :param y_test:  The y testing data.
         :param y_pred:  The y predicted data.
-        :param n_categories: The number of categories, starting and 0 and
-        ending at n_categories-1.
         :param fold:  An optional fold number to add to the title.
         :return: Nothing.  This plots the curve.
         """
-        n_classes = range(n_categories)
-
         if isinstance(y_test, list):
             y_test = np.array(y_test)
         if isinstance(y_pred, list):
             y_pred = np.array(y_pred)
 
         # Compute micro-average ROC curve and ROC area
-        if self.categorical:
-            yt = y_test
-            if len(y_pred.shape) > 1 and y_pred.shape[1] > 1:
-                yp = y_pred
-            else:
-                yp = label_binarize(y_pred.tolist(), classes=n_classes)
+        yt = y_test
+        if len(y_pred.shape) > 1 and y_pred.shape[1] > 1:
+            yp = y_pred
         else:
-            yt = label_binarize(y_test.tolist(), classes=n_classes)
-            yp = label_binarize(y_pred.tolist(), classes=n_classes)
+            yp = label_binarize(y_pred.tolist(), classes=range(self.n_classes))
         fpr = dict()
         tpr = dict()
         thresholds = dict()
         roc_auc = dict()
-        for i in n_classes:
+        for i in self.n_classes:
             fpr[i], tpr[i], thresholds[i] = roc_curve(yt[:, i], yp[:, i])
             roc_auc[i] = auc(fpr[i], tpr[i])
 
@@ -846,13 +790,13 @@ class ML(object):
         fpr["micro"], tpr["micro"], _ = roc_curve(yt.ravel(), yp.ravel())
         roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
 
-        all_fpr = np.unique(np.concatenate([fpr[i] for i in n_classes]))
+        all_fpr = np.unique(np.concatenate([fpr[i] for i in range(self.n_classes)]))
         mean_tpr = np.zeros_like(all_fpr)
-        for i in n_classes:
+        for i in range(self.n_classes):
             mean_tpr += interp(all_fpr, fpr[i], tpr[i])
 
         # Finally average it and compute AUC
-        mean_tpr /= len(n_classes)
+        mean_tpr /= self.n_classes
 
         fpr["macro"] = all_fpr
         tpr["macro"] = mean_tpr
@@ -860,14 +804,11 @@ class ML(object):
 
         plt.figure()
         lw = 2
-        for i, color in zip(n_classes,
+        for i, color in zip(range(self.n_classes),
                             ['aqua', 'darkorange', 'cornflowerblue', 'red',
                              'green', 'yellow']):
-            if self.categorical:
-                cn = label_binarize([i], classes=n_classes)
-                class_name = self.decode_classifications(cn)[0]
-            else:
-                class_name = self.decode_classifications([i])[0]
+            cn = label_binarize([i], classes=range(self.n_classes))
+            class_name = self.decode_classifications(cn)[0]
             plt.plot(fpr[i], tpr[i], color=color, lw=lw,
                      label='ROC curve for class {0} (area = {1:0.2f})'.format(class_name, roc_auc[i]))
         plt.plot(fpr["micro"], tpr["micro"], color='darkmagenta',
