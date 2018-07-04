@@ -495,7 +495,7 @@ class ML(object):
             y_test = np.array(y_test)
         if isinstance(y_pred, list):
             y_pred = np.array(y_pred)
-        cm = confusion_matrix(y_test.argmax(1), y_pred.argmax(1))
+        cm = confusion_matrix(column_or_1d(y_test.argmax(1)).tolist(), column_or_1d(y_pred).tolist())
         return ML._calculate_confusion_matrix(cm)
 
     @staticmethod
@@ -679,9 +679,10 @@ class ML(object):
             categorical = False
         accuracy, cm = ML.confusion_matrix(Y_test, y_pred, categorical)
         return_dict = {'classifier': classifier, 'cm': cm, 'accuracy': accuracy,
-                       'y_test': np.array(Y_test), 'y_train': np.array(Y_train),
+                       'y_test': np.array(Y_test),
+                       # 'y_train': np.array(Y_train),
                        'y_pred': np.array(y_pred),
-                       'X_test': np.array(X_test), 'X_train': np.array(X_train),
+                       # 'X_test': np.array(X_test), 'X_train': np.array(X_train),
                        'type': 'sklearn'}
         if batch_size or epochs:
             classifier_dict = {}
@@ -724,7 +725,7 @@ class ML(object):
         # Compute micro-average ROC curve and ROC area
         if self.categorical:
             yt = y_test
-            yp = y_pred
+            yp = label_binarize(y_pred.tolist(), classes=n_classes)
         else:
             yt = label_binarize(y_test.tolist(), classes=n_classes)
             yp = label_binarize(y_pred.tolist(), classes=n_classes)

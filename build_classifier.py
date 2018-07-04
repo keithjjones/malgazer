@@ -22,7 +22,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'ann'
+classifier_type = 'dt'
 feature_type = 'rwe'
 
 #
@@ -41,7 +41,7 @@ arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', str(number_of_j
 
 # Neural Network params
 batch_size = 100
-epochs = 10
+epochs = 1
 n_categories = 6
 
 # Cross fold validation variables
