@@ -495,7 +495,8 @@ class ML(object):
             y_test = np.array(y_test)
         if isinstance(y_pred, list):
             y_pred = np.array(y_pred)
-        if y_pred.shape[1] > 1:
+
+        if len(y_pred.shape) > 1 and y_pred.shape[1] > 1:
             cm = confusion_matrix(column_or_1d(y_test.argmax(1)).tolist(), column_or_1d(y_pred.argmax(1)).tolist())
         else:
             cm = confusion_matrix(column_or_1d(y_test.argmax(1)).tolist(), column_or_1d(y_pred).tolist())
@@ -725,10 +726,22 @@ class ML(object):
         """
         n_classes = range(n_categories)
 
+        if isinstance(y_test, list):
+            y_test = np.array(y_test)
+        if isinstance(y_pred, list):
+            y_pred = np.array(y_pred)
+
+        print(y_test)
+        print(type(y_test))
+        print(y_test.shape)
+        print(y_pred)
+        print(type(y_pred))
+        print(y_pred.shape)
+
         # Compute micro-average ROC curve and ROC area
         if self.categorical:
             yt = y_test
-            if y_pred.shape[1] > 1:
+            if len(y_pred.shape) > 1 and y_pred.shape[1] > 1:
                 yp = y_pred
             else:
                 yp = label_binarize(y_pred.tolist(), classes=n_classes)
