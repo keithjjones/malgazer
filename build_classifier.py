@@ -35,6 +35,7 @@ source_dir = '/Volumes/JONES/Focused Set May 2018/Binaries'
 
 datapoints = 1024
 windowsize = 256
+n_categories = 6
 number_of_jobs = 50
 if feature_type == 'rwe':
     datadir = '/Volumes/JONES/Focused Set May 2018/RWE'
@@ -45,7 +46,6 @@ arguments = ['-w', str(windowsize), '-d', str(datapoints), '-j', str(number_of_j
 # Neural Network params
 batch_size = 100
 epochs = 1
-n_categories = 6
 
 # Cross fold validation variables
 cross_fold_validation = False
