@@ -314,6 +314,8 @@ if build_classifier:
         print("Params: {0}".format(classifier.cv_results_['params']))
         print("Mean Test Score: {0}".format(classifier.cv_results_['mean_test_score']))
         print("Best Estimator: {0}".format(classifier.best_estimator_))
+        best_param = classifier.cv_results_['params'][(classifier.cv_results_['mean_test_score'] == classifier.best_score_).argmax()]
+        print("Best Params: {0}".format(best_param))
 
         # if generate_roc_curves:
         #     ml.plot_roc_curves(y_test, y_pred, n_categories)
