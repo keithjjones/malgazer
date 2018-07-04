@@ -25,7 +25,7 @@ pd.set_option('max_colwidth', 64)
 assemble_preprocessed_data = False
 # Build a classifier
 build_classifier = True
-classifier_type = 'dt'
+classifier_type = 'ann'
 feature_type = 'rwe'
 
 #
@@ -313,7 +313,13 @@ if build_classifier:
     # Save the classifier
     if cross_fold_validation is False and classifier_type.lower() != 'gridsearch':
         print("Saving the classifier...")
-        path = os.path.join(datadir, feature_type, classifier_type.lower())
+        if feature_type == 'rwe':
+            path = os.path.join(datadir,
+                                "classifiers_rwe_{0}_window_{1}_datapoints".format(windowsize, datapoints),
+                                classifier_type.lower())
+        else:
+            path = os.path.join(datadir, "classifiers", classifier_type.lower())
+
         try:
             os.stat(path)
         except:
