@@ -127,14 +127,13 @@ if build_classifier:
         X_test = X
         y_test = y
 
+    # List the data...
     ytr = ml.decode_classifications(y_train.tolist())
     yte = ml.decode_classifications(y_test.tolist())
-
     print("Training Class Count: \n{0}".format(pd.DataFrame(ytr)[0].value_counts()))
     print("Testing Class Count: \n{0}".format(pd.DataFrame(yte)[0].value_counts()))
 
     print("Beginning training...")
-
     if classifier_type.lower() == 'cnn':
         if cross_fold_validation is False:
             # Create the CNN
