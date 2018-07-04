@@ -15,6 +15,7 @@ sys.path.append(os.path.join('..', '..'))
 sys.path.append(os.path.join('..', '..', '..'))
 from malgazer.library.files import Sample
 from malgazer import library
+from malgazer.library.ml import ML
 from malgazer.docker.db_models.models import Submission, WebRequest, setup_database, clear_database, db
 
 
@@ -60,7 +61,8 @@ def process_sample(id):
     submission = Submission.query.filter_by(id=id).first()
     try:
         # ml = pickle.load(open(os.path.join('..', '..', 'classifier', 'ml.pickle'), 'rb'))
-        ml = dill.load(open(os.path.join('..', '..', 'classifier', 'ml.dill'), 'rb'))
+        # ml = dill.load(open(os.path.join('..', '..', 'classifier', 'ml.dill'), 'rb'))
+        ml = ML.load_classifier(os.path.join('..', '..', 'classifier'))
         s = Sample(fromfile=os.path.join('/samples', submission.sha256))
         y = ml.predict_sample(s)
         submission = Submission.query.filter_by(id=id).first()
