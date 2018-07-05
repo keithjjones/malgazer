@@ -40,7 +40,7 @@ def main():
     except:
         os.makedirs(args.OutputDirectory)
 
-    api = IntelApi(args.apikey)
+    intel_api = IntelApi(args.apikey)
 
     downloads = 0
     nextpage = None
@@ -52,7 +52,7 @@ def main():
         try:
             results = None
             while results is None:
-                results = api.get_intel_notifications_feed(nextpage)
+                results = intel_api.get_intel_notifications_feed(nextpage)
                 nextpage = results['results']['next']
                 results = results['results']
                 if 'error' in results:
@@ -80,7 +80,7 @@ def main():
                             downloaded = False
                             while downloaded is False:
                                 try:
-                                    response = api.get_file(notification['sha256'], subdir)
+                                    response = intel_api.get_file(notification['sha256'], subdir)
                                 except KeyboardInterrupt:
                                     if os.path.isfile(filename):
                                         os.remove(filename)
@@ -101,12 +101,12 @@ def main():
                                     downloaded = True
                                     if args.delete_downloaded:
                                         print("\t\tDeleting downloaded sample from feed...")
-                                        del_response = api.delete_intel_notifications([notification['id']])
+                                        del_response = intel_api.delete_intel_notifications([notification['id']])
                         else:
                             print("\t\tSkipping sample download, downloading metadata...")
                             if args.delete_downloaded:
                                 print("\t\tDeleting downloaded sample from feed...")
-                                del_response = api.delete_intel_notifications([notification['id']])
+                                del_response = intel_api.delete_intel_notifications([notification['id']])
 
                         downloads += 1
                         print("\t\tDownloaded {0:,} samples...".format(downloads))
@@ -114,7 +114,7 @@ def main():
                     else:
                         print("\tDeleting duplicate sample from feed...")
                         if args.delete_downloaded:
-                            del_response = api.delete_intel_notifications([notification['id']])
+                            del_response = intel_api.delete_intel_notifications([notification['id']])
 
                     ds = pd.Series(notification)
                     ds.name = notification['sha256']
@@ -125,7 +125,7 @@ def main():
                 else:
                     if args.delete_non_matches:
                         # Delete the notification if it does not match
-                        del_response = api.delete_intel_notifications([notification['id']])
+                        del_response = intel_api.delete_intel_notifications([notification['id']])
 
                 if args.number_of_samples > 0 and downloads >= args.number_of_samples:
                     break
