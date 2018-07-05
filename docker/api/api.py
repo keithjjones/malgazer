@@ -12,7 +12,7 @@ import pickle
 import sys
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
-sys.path.append(os.path.join('..', '..', '..'))
+# sys.path.append(os.path.join('..', '..', '..'))
 from library.files import Sample
 from library.ml import ML
 from docker.db_models.models import Submission, WebRequest, setup_database, clear_database, db

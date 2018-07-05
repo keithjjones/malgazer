@@ -14,14 +14,15 @@ services:
       - ./classifier:/classifier
     environment:
       - FLASK_APP=docker.api.api
-      - ENV FLASK_ENV=development
-    command: ["flask", "run", "--host=0.0.0.0", "--port=8080"]
-#    command: ["gunicorn", "-w 10", "-b 0.0.0.0:8080", "docker.api.api:app"]
+      - FLASK_ENV=development
+    command: ["flask", "run", "--host=0.0.0.0", "--port=8888"]
+#    command: ["gunicorn", "-w 10", "-b 0.0.0.0:8888", "docker.api.api:app"]
 
   web:
-    build:
-      context: ./
-      dockerfile: docker/Dockerfile-base
+    image:  malgazer_api:latest
+#    build:
+#      context: ./
+#      dockerfile: docker/Dockerfile-base
     depends_on:
       - db
       - api
@@ -32,7 +33,7 @@ services:
       - ./samples:/samples
     environment:
       - FLASK_APP=docker.web.web
-      - ENV FLASK_ENV=development
+      - FLASK_ENV=development
     command: ["flask", "run", "--host=0.0.0.0", "--port=8080"]
 #    command: ["gunicorn", "-w 10", "-b 0.0.0.0:8080", "docker.web.web:app"]
 
