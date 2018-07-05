@@ -109,12 +109,15 @@ def main(arguments=None):
     print("Cleaning up master data set...")
     output_df = pd.concat(outputs)
     output_df = output_df[~output_df.index.duplicated(keep='first')]
+    print("Full Data Set:")
     print(output_df['classification'].value_counts())
 
     print("Writing master data set to: {0} and {1}".format(output_hdf, output_hdf_trimmed))
     output_df.to_hdf(output_hdf, 'data')
     output_df_trimmed = output_df.groupby(['classification']).head(args.perclass)
     output_df_trimmed.to_hdf(output_hdf_trimmed, 'data')
+    print("Trimmed Data Set:")
+    print(output_df_trimmed['classification'].value_counts())
 
     # hashes_csv = os.path.join(path, 'hashes.csv')
     # hashes = pd.DataFrame(output_df_trimmed.index.values)

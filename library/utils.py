@@ -758,8 +758,8 @@ class Utils(object):
         Loads data from datadir, for feature_type, and sanity checks the data sets.
 
         :param datadir:  The data dir to load from.
-        :param feature_type:   The feature type:  'rwe' or 'gist'.  'rwe' requires a datapoints and windowsize named
-        argument.
+        :param feature_type:   The feature type:  'rwe' or 'gist'.
+        'rwe' requires a datapoints and windowsize named arguments.
         :param filterhashes:  Set to True to load hashes.csv and only show hashes that are inside that file.
         :return:  A 3-tuple of all_data, raw_data, and classifications where all_data is the assembly of raw_data and
         classifications.

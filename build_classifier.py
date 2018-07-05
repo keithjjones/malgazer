@@ -16,7 +16,7 @@ pd.set_option('max_colwidth', 64)
 #
 # Script actions
 #
-classifier_type = 'dt'
+classifier_type = 'gridsearch'
 feature_type = 'gist'
 
 #
@@ -47,9 +47,11 @@ cfv_groups = 5
 generate_roc_curves = False
 
 # Grid search params
-gridsearch_type = 'ann'
-gridsearch_params = {'epochs': [1, 2], 'batch_size': [100, 200]}
+gridsearch_type = 'svm'
+# gridsearch_params = {'epochs': [1, 2], 'batch_size': [100, 200]}
 # gridsearch_params = {'criterion': ['gini', 'entropy']}
+gridsearch_params = {'kernel': ['rbf', 'linear', 'poly', 'sigmoid']}
+gridsearch_cv = 5
 gridsearch_njobs = -1
 
 # KNN params
@@ -71,7 +73,7 @@ ovr_base_estimator = ML.build_svm_static(kernel='rbf')
 
 # Set this to the percentage for test size,
 # 0 makes the train and test set be the whole data set
-test_percent = 0.9
+test_percent = 0.2
 # Make the whole data set for training if we are doing cross fold validation
 if (cross_fold_validation and cross_fold_use_all_samples) or classifier_type.lower() == 'gridsearch':
     test_percent = 0
@@ -216,7 +218,7 @@ elif classifier_type.lower() == 'gridsearch':
 
     classifier = ml.build_gridsearch(gridsearch_type=gridsearch_type, estimator=classifier,
                                      param_grid=gridsearch_params,
-                                     cv=cfv_groups, n_jobs=gridsearch_njobs)
+                                     cv=gridsearch_cv, n_jobs=gridsearch_njobs)
     start_time = time.time()
 
     classifier = ml.train(Xt, yt)
@@ -293,4 +295,5 @@ try:
     os.stat(path)
 except:
     os.makedirs(path)
-ml.save_classifier(path)
+if classifier_type.lower() != 'gridsearch':
+    ml.save_classifier(path)
