@@ -1,10 +1,8 @@
 # Machine Learning Module
 import pandas as pd
 import numpy as np
-from numpy import argmax
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.models import model_from_json
-from sklearn.model_selection import cross_val_score
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, MaxPooling1D, Conv1D, InputLayer
 from sklearn.model_selection import GridSearchCV
@@ -27,12 +25,11 @@ from sklearn.model_selection import StratifiedKFold
 from scipy import interp
 import matplotlib.pyplot as plt
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
-import keras.backend as K
 import keras.callbacks
 import os
-import pickle
 import dill
 from .entropy import resample
+from sklearn import tree
 
 
 class ML(object):
@@ -108,6 +105,10 @@ class ML(object):
         :param filename: Base file name of the classifier (without extensions)
         :return: Nothing
         """
+        if self.classifier_type == 'gridsearch':
+            raise TypeError("Gridsearch model saving is not supported!")
+        if self.classifier_type == 'dt':
+            tree.export_graphviz(self.classifier, out_file=os.path.join(directory, 'tree.dot'))
         if self.classifier_type in ['ann', 'cnn']:
             with open(os.path.join(directory, "nn.json"), 'w') as file:
                 file.write(self.classifier.to_json())
@@ -362,16 +363,16 @@ class ML(object):
         return self.classifier.predict(X)
 
     @staticmethod
-    def build_ann_static(input, outputs):
+    def build_ann_static(X, y):
         """
         Create a generic ANN.
 
-        :param input:  The input to the ANN, used to find input shape.
-        :param outputs:  The output to the ANN, used to find the output shape.
+        :param X:  The input to the ANN, used to find input shape.
+        :param y:  The output to the ANN, used to find the output shape.
         :return:  The classifier.
         """
-        datapoints = input.shape[1]
-        output_shape = outputs.shape[1]
+        datapoints = X.shape[1]
+        output_shape = y.shape[1]
         classifier = Sequential()
         classifier.add(Dense(units=datapoints, kernel_initializer='uniform',
                              activation='relu', input_dim=datapoints))
@@ -389,31 +390,31 @@ class ML(object):
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_ann(self, input, outputs):
+    def build_ann(self, X, y):
         """
         Create a generic ANN.
 
-        :param input:  The input to the ANN, used to find input shape.
-        :param outputs:  The output to the ANN, used to find the output shape.
+        :param X:  The input to the ANN, used to find input shape.
+        :param y:  The output to the ANN, used to find the output shape.
         :return:  The classifier.
         """
         self.classifier_type = 'ann'
-        self.classifier = ML.build_ann_static(input, outputs)
+        self.classifier = ML.build_ann_static(X, y)
         self.classifier.summary()
         return self.classifier
 
     @staticmethod
-    def build_cnn_static(input, outputs):
+    def build_cnn_static(X, y):
         """
         Create a generic CNN.
 
-        :param input:  The input to the CNN, used to find input shape.
-        :param outputs:  The output to the CNN, used to find the output shape.
+        :param X:  The input to the CNN, used to find input shape.
+        :param y:  The output to the CNN, used to find the output shape.
         :return:  The classifier.
         """
-        datapoints = input.shape[1:]
+        datapoints = X.shape[1:]
         input_dim = datapoints[0]
-        output_shape = outputs.shape[1]
+        output_shape = y.shape[1]
         classifier = Sequential()
         classifier.add(InputLayer(input_shape=datapoints))
         classifier.add(Conv1D(filters=10, kernel_size=int(input_dim/4), activation='relu'))
@@ -431,20 +432,20 @@ class ML(object):
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_cnn(self, input, outputs):
+    def build_cnn(self, X, y):
         """
         Create a generic CNN.
 
-        :param input:  The input to the CNN, used to find input shape.
-        :param outputs:  The output to the CNN, used to find the output shape.
+        :param X:  The input to the CNN, used to find input shape.
+        :param y:  The output to the CNN, used to find the output shape.
         :return:  The classifier.
         """
-        if len(input.shape) != 3:
-            X_in = np.expand_dims(input, axis=2)
+        if len(X.shape) != 3:
+            X = np.expand_dims(X, axis=2)
         else:
-            X_in = input
+            X = X
         self.classifier_type = 'cnn'
-        self.classifier = ML.build_cnn_static(X_in, outputs)
+        self.classifier = ML.build_cnn_static(X, y)
         self.classifier.summary()
         return self.classifier
 
