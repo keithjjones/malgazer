@@ -42,8 +42,9 @@ def main(arguments=None):
                         help="The maximum number of samples, per class."
                              "", type=int, default=11000)
     parser.add_argument("-j", "--jobs",
-                        help="The number of jobs for this task."
-                             "", type=int, default=8)
+                        help="The number of jobs for this task.  "
+                        "Use -1 for all CPU cores."
+                             "", type=int, default=-1)
     if isinstance(arguments, list):
         args = parser.parse_args(arguments)
     else:
@@ -80,7 +81,10 @@ def main(arguments=None):
 
     print("Assembling VT data...")
     saved_futures = {}
-    with ProcessPoolExecutor(max_workers=args.jobs) as executor:
+    max_workers = args.jobs
+    if max_workers < 0:
+        max_workers = None
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
         for hdf_file in hdf_files:
             print("\tComputing File: {0}".format(hdf_file))
             future = executor.submit(assemble_hdfs, hdf_file)
