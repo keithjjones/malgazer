@@ -10,7 +10,8 @@ import sys
 def main(arguments=None):
     # Argument parsing
     parser = argparse.ArgumentParser(
-        description='Calculates the GIST features from a directory of files.')
+        description='Calculates the GIST features from a directory of files.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('MalwareDirectory',
                         help='The directory containing malware to analyze.')
     parser.add_argument('DataDirectory',

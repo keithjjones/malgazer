@@ -4,7 +4,8 @@ import pandas as pd
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Pulls hashes from VT data.')
+        description='Pulls hashes from VT data.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('VTCSV',
                         help='The VT CSV file.')
     parser.add_argument("-l", "--lowercase",

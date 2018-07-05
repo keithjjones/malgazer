@@ -11,7 +11,8 @@ pd.set_option('max_colwidth', 64)
 def main(arguments=None):
     # Argument parsing
     parser = argparse.ArgumentParser(
-        description='Calculates the RWE features from a directory of files.')
+        description='Calculates the RWE features from a directory of files.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('DataDirectory',
                         help='The directory containing the data files.'
                         'This will also contain hashes.txt when finished.')

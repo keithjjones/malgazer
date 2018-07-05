@@ -9,7 +9,8 @@ import pandas as pd
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Downloads samples from VT Intelligence based upon a query.')
+        description='Downloads samples from VT Intelligence based upon a query.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('OutputDirectory',
                         help='The output directory for the samples.')
     parser.add_argument('Query',

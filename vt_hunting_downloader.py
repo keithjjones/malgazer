@@ -11,7 +11,8 @@ from virus_total_apis import IntelApi
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Downloads samples from VT Intelligence.')
+        description='Downloads samples from VT Intelligence.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('OutputDirectory',
                         help='The output directory for the samples.')
     parser.add_argument("-a", "--apikey",

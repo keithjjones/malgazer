@@ -16,7 +16,7 @@ pd.set_option('max_colwidth', 64)
 #
 # Script actions
 #
-classifier_type = 'ann'
+classifier_type = 'dt'
 feature_type = 'rwe'
 
 #
