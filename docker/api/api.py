@@ -13,10 +13,9 @@ import sys
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
 sys.path.append(os.path.join('..', '..', '..'))
-from malgazer.library.files import Sample
-from malgazer import library
-from malgazer.library.ml import ML
-from malgazer.docker.db_models.models import Submission, WebRequest, setup_database, clear_database, db
+from library.files import Sample
+from library.ml import ML
+from docker.db_models.models import Submission, WebRequest, setup_database, clear_database, db
 
 
 # Initialize and configure the Flask API
