@@ -2,8 +2,6 @@ import argparse
 import datetime
 import os
 import time
-import ast
-import json
 import pandas as pd
 from library.files import sha256_file
 from virus_total_apis import IntelApi
@@ -48,6 +46,7 @@ def main():
     nextpage = None
 
     df = pd.DataFrame()
+    rows_to_add = []
 
     while True:
         try:
@@ -122,7 +121,7 @@ def main():
                     ds_scans = pd.Series(notification['scans'])
                     ds_scans.name = notification['sha256']
                     ds = ds.append(ds_scans)
-                    df = df.append(ds)
+                    rows_to_add.append(ds)
                 else:
                     if args.delete_non_matches:
                         # Delete the notification if it does not match
@@ -137,6 +136,9 @@ def main():
         except KeyboardInterrupt:
             print("Caught CTRL-C!")
             break
+
+    print("Assembling CSV...")
+    df = df.append(rows_to_add)
 
     now = datetime.datetime.now()
     now_str = "{0}_{1:02}_{2:02}_{3:02}_{4:02}_{5:02}_{6}".format(now.year,

@@ -38,6 +38,7 @@ def main():
     nextpage = None
 
     df = pd.DataFrame()
+    rows_to_add = []
 
     while downloads <= args.number_of_samples:
         try:
@@ -50,6 +51,7 @@ def main():
                     results = None
                 else:
                     results = results.json()
+
             print("Downloading hashes for samples...")
 
             for hash in results['hashes']:
@@ -99,7 +101,7 @@ def main():
 
                     ds = pd.Series(file_report['results'])
                     ds.name = hash.upper()
-                    df = df.append(ds)
+                    rows_to_add.append(ds)
                 else:
                     break
 
@@ -108,6 +110,9 @@ def main():
         except KeyboardInterrupt:
             print("Caught CTRL-C!")
             break
+
+    print("Assembling CSV...")
+    df = df.append(rows_to_add)
 
     now = datetime.datetime.now()
     now_str = "{0}_{1:02}_{2:02}_{3:02}_{4:02}_{5:02}_{6}".format(now.year,
