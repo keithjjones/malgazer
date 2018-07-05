@@ -111,7 +111,7 @@ def main():
             print("Caught CTRL-C!")
             break
 
-    print("Assembling CSV...")
+    print("Assembling HDF...")
     df = df.append(rows_to_add)
 
     now = datetime.datetime.now()
@@ -122,8 +122,8 @@ def main():
                                                                   now.minute,
                                                                   now.second,
                                                                   now.microsecond)
-    print("Writing metadata CSV...")
-    df.to_csv(os.path.join(args.OutputDirectory, "vti_metadata_{0}.csv".format(now_str)))
+    print("Writing metadata HDF...")
+    df.to_hdf(os.path.join(args.OutputDirectory, "vti_metadata_{0}.hdf".format(now_str)), 'data')
     print("Downloaded {0:,} Total Samples".format(downloads))
 
 

@@ -79,17 +79,13 @@ if (cross_fold_validation and cross_fold_use_all_samples) or classifier_type.low
 print("Loading data...")
 
 # Load data
-all_data, raw_data, classifications = Utils.load_features(datadir, feature_type, windowsize=windowsize, datapoints=datapoints)
-
-# Pull the hashes we care about
-hashes = pd.read_csv(os.path.join(datadir, 'hashes.txt'), header=None).values[:, 0]
-data = Utils.filter_hashes(all_data, hashes)
+all_data, raw_data, classifications = Utils.load_features(datadir, feature_type, filterhashes=True, windowsize=windowsize, datapoints=datapoints)
 
 print("Test percent: {0}".format(test_percent))
 
 # Assemble the final training data
-X = data.drop('classification', axis=1).values.copy()
-y = pd.DataFrame(data['classification']).values.copy()
+X = all_data.drop('classification', axis=1).values.copy()
+y = pd.DataFrame(all_data['classification']).values.copy()
 
 # Make the classifier
 ml = ML(feature_type=feature_type, classifier_type=classifier_type, n_classes=n_categories, rwe_windowsize=windowsize, datapoints=datapoints)

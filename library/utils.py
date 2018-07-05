@@ -270,6 +270,21 @@ class Utils(object):
         return Utils.estimate_vt_classifications_from_DataFrame(df, products)
 
     @staticmethod
+    def estimate_vt_classifications_from_hdf(filename, products=None):
+        """
+        Reads a HDF file containing VT classifications and attempts to estimate
+        the accurate classification from several AV vendors.
+
+        :param filename:  The file name of the HDF containing the VT data.
+        :param products:  The list of products (columns) to use in the classification.
+        The order is important.  Products earlier in the list take precedence over
+        products later in the list.
+        :return:  A DataFrame with the classification for each hash.
+        """
+        df = pd.read_hdf(filename, 'data')
+        return Utils.estimate_vt_classifications_from_DataFrame(df, products)
+
+    @staticmethod
     def estimate_vt_classifications_from_DataFrame(classifications, products=None):
         """
         Reads a DataFrame containing VT classifications and attempts to estimate
@@ -738,13 +753,14 @@ class Utils(object):
         return cls
 
     @staticmethod
-    def load_features(datadir, feature_type='rwe', *args, **kwargs):
+    def load_features(datadir, feature_type='rwe', filterhashes=False, *args, **kwargs):
         """
         Loads data from datadir, for feature_type, and sanity checks the data sets.
 
         :param datadir:  The data dir to load from.
         :param feature_type:   The feature type:  'rwe' or 'gist'.  'rwe' requires a datapoints and windowsize named
         argument.
+        :param filterhashes:  Set to True to load hashes.csv and only show hashes that are inside that file.
         :return:  A 3-tuple of all_data, raw_data, and classifications where all_data is the assembly of raw_data and
         classifications.
         """
@@ -752,6 +768,10 @@ class Utils(object):
             raw_data, classification_data = Utils.load_rwe_features(datadir, kwargs.get('windowsize', 256), kwargs.get('datapoints', 1024))
         if feature_type.lower() == 'gist':
             raw_data, classification_data = Utils.load_gist_features(datadir)
+        if filterhashes:
+            hashes = pd.read_csv(os.path.join(datadir, 'hashes.txt'), header=None).values[:, 0]
+            raw_data = Utils.filter_hashes(raw_data, hashes)
+            classification_data = Utils.filter_hashes(classification_data, hashes)
         return Utils.sanity_check_classifications(raw_data, classification_data)
 
     @staticmethod
