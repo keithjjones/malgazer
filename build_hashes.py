@@ -17,15 +17,15 @@ def main(arguments=None):
                         'This will also contain hashes.txt when finished.')
     parser.add_argument("-p", "--perclass",
                         help="The maximum number of samples, per class."
-                             "", type=int, default=10000, required=False)
+                             "", type=int, default=10000)
     parser.add_argument("-w", "--window",
                         help="Window size, in bytes, for running entropy."
-                             "", type=int, default=256, required=False)
+                             "", type=int, default=256)
     parser.add_argument("-d", "--datapoints",
                         help="The number of data points to sample running window entropy."
                              "Multiple datapoints can be identified as comma "
                              "separated values without spaces."
-                             "", type=int, default=1024, required=False)
+                             "", type=int, default=1024)
     if isinstance(arguments, list):
         args = parser.parse_args(arguments)
     else:

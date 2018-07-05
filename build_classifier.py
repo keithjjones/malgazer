@@ -82,7 +82,7 @@ print("Loading data...")
 all_data, raw_data, classifications = Utils.load_features(datadir, feature_type, windowsize=windowsize, datapoints=datapoints)
 
 # Pull the hashes we care about
-hashes = pd.read_csv(os.path.join(datadir, 'hashes_60k.txt'), header=None).values[:, 0]
+hashes = pd.read_csv(os.path.join(datadir, 'hashes.txt'), header=None).values[:, 0]
 data = Utils.filter_hashes(all_data, hashes)
 
 print("Test percent: {0}".format(test_percent))
