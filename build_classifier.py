@@ -17,7 +17,7 @@ pd.set_option('max_colwidth', 64)
 # Script actions
 #
 classifier_type = 'dt'
-feature_type = 'rwe'
+feature_type = 'gist'
 
 #
 # Calculate features

@@ -788,7 +788,7 @@ class Utils(object):
         # exception if it does not exist.
         os.stat(datadir)
         df = pd.read_hdf(os.path.join(datadir, 'rwe_window_{0}_datapoints_{1}.hdf'.format(windowsize, datapoints)), 'rwe')
-        classifications = pd.read_csv(os.path.join(datadir, 'classifications.csv'), index_col=0)
+        classifications = pd.read_hdf(os.path.join(datadir, 'classifications.hdf'), 'data')
         return df, classifications
 
     @staticmethod
@@ -803,7 +803,7 @@ class Utils(object):
         # exception if it does not exist.
         os.stat(datadir)
         df = pd.read_hdf(os.path.join(datadir, 'gist.hdf'), 'gist')
-        classifications = pd.read_csv(os.path.join(datadir, 'classifications.csv'), index_col=0)
+        classifications = pd.read_hdf(os.path.join(datadir, 'classifications.hdf'), 'data')
         return df, classifications
 
     @staticmethod
