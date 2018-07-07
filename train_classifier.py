@@ -11,7 +11,10 @@ from keras.wrappers.scikit_learn import KerasClassifier
 
 pd.set_option('max_colwidth', 64)
 
+# This controls the size and look of the divider
 DIVIDER_LENGTH = 80
+DIVIDER_CHAR = '='
+DIVIDER = DIVIDER_CHAR*DIVIDER_LENGTH
 
 
 def get_estimator_static(classifier_type, *args, **kwargs):
@@ -206,11 +209,17 @@ def main(arguments=None):
     if cross_fold_validation or classifier_type == 'gridsearch':
         test_percent = 0
 
+    print(DIVIDER)
     print("Loading data...")
+    print(DIVIDER)
 
     # Load data
     all_data, raw_data, classifications = Utils.load_features(datadir, feature_type, filterhashes=True,
                                                               windowsize=windowsize, datapoints=datapoints)
+
+    print(DIVIDER)
+    print("Number of features: {0:,}".format(len(raw_data.columns)))
+    print(DIVIDER)
 
     # Assemble the final training data
     X = all_data.drop('classification', axis=1).values.copy()
@@ -219,6 +228,7 @@ def main(arguments=None):
     # Make the classifier
     ml = ML(feature_type=feature_type, classifier_type=classifier_type, n_classes=n_categories, rwe_windowsize=windowsize, datapoints=datapoints)
     X, y = ml.preprocess_data(X, y)
+
     if test_percent > 0:
         X_train, X_test, y_train, y_test = ml.train_test_split(X, y, test_percent=test_percent)
     else:
@@ -231,19 +241,26 @@ def main(arguments=None):
     ytr = ml.decode_classifications(y_train.tolist())
     yte = ml.decode_classifications(y_test.tolist())
     print("\n")
-    print("="*DIVIDER_LENGTH)
+    if classifier_type == 'gridsearch':
+        print(DIVIDER)
+        print("Grid Search Enabled!")
+    if cross_fold_validation:
+        print(DIVIDER)
+        print("Cross Fold Validation {0} Enabled!".format(cfv_groups))
+    print(DIVIDER)
     print("Training Class Count:")
-    print("="*DIVIDER_LENGTH)
+    print(DIVIDER)
     print("\t{0}".format(pd.DataFrame(ytr)[0].value_counts().to_string().replace('\n', '\n\t')))
-    print("="*DIVIDER_LENGTH)
+    print(DIVIDER)
     print("Testing Class Count:")
-    print("="*DIVIDER_LENGTH)
+    print(DIVIDER)
     print("\t{0}".format(pd.DataFrame(yte)[0].value_counts().to_string().replace('\n', '\n\t')))
-    print("="*DIVIDER_LENGTH)
+    print(DIVIDER)
     print("\n")
 
-    print("="*DIVIDER_LENGTH)
+    print(DIVIDER)
     print("Begin training...")
+    print(DIVIDER)
     print("\n")
     if classifier_type.lower() == 'cnn':
         if cross_fold_validation is False:
@@ -254,7 +271,7 @@ def main(arguments=None):
             start_time = time.time()
             classifier = ml.train(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=False)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
             print("\n")
 
             # Predict the results
@@ -263,13 +280,13 @@ def main(arguments=None):
             # Making the Confusion Matrix
             accuracy, cm = ml.confusion_matrix(y_test, y_pred)
 
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
             print("Confusion Matrix:")
             print(cm)
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
             print("\tAccuracy:")
             print("\t{0}".format(accuracy))
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
 
             if generate_roc_curves:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
@@ -281,10 +298,10 @@ def main(arguments=None):
                                                                    epochs=epochs,
                                                                    cv=cfv_groups)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
 
             if generate_roc_curves:
                 for fold in range(cfv_groups):
@@ -302,7 +319,7 @@ def main(arguments=None):
             start_time = time.time()
             classifier = ml.train(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=False)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
             print("\n")
 
             # Predict the results
@@ -311,13 +328,13 @@ def main(arguments=None):
             # Making the Confusion Matrix
             accuracy, cm = ml.confusion_matrix(y_test, y_pred)
 
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
             print("Confusion Matrix:")
             print(cm)
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
             print("\tAccuracy:")
             print("\t{0}".format(accuracy))
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
 
             if generate_roc_curves:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
@@ -329,10 +346,10 @@ def main(arguments=None):
                                                                    epochs=epochs,
                                                                    cv=cfv_groups)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
 
             if generate_roc_curves:
                 for fold in range(cfv_groups):
@@ -358,20 +375,20 @@ def main(arguments=None):
 
         classifier = ml.train(Xt, yt)
         print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-        print("=" * DIVIDER_LENGTH)
+        print(DIVIDER)
         print("\n")
 
-        print("=" * DIVIDER_LENGTH)
+        print(DIVIDER)
         print("Best Score: {0}".format(classifier.best_score_))
-        print("=" * DIVIDER_LENGTH)
+        print(DIVIDER)
         print("CV Results: {0}".format(classifier.cv_results_))
         print("Params: {0}".format(classifier.cv_results_['params']))
-        print("=" * DIVIDER_LENGTH)
+        print(DIVIDER)
         print("Mean Test Score: {0}".format(classifier.cv_results_['mean_test_score']))
         best_param = classifier.cv_results_['params'][(classifier.cv_results_['mean_test_score'] == classifier.best_score_).argmax()]
-        print("=" * DIVIDER_LENGTH)
+        print(DIVIDER)
         print("Best Params: {0}".format(best_param))
-        print("=" * DIVIDER_LENGTH)
+        print(DIVIDER)
     else:
         # This area is for scikit learn models
         if classifier_type.lower() == 'svm':
@@ -399,7 +416,7 @@ def main(arguments=None):
         if cross_fold_validation is False:
             classifier = ml.train(X_train, y_train)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
             print("\n")
             y_pred = ml.predict(X_test)
             # probas = ml.classifier.predict_proba(X_test)
@@ -407,13 +424,13 @@ def main(arguments=None):
             # Making the Confusion Matrix
             accuracy, cm = ml.confusion_matrix(y_test, y_pred)
 
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
             print("Confusion Matrix:")
             print(cm)
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
             print("\tAccuracy:")
             print("\t{0}".format(accuracy))
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
 
             if generate_roc_curves:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
@@ -422,10 +439,10 @@ def main(arguments=None):
             mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
                                                                    cv=cfv_groups)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
-            print("=" * DIVIDER_LENGTH)
+            print(DIVIDER)
 
             if generate_roc_curves:
                 for fold in range(cfv_groups):
@@ -448,11 +465,11 @@ def main(arguments=None):
     except:
         os.makedirs(path)
     if classifier_type.lower() != 'gridsearch':
-        print("=" * DIVIDER_LENGTH)
+        print(DIVIDER)
         print("Saving the classifier...")
         ml.save_classifier(path)
         print("Classifier saved to: {0}".format(path))
-        print("=" * DIVIDER_LENGTH)
+        print(DIVIDER)
         print("\n")
 
 
