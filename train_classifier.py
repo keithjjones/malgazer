@@ -111,6 +111,10 @@ def main(arguments=None):
     parser.add_argument("-n", "--numclasses",
                         help="The number of classes in the training data."
                              "", type=int, default=6)
+    parser.add_argument("-e", "--estimatorparams",
+                        help="Extra params to use for an estimator, as a JSON dict.  Leave as '{}' to add nothing.  "
+                             "Ignored for gridsearch."
+                             "", type=str, default='{}')
     parser.add_argument("-roc", "--roccurves", action='store_true',
                         help="Plot the ROC curves."
                              "", required=False)
@@ -129,6 +133,9 @@ def main(arguments=None):
     parser.add_argument("-ncs", "--ncshrink",
                         help="The nc shrink threshold."
                              "", type=float, default=0.2)
+    parser.add_argument("-rfn", "--rfnumestimators",
+                        help="The number of estimators for rf."
+                             "", type=int, default=20)
     parser.add_argument("-gt", "--gridsearchtype",
                         help="The type of the base estimator for gridsearch."
                              "", type=str, default='dt')
@@ -145,6 +152,9 @@ def main(arguments=None):
     parser.add_argument("-at", "--adaboosttype",
                         help="The type of the base estimator for adaboost."
                              "", type=str, default='dt')
+    parser.add_argument("-aa", "--adaboostalgorithm",
+                        help="The algorithm of adaboost."
+                             "", type=str, default='SAMME')
     parser.add_argument("-an", "--adaboostnumestimators",
                         help="The number of estimators for adaboost."
                              "", type=int, default=20)
@@ -179,6 +189,7 @@ def main(arguments=None):
     gridsearch_njobs = args.gridsearchjobs
     gridsearch_cv = args.gridsearchcv
     adaboost_type = args.adaboosttype
+    adaboost_algorithm = args.adaboostalgorithm
     adaboost_n_estimators = args.adaboostnumestimators
     adaboost_base_estimator = get_estimator_static(adaboost_type)
     knn_weights = 'distance'
@@ -187,6 +198,8 @@ def main(arguments=None):
     ovr_type = args.ovrtype.lower()
     ovr_base_estimator = get_estimator_static(ovr_type)
     nc_shrink_threshold = args.ncshrink
+    extra_estimator_params = json.loads(args.estimatorparams)
+    rf_numestimators = args.rfnumestimators
 
     if cross_fold_validation or classifier_type == 'gridsearch':
         test_percent = 0
@@ -219,11 +232,15 @@ def main(arguments=None):
     ytr = ml.decode_classifications(y_train.tolist())
     yte = ml.decode_classifications(y_test.tolist())
     print("\n")
-    print("======")
-    print("Training Class Count: \n{0}".format(pd.DataFrame(ytr)[0].value_counts()))
-    print("======")
-    print("Testing Class Count: \n{0}".format(pd.DataFrame(yte)[0].value_counts()))
-    print("======")
+    print("=====================")
+    print("Training Class Count:")
+    print("=====================")
+    print("{0}".format(pd.DataFrame(ytr)[0].value_counts()))
+    print("=====================")
+    print("Testing Class Count:")
+    print("=====================")
+    print("{0}".format(pd.DataFrame(yte)[0].value_counts()))
+    print("=====================")
     print("\n")
 
     print("Begin training...")
@@ -247,8 +264,8 @@ def main(arguments=None):
 
             print("Confusion Matrix:")
             print(cm)
-            print("Accuracy:")
-            print(accuracy)
+            print("\tAccuracy:")
+            print("\t{0}".format(accuracy))
 
             if generate_roc_curves:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
@@ -289,8 +306,8 @@ def main(arguments=None):
 
             print("Confusion Matrix:")
             print(cm)
-            print("Accuracy:")
-            print(accuracy)
+            print("\tAccuracy:")
+            print("\t{0}".format(accuracy))
 
             if generate_roc_curves:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
@@ -341,21 +358,25 @@ def main(arguments=None):
     else:
         # This area is for scikit learn models
         if classifier_type.lower() == 'svm':
-            classifier = get_estimator(classifier_type.lower(), ml, kernel='rbf')
+            estimator_params = {'kernel': 'rbf'}
         elif classifier_type.lower() == 'dt':
-            classifier = get_estimator(classifier_type.lower(), ml, criterion='entropy')
+            estimator_params = {'criterion': 'entropy'}
         elif classifier_type.lower() == 'nb':
-            classifier = get_estimator(classifier_type.lower(), ml)
+            pass
         elif classifier_type.lower() == 'rf':
-            classifier = get_estimator(classifier_type.lower(), ml, n_estimators=10, criterion='entropy')
+            estimator_params = {'n_estimators': rf_numestimators, 'criterion': 'entropy'}
         elif classifier_type.lower() == 'knn':
-            classifier = get_estimator(classifier_type.lower(), ml, n_neighbors=knn_neighbors, weights=knn_weights, n_jobs=knn_n_jobs)
+            estimator_params = {'n_neighbors': knn_neighbors, 'weights': knn_weights,
+                                'n_jobs': knn_n_jobs}
         elif classifier_type.lower() == 'nc':
-            classifier = get_estimator(classifier_type.lower(), ml, shrink_threshold=nc_shrink_threshold)
+            estimator_params = {'shrink_threshold': nc_shrink_threshold}
         elif classifier_type.lower() == 'adaboost':
-            classifier = get_estimator(classifier_type.lower(), ml, adaboost_type=adaboost_type, n_estimators=adaboost_n_estimators, base_estimator=adaboost_base_estimator, algorithm='SAMME')
+            estimator_params = {'n_estimators': adaboost_n_estimators, 'base_estimator': adaboost_base_estimator,
+                                'algorithm': adaboost_algorithm, 'adaboost_type': adaboost_type}
         elif classifier_type.lower() == 'ovr':
-            classifier = get_estimator(classifier_type.lower(), ml, ovr_type=ovr_type, estimator=ovr_base_estimator)
+            estimator_params = {'ovr_type': ovr_type, 'estimator': ovr_base_estimator}
+        estimator_params.update(extra_estimator_params)
+        classifier = get_estimator(classifier_type.lower(), ml, **estimator_params)
 
         start_time = time.time()
         if cross_fold_validation is False:
@@ -370,8 +391,8 @@ def main(arguments=None):
 
             print("Confusion Matrix:")
             print(cm)
-            print("Accuracy:")
-            print(accuracy)
+            print("\tAccuracy:")
+            print("\t{0}".format(accuracy))
 
             if generate_roc_curves:
                 ml.plot_roc_curves(y_test, y_pred, n_categories)
