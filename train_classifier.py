@@ -164,7 +164,7 @@ def main(arguments=None):
                             "the GridsearchCV in scikit learn."
                              "", type=str, default='{}')
     parser.add_argument("-gj", "--gridsearchjobs",
-                        help="The number of jobs for the gridsearch."
+                        help="The number of jobs for the gridsearch.  -1 uses all available CPU cores."
                              "", type=int, default=-1)
     parser.add_argument("-gc", "--gridsearchcv",
                         help="The number of cross validation groups for the gridsearch."
@@ -182,7 +182,7 @@ def main(arguments=None):
                         help="The number of neighbors for knn."
                              "", type=int, default=1)
     parser.add_argument("-kj", "--knnjobs",
-                        help="The number of jobs for knn."
+                        help="The number of jobs for knn.  -1 uses all available CPU cores."
                              "", type=int, default=-1)
     parser.add_argument("-ot", "--ovrtype",
                         help="The type of the base estimator for ovr."
@@ -410,7 +410,7 @@ def main(arguments=None):
         print(DIVIDER)
         print("CV Results:")
         print("{0}".format(classifier.cv_results_))
-        print("\n")
+        print(DIVIDER)
         print("Params:")
         print("{0}".format(classifier.cv_results_['params']))
         print(DIVIDER)
