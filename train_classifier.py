@@ -28,7 +28,7 @@ CLASSIFIER_TO_STRING = {
     'nc': 'Nearest Centroid (nc)',
     'ovr': 'OneVRest (ovr)',
     'rf': 'Random Forest (rf)',
-    'svm': 'State Vector Machine (svm)'
+    'svm': 'Support Vector Machine (svm)'
 }
 
 
@@ -111,7 +111,7 @@ def main(arguments=None):
     parser.add_argument('ClassifierType',
                         help='The classifier type.  Valid values: '
                         'ann - Artifical Neural Network, cnn - Convolutional Neural Network, '
-                        'dt - Decision Tree, svm - State Vector Machine, nb - Naive Bayes, '
+                        'dt - Decision Tree, svm - Support Vector Machine, nb - Naive Bayes, '
                         'rf - Random Forest, knn - k-Nearest Neighbors, nc - Nearest Centroid, '
                         'adaboost - Adaboost (requires a base estimator), '
                         'ovr - OneVRest (requires a base estimator), '
