@@ -233,6 +233,10 @@ def main(arguments=None):
                                                               windowsize=windowsize, datapoints=datapoints)
 
     print(DIVIDER)
+    print("Feature Type: {0}".format(feature_type))
+    if feature_type == 'rwe':
+        print("\tWindow Size: {0:,}".format(windowsize))
+        print("\tData points: {0:,}".format(datapoints))
     print("Number of features: {0:,}".format(len(raw_data.columns)))
     print(DIVIDER)
 
