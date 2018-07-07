@@ -153,7 +153,7 @@ def main(arguments=None):
                              "", type=int, default=-1)
     parser.add_argument("-gc", "--gridsearchcv",
                         help="The number of cross validation groups for the gridsearch."
-                             "", type=int, default=-1)
+                             "", type=int, default=5)
     parser.add_argument("-at", "--adaboosttype",
                         help="The type of the base estimator for adaboost."
                              "", type=str, default='dt')
@@ -241,12 +241,24 @@ def main(arguments=None):
     ytr = ml.decode_classifications(y_train.tolist())
     yte = ml.decode_classifications(y_test.tolist())
     print("\n")
+    print(DIVIDER)
+    print("Classifier Type: {0}".format(classifier_type))
     if classifier_type == 'gridsearch':
         print(DIVIDER)
         print("Grid Search Enabled!")
+        print("Grid Search Type: {0}".format(gridsearch_type))
+        print("Grid Search Parameters: {0}".format(gridsearch_params))
     if cross_fold_validation:
         print(DIVIDER)
-        print("Cross Fold Validation {0} Enabled!".format(cfv_groups))
+        print("Cross Fold Validation - {0} Fold(s) - Enabled!".format(cfv_groups))
+    if classifier_type == 'ovr':
+        print(DIVIDER)
+        print('OneVRest Enabled!')
+        print("OneVRest Type: {0}".format(ovr_type))
+    if classifier_type == 'adaboost':
+        print(DIVIDER)
+        print("AdaBoost Enabled!")
+        print("AdaBoost Type: {0}".format(adaboost_type))
     print(DIVIDER)
     print("Training Class Count:")
     print(DIVIDER)
@@ -410,6 +422,9 @@ def main(arguments=None):
         elif classifier_type.lower() == 'ovr':
             estimator_params = {'ovr_type': ovr_type, 'estimator': ovr_base_estimator}
         estimator_params.update(extra_estimator_params)
+        print(DIVIDER)
+        print("Model hyperparameters: {0}".format(estimator_params))
+        print(DIVIDER)
         classifier = get_estimator(classifier_type.lower(), ml, **estimator_params)
 
         start_time = time.time()
