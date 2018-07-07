@@ -3,6 +3,7 @@ import argparse
 import time
 import os
 import pandas as pd
+import json
 from library.utils import Utils
 from library.ml import ML
 from keras.wrappers.scikit_learn import KerasClassifier
@@ -132,7 +133,8 @@ def main(arguments=None):
                         help="The type of the base estimator for gridsearch."
                              "", type=str, default='dt')
     parser.add_argument("-gp", "--gridsearchparams",
-                        help="The params for the gridsearch."
+                        help="The params for the gridsearch.  This is a JSON string that will be accepted by "
+                            "the GridsearchCV in scikit learn."
                              "", type=str, default='{}')
     parser.add_argument("-gj", "--gridsearchjobs",
                         help="The number of jobs for the gridsearch."
@@ -173,7 +175,7 @@ def main(arguments=None):
     batch_size = args.nnbatchsize
     epochs = args.nnepochs
     gridsearch_type = args.gridsearchtype.lower()
-    gridsearch_params = args.gridsearchparams
+    gridsearch_params = json.loads(args.gridsearchparams)
     gridsearch_njobs = args.gridsearchjobs
     gridsearch_cv = args.gridsearchcv
     adaboost_type = args.adaboosttype
@@ -225,6 +227,7 @@ def main(arguments=None):
     print("\n")
 
     print("Begin training...")
+    print("\n")
     if classifier_type.lower() == 'cnn':
         if cross_fold_validation is False:
             # Create the CNN
@@ -234,6 +237,7 @@ def main(arguments=None):
             start_time = time.time()
             classifier = ml.train(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=False)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+            print("\n")
 
             # Predict the results
             y_pred = ml.predict(X_test)
@@ -275,6 +279,7 @@ def main(arguments=None):
             start_time = time.time()
             classifier = ml.train(X_train, y_train, batch_size=batch_size, epochs=epochs, tensorboard=False)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+            print("\n")
 
             # Predict the results
             y_pred = ml.predict(X_test)
@@ -324,6 +329,7 @@ def main(arguments=None):
 
         classifier = ml.train(Xt, yt)
         print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+        print("\n")
 
         print("Best Score: {0}".format(classifier.best_score_))
         print("CV Results: {0}".format(classifier.cv_results_))
@@ -355,6 +361,7 @@ def main(arguments=None):
         if cross_fold_validation is False:
             classifier = ml.train(X_train, y_train)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+            print("\n")
             y_pred = ml.predict(X_test)
             # probas = ml.classifier.predict_proba(X_test)
 
@@ -384,7 +391,7 @@ def main(arguments=None):
                     ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1)
 
     # Save the classifier
-    print("Saving the classifier...")
+    print("\n")
     if feature_type == 'rwe':
         path = os.path.join(datadir,
                             "classifiers_rwe_{0}_window_{1}_datapoints".format(windowsize, datapoints),
@@ -397,8 +404,10 @@ def main(arguments=None):
     except:
         os.makedirs(path)
     if classifier_type.lower() != 'gridsearch':
+        print("Saving the classifier...")
         ml.save_classifier(path)
         print("Classifier saved to: {0}".format(path))
+        print("\n")
 
 
 if __name__ == "__main__":
