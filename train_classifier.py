@@ -17,6 +17,21 @@ DIVIDER_CHAR = '='
 DIVIDER = DIVIDER_CHAR*DIVIDER_LENGTH
 
 
+CLASSIFIER_TO_STRING = {
+    'adaboost': 'AdaBoost (adaboost)',
+    'ann': 'Artificial Neural Network (ann)',
+    'cnn': 'Convolutional Neural Network (cnn)',
+    'dt': 'Decision Tree (dt)',
+    'gridsearch': 'Grid Search (gridsearch)',
+    'knn': 'k-Nearest Neighbors (knn)',
+    'nb': 'Naive Bayes (nb)',
+    'nc': 'Nearest Centroid (nc)',
+    'ovr': 'OneVRest (ovr)',
+    'rf': 'Random Forest (rf)',
+    'svm': 'State Vector Machine (svm)'
+}
+
+
 def get_estimator_static(classifier_type, *args, **kwargs):
     """
     Returns a static estimator based on classifier type.
@@ -242,11 +257,11 @@ def main(arguments=None):
     yte = ml.decode_classifications(y_test.tolist())
     print("\n")
     print(DIVIDER)
-    print("Classifier Type: {0}".format(classifier_type))
+    print("Classifier Type: {0}".format(CLASSIFIER_TO_STRING[classifier_type]))
     if classifier_type == 'gridsearch':
         print(DIVIDER)
         print("Grid Search Enabled!")
-        print("Grid Search Type: {0}".format(gridsearch_type))
+        print("Grid Search Type: {0}".format(CLASSIFIER_TO_STRING[gridsearch_type]))
         print("Grid Search Parameters: {0}".format(gridsearch_params))
     if cross_fold_validation:
         print(DIVIDER)
@@ -254,11 +269,11 @@ def main(arguments=None):
     if classifier_type == 'ovr':
         print(DIVIDER)
         print('OneVRest Enabled!')
-        print("OneVRest Type: {0}".format(ovr_type))
+        print("OneVRest Type: {0}".format(CLASSIFIER_TO_STRING[ovr_type]))
     if classifier_type == 'adaboost':
         print(DIVIDER)
         print("AdaBoost Enabled!")
-        print("AdaBoost Type: {0}".format(adaboost_type))
+        print("AdaBoost Type: {0}".format(CLASSIFIER_TO_STRING[adaboost_type]))
     print(DIVIDER)
     print("Training Class Count:")
     print(DIVIDER)
@@ -393,8 +408,11 @@ def main(arguments=None):
         print(DIVIDER)
         print("Best Score: {0}".format(classifier.best_score_))
         print(DIVIDER)
-        print("CV Results: {0}".format(classifier.cv_results_))
-        print("Params: {0}".format(classifier.cv_results_['params']))
+        print("CV Results:")
+        print("{0}".format(classifier.cv_results_))
+        print("\n")
+        print("Params:")
+        print("{0}".format(classifier.cv_results_['params']))
         print(DIVIDER)
         print("Mean Test Score: {0}".format(classifier.cv_results_['mean_test_score']))
         best_param = classifier.cv_results_['params'][(classifier.cv_results_['mean_test_score'] == classifier.best_score_).argmax()]
