@@ -288,7 +288,6 @@ def main(arguments=None):
     print(DIVIDER)
     print("Begin training...")
     print(DIVIDER)
-    print("\n")
     if classifier_type.lower() == 'cnn':
         if cross_fold_validation is False:
             # Create the CNN
@@ -508,4 +507,8 @@ def main(arguments=None):
 
 if __name__ == "__main__":
     args = sys.argv[1:]
+    print(DIVIDER)
+    print("Command Line:")
+    print("\t{0}".format(' '.join(sys.argv)))
+    print(DIVIDER)
     main(args)
