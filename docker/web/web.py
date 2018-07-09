@@ -27,6 +27,8 @@ POSSIBLE_CLASSIFICATIONS = [
     ('PUP', 'PUP'),
     ('Unknown', 'Unknown')
 ]
+MULTIUSER = bool(int(os.environ['MULTIUSER']))
+
 
 # Initialize and configure the Flask website.
 app = Flask(__name__)
