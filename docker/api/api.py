@@ -58,22 +58,22 @@ def reset():
     return json.dumps({'status': 'reset'}), 200
 
 
-def process_sample(id):
+def process_sample(submission_id):
     """
     Processes a sample after it has been submitted.  This runs as a thread.
 
-    :param id:  The ID of the submission in the database.
+    :param submission_id:  The ID of the submission in the database.
     :return: Nothing.
     """
     sys.modules['library'] = library
-    submission = Submission.query.filter_by(id=id).first()
+    submission = Submission.query.filter_by(id=submission_id).first()
     try:
         # ml = pickle.load(open(os.path.join('..', '..', 'classifier', 'ml.pickle'), 'rb'))
         # ml = dill.load(open(os.path.join('..', '..', 'classifier', 'ml.dill'), 'rb'))
         ml = ML.load_classifier(os.path.join('..', '..', 'classifier'))
         s = Sample(fromfile=os.path.join('/samples', submission.sha256))
         y = ml.predict_sample(s)
-        submission = Submission.query.filter_by(id=id).first()
+        submission = Submission.query.filter_by(id=submission_id).first()
         submission.status = 'Done'
         submission.classification = y
         app.logger.info('Finished processing sample: {0} as: {1}'.format(s.sha256, y))
