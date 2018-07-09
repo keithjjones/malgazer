@@ -12,6 +12,8 @@ services:
       - .:/malgazer
       - ./samples:/samples
       - ./classifier:/classifier
+    env_file:
+      - ./docker/environment_variables.env
     environment:
       - FLASK_APP=docker.api.api
       - FLASK_ENV=development
@@ -20,9 +22,6 @@ services:
 
   web:
     image:  malgazer_api:latest
-#    build:
-#      context: ./
-#      dockerfile: docker/Dockerfile-base
     depends_on:
       - db
       - api
@@ -31,6 +30,8 @@ services:
     volumes:
       - .:/malgazer
       - ./samples:/samples
+    env_file:
+      - ./docker/environment_variables.env
     environment:
       - FLASK_APP=docker.web.web
       - FLASK_ENV=development
@@ -41,5 +42,5 @@ services:
     image: postgres:latest
     volumes:
       - ./docker/db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=malgazer
+    env_file:
+      - ./docker/environment_variables.env
