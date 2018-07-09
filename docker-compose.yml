@@ -13,11 +13,12 @@ services:
       - ./samples:/samples
       - ./classifier:/classifier
     env_file:
-      - ./docker/environment_variables.env
+      - ./.env
     environment:
       - FLASK_APP=docker.api.api
       - FLASK_ENV=development
-    command: ["flask", "run", "--host=0.0.0.0", "--port=8888"]
+    command: ${MALGAZER_API_CMD}
+#    command: ["flask", "run", "--host=0.0.0.0", "--port=8888"]
 #    command: ["gunicorn", "-w 10", "-b 0.0.0.0:8888", "docker.api.api:app"]
 
   web:
@@ -31,11 +32,12 @@ services:
       - .:/malgazer
       - ./samples:/samples
     env_file:
-      - ./docker/environment_variables.env
+      - ./.env
     environment:
       - FLASK_APP=docker.web.web
       - FLASK_ENV=development
-    command: ["flask", "run", "--host=0.0.0.0", "--port=8080"]
+    command: ${MALGAZER_WEB_CMD}
+#    command: ["flask", "run", "--host=0.0.0.0", "--port=8080"]
 #    command: ["gunicorn", "-w 10", "-b 0.0.0.0:8080", "docker.web.web:app"]
 
   db:
@@ -43,4 +45,4 @@ services:
     volumes:
       - ./docker/db:/var/lib/postgresql/data
     env_file:
-      - ./docker/environment_variables.env
+      - ./.env
