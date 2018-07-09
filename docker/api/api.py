@@ -16,6 +16,7 @@ sys.path.append(os.path.join('..', '..'))
 from library.files import Sample
 from library.ml import ML
 from docker.db_models.models import Submission, WebRequest, setup_database, clear_database, db
+import library
 
 
 # Initialize and configure the Flask API
@@ -67,8 +68,9 @@ def process_sample(id):
         submission = Submission.query.filter_by(id=id).first()
         submission.status = 'Done'
         submission.classification = y
-    except:
+    except Exception as exc:
         submission.status = 'Error'
+        print("Exception {0}: {1}".format(type(exc), exc))
     db.session.add(submission)
     db.session.commit()
 
