@@ -28,6 +28,7 @@ POSSIBLE_CLASSIFICATIONS = [
     ('Unknown', 'Unknown')
 ]
 MULTIUSER = bool(int(os.environ['MULTIUSER']))
+NODE = "web"
 
 
 # Initialize and configure the Flask website.

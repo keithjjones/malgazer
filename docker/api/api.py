@@ -25,6 +25,7 @@ db.init_app(app)
 
 # Global values
 SAMPLES_DIRECTORY = "/samples"
+NODE = "api"
 
 
 def setup_db():
