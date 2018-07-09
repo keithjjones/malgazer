@@ -76,7 +76,7 @@ def process_sample(id):
         submission = Submission.query.filter_by(id=id).first()
         submission.status = 'Done'
         submission.classification = y
-        app.logger.info('Finished processing sample: {0}'.format(s.sha256))
+        app.logger.info('Finished processing sample: {0} as: {1}'.format(s.sha256, y))
     except Exception as exc:
         submission.status = 'Error'
         print("Exception {0}: {1}".format(type(exc), exc))
