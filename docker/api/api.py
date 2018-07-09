@@ -68,7 +68,6 @@ def process_sample(submission_id):
     sys.modules['library'] = library
     submission = Submission.query.filter_by(id=submission_id).first()
     try:
-        # ml = pickle.load(open(os.path.join('..', '..', 'classifier', 'ml.pickle'), 'rb'))
         # ml = dill.load(open(os.path.join('..', '..', 'classifier', 'ml.dill'), 'rb'))
         ml = ML.load_classifier(os.path.join('..', '..', 'classifier'))
         s = Sample(fromfile=os.path.join('/samples', submission.sha256))
@@ -80,7 +79,7 @@ def process_sample(submission_id):
     except Exception as exc:
         submission.status = 'Error'
         print("Exception {0}: {1}".format(type(exc), exc))
-        app.logger.info('Error processing sample: {0} - {1}'.format(s.sha256, exc))
+        app.logger.exception('Error processing sample: {0} - Exception: {1}'.format(s.sha256, exc))
     db.session.add(submission)
     db.session.commit()
 
