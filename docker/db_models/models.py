@@ -44,28 +44,7 @@ class User(db.Model):
     last_login = db.Column(db.DateTime, nullable=True)
 
 
-class SystemLog(db.Model):
-    """
-    The class for the system logs for database storage.
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    node = db.Column(db.String(100), nullable=False)
-    time = db.Column(db.DateTime, nullable=False)
-    message = db.Column(db.String(1000), nullable=False)
-
-
-class UserLog(db.Model):
-    """
-    The class for the user logs for database storage.
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    node = db.Column(db.String(100), nullable=False)
-    time = db.Column(db.DateTime, nullable=False)
-    message = db.Column(db.String(1000), nullable=False)
-    ip_address = db.Column(postgresql.INET, nullable=False)
-
-
-TABLES = [WebRequest, Submission, User]
+TABLES = [WebRequest, Submission]
 
 
 def generate_api_key(length=60):

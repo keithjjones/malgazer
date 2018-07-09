@@ -9,6 +9,7 @@ import glob
 import multiprocessing
 import threading
 import sys
+import logging
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
 from library.files import Sample
@@ -22,6 +23,14 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 db.init_app(app)
+applogger = app.logger
+file_handler = logging.FileHandler("/logs/api.log")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(logging.Formatter(
+    '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+))
+applogger.setLevel(logging.DEBUG)
+applogger.addHandler(file_handler)
 
 # Global values
 SAMPLES_DIRECTORY = "/samples"
@@ -67,9 +76,11 @@ def process_sample(id):
         submission = Submission.query.filter_by(id=id).first()
         submission.status = 'Done'
         submission.classification = y
+        app.logger.info('Finished processing sample: {0}'.format(s.sha256))
     except Exception as exc:
         submission.status = 'Error'
         print("Exception {0}: {1}".format(type(exc), exc))
+        app.logger.info('Error processing sample: {0} - {1}'.format(s.sha256, exc))
     db.session.add(submission)
     db.session.commit()
 
@@ -104,6 +115,7 @@ def submit():
     db.session.commit()
     proc = multiprocessing.Process(target=process_sample, args=(submission.id,))
     proc.start()
+    app.logger.info('Submitted Sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
     # thread = threading.Thread(target=process_sample, args=(submission.id,))
     # thread.daemon = True
     # thread.start()

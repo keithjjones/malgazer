@@ -10,6 +10,7 @@ import os
 import json
 import datetime
 import sys
+import logging
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
 from library.files import Sample
@@ -30,7 +31,6 @@ POSSIBLE_CLASSIFICATIONS = [
 MULTIUSER = bool(int(os.environ['MULTIUSER']))
 NODE = "web"
 
-
 # Initialize and configure the Flask website.
 app = Flask(__name__)
 app.config.update(dict(
@@ -41,6 +41,14 @@ app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
 db.init_app(app)
 csrf = CSRFProtect(app)
+applogger = app.logger
+file_handler = logging.FileHandler("/logs/web.log")
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(logging.Formatter(
+    '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
+))
+applogger.setLevel(logging.DEBUG)
+applogger.addHandler(file_handler)
 
 
 class SubmissionForm(FlaskForm):
@@ -86,6 +94,7 @@ def submit():
                          ip_address=ip_addr)
         db.session.add(req)
         db.session.commit()
+        app.logger.info('Submitted Sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
         return redirect(url_for('history'))
     return render_template('submit.html', form=form)
 

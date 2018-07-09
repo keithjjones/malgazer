@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
 COPY ./requirements.txt ./requirements-manual.txt /
 RUN pip install --no-cache-dir -r /requirements.txt
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* && rm -rf ~/.cache/pip
-RUN mkdir /samples
+RUN mkdir /samples /logs
 
 WORKDIR /malgazer
 CMD ${COMMAND}

@@ -9,6 +9,7 @@ services:
     ports:
       - "8888:8888"
     volumes:
+      - ./docker/logs/api:/logs
       - .:/malgazer
       - ./samples:/samples
       - ./classifier:/classifier
@@ -30,6 +31,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
+      - ./docker/logs/web:/logs
       - .:/malgazer
       - ./samples:/samples
     deploy:
