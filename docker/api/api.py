@@ -7,15 +7,10 @@ import datetime
 import sqlalchemy
 import glob
 import multiprocessing
-from threading import Thread
-import dill
-import pickle
-import sys
 import threading
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+import sys
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
-# sys.path.append(os.path.join('..', '..', '..'))
 from library.files import Sample
 from library.ml import ML
 from docker.db_models.models import Submission, WebRequest, setup_database, clear_database, db
@@ -30,9 +25,6 @@ db.init_app(app)
 
 # Global values
 SAMPLES_DIRECTORY = "/samples"
-
-# Pool
-# EXECUTOR = ProcessPoolExecutor(max_workers=10)
 
 
 def setup_db():
@@ -115,7 +107,6 @@ def submit():
     # thread.daemon = True
     # thread.start()
     # process_sample(submission.id)
-    # EXECUTOR.submit(process_sample, submission.id)
     return json.dumps(return_data), 200
 
 
