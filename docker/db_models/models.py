@@ -51,7 +51,7 @@ class SystemLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     node = db.Column(db.String(100), nullable=False)
     time = db.Column(db.DateTime, nullable=False)
-    message = db.Column(db.DateTime, nullable=False)
+    message = db.Column(db.String(1000), nullable=False)
 
 
 class UserLog(db.Model):
@@ -61,7 +61,7 @@ class UserLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     node = db.Column(db.String(100), nullable=False)
     time = db.Column(db.DateTime, nullable=False)
-    message = db.Column(db.DateTime, nullable=False)
+    message = db.Column(db.String(1000), nullable=False)
     ip_address = db.Column(postgresql.INET, nullable=False)
 
 
