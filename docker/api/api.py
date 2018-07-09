@@ -7,9 +7,11 @@ import datetime
 import sqlalchemy
 import glob
 import multiprocessing
+from threading import Thread
 import dill
 import pickle
 import sys
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
 # sys.path.append(os.path.join('..', '..', '..'))
@@ -27,6 +29,9 @@ db.init_app(app)
 
 # Global values
 SAMPLES_DIRECTORY = "/samples"
+
+# Pool
+# EXECUTOR = ProcessPoolExecutor(max_workers=10)
 
 
 def setup_db():
@@ -103,8 +108,10 @@ def submit():
                    'status': submission.status}
     db.session.add(submission)
     db.session.commit()
-    thread = multiprocessing.Process(target=process_sample, args=(submission.id,))
-    thread.start()
+    # thread = multiprocessing.Process(target=process_sample, args=(submission.id,))
+    # thread.start()
+    process_sample(submission.id)
+    # EXECUTOR.submit(process_sample, submission.id)
     return json.dumps(return_data), 200
 
 
