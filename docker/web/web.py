@@ -30,7 +30,6 @@ POSSIBLE_CLASSIFICATIONS = [
     ('Unknown', 'Unknown')
 ]
 MULTIUSER = bool(int(os.environ['MULTIUSER']))
-NODE = "web"
 
 # Initialize and configure the Flask website.
 app = Flask(__name__)
@@ -83,11 +82,13 @@ def submit():
         url = "{0}/submit".format(API_URL)
         try:
             req = requests.post(url, files=files, data=data)
-        except:
+        except Exception as exc:
             flash('Exception while sending file to API!')
+            app.logger.exception('Error submitting sample: {0} - Exception: {1}'.format(s.sha256, exc))
             return redirect(url_for('submit'))
         if req.status_code != 200:
             flash("API FAILURE - HTTP Code: {0}".format(req.status_code))
+            app.logger.error('Submit API did not return 200: {0}'.format(req))
             return redirect(url_for('submit'))
         submit_time = datetime.datetime.now()
         req = WebRequest(sha256=s.sha256, time=submit_time,
@@ -108,11 +109,13 @@ def history():
     url = "{0}/history".format(API_URL)
     try:
         req = requests.get(url)
-    except:
+    except Exception as exc:
         flash('Exception while pulling history from API!')
+        app.logger.exception('Exception while pulling history - Exception: {0}'.format(exc))
         return redirect(url_for('main'))
     if req.status_code != 200:
         flash("API FAILURE - HTTP Code: {0}".format(req.status_code))
+        app.logger.error('History API did not return 200: {0}'.format(req))
         return redirect(url_for('main'))
     history = json.loads(req.text)
     return render_template('history.html', history=history)

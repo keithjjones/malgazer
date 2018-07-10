@@ -35,7 +35,6 @@ applogger.addHandler(file_handler)
 
 # Global values
 SAMPLES_DIRECTORY = "/samples"
-NODE = "api"
 
 
 def setup_db():
@@ -79,7 +78,6 @@ def process_sample(submission_id):
         app.logger.info('Finished processing sample: {0} as: {1}'.format(s.sha256, y))
     except Exception as exc:
         submission.status = 'Error'
-        print("Exception {0}: {1}".format(type(exc), exc))
         app.logger.exception('Error processing sample: {0} - Exception: {1}'.format(s.sha256, exc))
     db.session.add(submission)
     db.session.commit()
