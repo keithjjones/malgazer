@@ -3,15 +3,21 @@
 {% block content %}
 <form method="POST" enctype="multipart/form-data" action="{{ url_for('register') }}">
   {{ form.csrf_token }}
-  <table>
-    <tr><td>{{ form.email.label }}</td></tr>
-    <tr><td>{{ form.email }}</td></tr>
-    <tr><td>{{ form.password.label }}</td></tr>
-    <tr><td>{{ form.password }}</td></tr>
-    <tr><td>{{ form.password_confirm.label }}</td></tr>
-    <tr><td>{{ form.password_confirm }}</td></tr>
-  </table>
-  <br>
-  <input type="submit" class="btn btn-outline-primary" value="Register">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <table>
+          <tr><td>{{ form.email.label }}</td></tr>
+          <tr><td>{{ form.email }}</td></tr>
+          <tr><td>{{ form.password.label }}</td></tr>
+          <tr><td>{{ form.password }}</td></tr>
+          <tr><td>{{ form.password_confirm.label }}</td></tr>
+          <tr><td>{{ form.password_confirm }}</td></tr>
+        </table>
+        <br>
+        <input type="submit" class="btn btn-outline-primary" value="Register">
+      </div>
+    </div>
+  </div>
 </form>
 {% endblock %}

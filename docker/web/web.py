@@ -101,10 +101,19 @@ def login():
     """
     ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     form = LoginForm()
-    if form.validate_on_submit():
-        redirect(url_for('main'))
+    if request.method == 'POST':
+        if form.validate():
+            redirect(url_for('main'))
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(u"Error in the %s field - %s" % (
+                        getattr(form, field).label.text,
+                        error
+                    ))
+            redirect(url_for('register'))
     State = {'multiuser': MULTIUSER, 'loggedin': False}
-    return render_template('login.html', state=State, form=form)
+    return render_template('login.html', state=StateInfo(State), form=form)
 
 
 @app.route('/logout')
@@ -127,7 +136,7 @@ def register():
                     ))
             redirect(url_for('register'))
     State = {'multiuser': MULTIUSER, 'loggedin': False}
-    return render_template('register.html', state=State, form=form)
+    return render_template('register.html', state=StateInfo(State), form=form)
 
 
 @app.route('/submit', methods=('GET', 'POST'))
@@ -162,7 +171,7 @@ def submit():
         app.logger.info('Submitted sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
         return redirect(url_for('history'))
     State = {'multiuser': MULTIUSER, 'loggedin': False}
-    return render_template('submit.html', state=State, form=form)
+    return render_template('submit.html', state=StateInfo(State), form=form)
 
 
 @app.route('/history')
@@ -183,7 +192,7 @@ def history():
         return redirect(url_for('main'))
     history = json.loads(req.text)
     State = {'multiuser': MULTIUSER, 'loggedin': False}
-    return render_template('history.html', state=State, history=history)
+    return render_template('history.html', state=StateInfo(State), history=history)
 
 
 @app.route('/api')
@@ -191,7 +200,8 @@ def api():
     """
     The API information page.
     """
-    return render_template('api.html')
+    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    return render_template('api.html', state=StateInfo(State))
 
 
 if __name__ == '__main__':

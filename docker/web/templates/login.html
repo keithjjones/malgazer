@@ -3,17 +3,29 @@
 {% block content %}
 <form method="POST" enctype="multipart/form-data" action="{{ url_for('login') }}">
   {{ form.csrf_token }}
-  <table>
-    <tr><td>{{ form.email.label }}</td></tr>
-    <tr><td>{{ form.email }}</td></tr>
-    <tr><td>{{ form.password.label }}</td></tr>
-    <tr><td>{{ form.password }}</td></tr>
-  </table>
-  <br>
-  <input type="submit" class="btn btn-outline-primary" value="Login">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Existing accounts...</h5>
+        <table>
+          <tr><td>{{ form.email.label }}</td></tr>
+          <tr><td>{{ form.email }}</td></tr>
+          <tr><td>{{ form.password.label }}</td></tr>
+          <tr><td>{{ form.password }}</td></tr>
+        </table>
+        <br>
+        <input type="submit" class="btn btn-outline-primary" value="Login">
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Need an account?</h5>
+        <a class="btn btn-outline-primary" href="{{ url_for('register') }}">Register</a>
+      </div>
+    </div>
+  </div>
   <br><br>
-  If you do not have an account, register instead:
-  <br><br>
-  <a class="btn btn-outline-primary" href="{{ url_for('register') }}">Register</a>
 </form>
 {% endblock %}
