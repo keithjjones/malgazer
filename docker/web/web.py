@@ -5,6 +5,7 @@ from wtforms import RadioField, StringField, PasswordField, ValidationError
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 from flask_wtf.file import FileField, FileRequired
 from flask_wtf.csrf import CSRFProtect, CSRFError
+import flask_login
 import requests
 import os
 import json
@@ -15,7 +16,7 @@ import logging.handlers
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
 from library.files import Sample
-from docker.db_models.models import Submission, WebRequest, setup_database, db
+from docker.db_models.models import Submission, WebRequest, User, setup_database, db
 
 
 # Global values
@@ -49,6 +50,13 @@ file_handler.setFormatter(logging.Formatter(
 ))
 applogger.setLevel(logging.DEBUG)
 applogger.addHandler(file_handler)
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.filter_by(id=user_id).first()
 
 
 class SubmissionForm(FlaskForm):
@@ -81,8 +89,11 @@ class StateInfo(object):
     def __init__(self, data):
         if not isinstance(data, dict):
             raise TypeError("Input must be a dictionary")
-        for k in data:
-            setattr(self, k, data[k])
+        self.__dict__ = data
+
+
+def login_decorate(somefunc):
+    return flask_login.login_required(somefunc) if MULTIUSER else lambda x: x
 
 
 @app.route('/')
@@ -103,18 +114,20 @@ def login():
     form = LoginForm()
     if request.method == 'POST':
         if form.validate():
-            redirect(url_for('main'))
+            return redirect(url_for('main'))
         else:
             for field, errors in form.errors.items():
                 for error in errors:
                     flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error))
-            redirect(url_for('register'))
+            return redirect(url_for('register'))
     State = {'multiuser': MULTIUSER, 'loggedin': False}
     return render_template('login.html', state=StateInfo(State), form=form)
 
 
 @app.route('/logout')
+@login_decorate
 def logout():
+    flask_login.logout_user()
     return redirect(url_for('main'))
 
 
@@ -123,23 +136,34 @@ def register():
     form = RegisterForm()
     if request.method == 'POST':
         if form.validate():
-            redirect(url_for('main'))
+            users = User.query.filter_by(email=form.email.data).all()
+            if len(users) == 0:
+                user = User(email=form.email.data, password=form.password.data, registration=datetime.datetime.now())
+                db.session.add(user)
+                db.session.commit()
+                flash("Account registered.")
+                return redirect(url_for('login'))
+            else:
+                flash("Email already registered.")
+                return redirect(url_for('register'))
         else:
             for field, errors in form.errors.items():
                 for error in errors:
                     flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error))
-            redirect(url_for('register'))
+            return redirect(url_for('register'))
     State = {'multiuser': MULTIUSER, 'loggedin': False}
     return render_template('register.html', state=StateInfo(State), form=form)
 
 
 @app.route('/myaccount')
+@login_decorate
 def myaccount():
     State = {'multiuser': MULTIUSER, 'loggedin': False}
     return render_template('myaccount.html', state=StateInfo(State))
 
 
 @app.route('/submit', methods=('GET', 'POST'))
+@login_decorate
 def submit():
     """
     The sample submission page.
@@ -179,6 +203,7 @@ def submit():
 
 
 @app.route('/history')
+@login_decorate
 def history():
     """
     The submission history page.
@@ -200,6 +225,7 @@ def history():
 
 
 @app.route('/api')
+@login_decorate
 def api():
     """
     The API information page.

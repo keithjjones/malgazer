@@ -38,6 +38,9 @@ SAMPLES_DIRECTORY = "/samples"
 MULTIUSER = bool(int(os.environ['MULTIUSER']))
 
 
+db.create_all()
+
+
 def setup_db():
     setup_database()
 

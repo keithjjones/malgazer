@@ -3,7 +3,7 @@ import sqlalchemy
 from sqlalchemy.dialects import postgresql
 from binascii import hexlify
 import os
-
+from passlib.hash import bcrypt
 
 db = SQLAlchemy()
 
@@ -37,7 +37,8 @@ class User(db.Model):
     The user class for database storage.
     """
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.Text, nullable=False, index=True)
+    email = db.Column(db.Text, nullable=False, index=True, unique=True)
+    password = db.Column(db.Text, nullable=False)
     config = db.Column(postgresql.JSON, nullable=True)
     api_key = db.Column(db.Text, nullable=True)
     registration = db.Column(db.DateTime, nullable=False)
@@ -45,6 +46,14 @@ class User(db.Model):
     activated_date = db.Column(db.DateTime, nullable=True)
     last_login = db.Column(db.DateTime, nullable=True)
     last_login_ip = db.Column(postgresql.INET, nullable=True)
+
+    def __init__(self, *args, **kwargs):
+        if 'password' in kwargs:
+            kwargs['password'] = bcrypt.encrypt(kwargs['password'])
+        super(User, self).__init__(*args, **kwargs)
+
+    def validate_password(self, password):
+        return bcrypt.verify(password, self.password)
 
 
 TABLES = [WebRequest, Submission, User]
