@@ -107,10 +107,7 @@ def login():
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    flash(u"Error in the %s field - %s" % (
-                        getattr(form, field).label.text,
-                        error
-                    ))
+                    flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error))
             redirect(url_for('register'))
     State = {'multiuser': MULTIUSER, 'loggedin': False}
     return render_template('login.html', state=StateInfo(State), form=form)
@@ -130,10 +127,7 @@ def register():
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    flash(u"Error in the %s field - %s" % (
-                        getattr(form, field).label.text,
-                        error
-                    ))
+                    flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error))
             redirect(url_for('register'))
     State = {'multiuser': MULTIUSER, 'loggedin': False}
     return render_template('register.html', state=StateInfo(State), form=form)
@@ -170,6 +164,10 @@ def submit():
         db.session.commit()
         app.logger.info('Submitted sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
         return redirect(url_for('history'))
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error))
     State = {'multiuser': MULTIUSER, 'loggedin': False}
     return render_template('submit.html', state=StateInfo(State), form=form)
 
