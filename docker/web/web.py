@@ -1,7 +1,7 @@
 from flask import Flask, render_template, abort, redirect, url_for, flash, request
 from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
-from wtforms import RadioField, StringField, PasswordField
+from wtforms import RadioField, StringField, PasswordField, ValidationError
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 from flask_wtf.file import FileField, FileRequired
 from flask_wtf.csrf import CSRFProtect, CSRFError
@@ -72,9 +72,17 @@ class RegisterForm(FlaskForm):
     The register form.
     """
     email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=64)])
-    password_confirm = PasswordField('Confirm Password', validators=[DataRequired(),
-                                                             EqualTo('password', message='Passwords must match')])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=64),
+                                                     EqualTo('password_confirm', message='Passwords must match')])
+    password_confirm = PasswordField('Confirm Password')
+
+
+class StateInfo(object):
+    def __init__(self, data):
+        if not isinstance(data, dict):
+            raise TypeError("Input must be a dictionary")
+        for k in data:
+            setattr(self, k, data[k])
 
 
 @app.route('/')
@@ -86,7 +94,7 @@ def main():
     return render_template('main.html', state=State)
 
 
-@app.route('/login')
+@app.route('/login', methods=('GET', 'POST'))
 def login():
     """
     The login page.
@@ -94,7 +102,7 @@ def login():
     ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     form = LoginForm()
     if form.validate_on_submit():
-        pass
+        redirect(url_for('main'))
     State = {'multiuser': MULTIUSER, 'loggedin': False}
     return render_template('login.html', state=State, form=form)
 
@@ -104,9 +112,20 @@ def logout():
     return redirect(url_for('main'))
 
 
-@app.route('/register')
+@app.route('/register', methods=('GET', 'POST'))
 def register():
     form = RegisterForm()
+    if request.method == 'POST':
+        if form.validate():
+            redirect(url_for('main'))
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(u"Error in the %s field - %s" % (
+                        getattr(form, field).label.text,
+                        error
+                    ))
+            redirect(url_for('register'))
     State = {'multiuser': MULTIUSER, 'loggedin': False}
     return render_template('register.html', state=State, form=form)
 
