@@ -4,6 +4,8 @@ from sqlalchemy.dialects import postgresql
 from binascii import hexlify
 import os
 from passlib.hash import bcrypt
+from flask_login import UserMixin
+
 
 db = SQLAlchemy()
 
@@ -53,7 +55,26 @@ class User(db.Model):
         super(User, self).__init__(*args, **kwargs)
 
     def validate_password(self, password):
-        return bcrypt.verify(password, self.password)
+        login = bcrypt.verify(password, self.password)
+        return login
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        # return self.activated
+        return True
+
+    def get_id(self):
+        return "{0}".format(self.id)
+
+    @property
+    def is_anonymous(self):
+        return False
+
+
 
 
 TABLES = [WebRequest, Submission, User]

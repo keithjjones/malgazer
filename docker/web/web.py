@@ -1,4 +1,5 @@
 from flask import Flask, render_template, abort, redirect, url_for, flash, request
+from urllib.parse import urlparse, urljoin
 from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
 from wtforms import RadioField, StringField, PasswordField, ValidationError
@@ -52,11 +53,19 @@ applogger.setLevel(logging.DEBUG)
 applogger.addHandler(file_handler)
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.filter_by(id=user_id).first()
+    return User.query.get(int(user_id))
+
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ('http', 'https') and \
+           ref_url.netloc == test_url.netloc
 
 
 class SubmissionForm(FlaskForm):
@@ -93,7 +102,10 @@ class StateInfo(object):
 
 
 def login_decorate(somefunc):
-    return flask_login.login_required(somefunc) if MULTIUSER else lambda x: x
+    if MULTIUSER:
+        return flask_login.login_required(somefunc)
+    else:
+        return somefunc
 
 
 @app.route('/')
@@ -101,8 +113,8 @@ def main():
     """
     The main page.
     """
-    State = {'multiuser': MULTIUSER, 'loggedin': False}
-    return render_template('main.html', state=State)
+    State = {'multiuser': MULTIUSER}
+    return render_template('main.html', state=StateInfo(State))
 
 
 @app.route('/login', methods=('GET', 'POST'))
@@ -114,13 +126,28 @@ def login():
     form = LoginForm()
     if request.method == 'POST':
         if form.validate():
-            return redirect(url_for('main'))
+            user = User.query.filter_by(email=form.email.data).first()
+            if user and user.validate_password(form.password.data):
+                flask_login.login_user(user)
+                flash("Successfully logged in.")
+
+                # next = request.args.get('next')
+                # # is_safe_url should check if the url is safe for redirects.
+                # # See http://flask.pocoo.org/snippets/62/ for an example.
+                # if not is_safe_url(next):
+                #     return abort(400)
+                # if next:
+                #     return redirect(next)
+                return redirect(url_for('main'))
+            else:
+                flash("Invalid login.  Try again.")
+                return redirect(url_for('login'))
         else:
             for field, errors in form.errors.items():
                 for error in errors:
                     flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error))
             return redirect(url_for('register'))
-    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    State = {'multiuser': MULTIUSER}
     return render_template('login.html', state=StateInfo(State), form=form)
 
 
@@ -151,14 +178,14 @@ def register():
                 for error in errors:
                     flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error))
             return redirect(url_for('register'))
-    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    State = {'multiuser': MULTIUSER}
     return render_template('register.html', state=StateInfo(State), form=form)
 
 
 @app.route('/myaccount')
 @login_decorate
 def myaccount():
-    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    State = {'multiuser': MULTIUSER}
     return render_template('myaccount.html', state=StateInfo(State))
 
 
@@ -198,7 +225,7 @@ def submit():
         for field, errors in form.errors.items():
             for error in errors:
                 flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error))
-    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    State = {'multiuser': MULTIUSER}
     return render_template('submit.html', state=StateInfo(State), form=form)
 
 
@@ -220,7 +247,7 @@ def history():
         app.logger.error('History API did not return 200: {0}'.format(req))
         return redirect(url_for('main'))
     history = json.loads(req.text)
-    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    State = {'multiuser': MULTIUSER}
     return render_template('history.html', state=StateInfo(State), history=history)
 
 
@@ -230,7 +257,7 @@ def api():
     """
     The API information page.
     """
-    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    State = {'multiuser': MULTIUSER}
     return render_template('api.html', state=StateInfo(State))
 
 

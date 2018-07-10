@@ -24,6 +24,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 db.init_app(app)
+
 applogger = app.logger
 file_handler = logging.handlers.TimedRotatingFileHandler("/logs/api.log", when='midnight', backupCount=30)
 file_handler.setLevel(logging.DEBUG)
@@ -37,8 +38,8 @@ applogger.addHandler(file_handler)
 SAMPLES_DIRECTORY = "/samples"
 MULTIUSER = bool(int(os.environ['MULTIUSER']))
 
-
-db.create_all()
+with app.app_context():
+    db.create_all()
 
 
 def setup_db():
