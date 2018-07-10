@@ -37,9 +37,13 @@
   </ul>
 </nav>
 
-{% for message in get_flashed_messages() %}
-  <div class="alert alert-danger top-buffer left-buffer right-buffer" role="alert">{{ message }}</div>
-{% endfor %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{category}} top-buffer left-buffer right-buffer" role="alert">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 
 <div class="top-buffer left-buffer right-buffer">{% block content %}{% endblock %}</div>
 

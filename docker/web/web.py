@@ -140,7 +140,7 @@ def login():
             user = User.query.filter_by(email=form.email.data).first()
             if user and user.validate_password(form.password.data):
                 flask_login.login_user(user)
-                flash("Successfully logged in.")
+                flash("Successfully logged in.", 'success')
 
                 # next = request.args.get('next')
                 # # is_safe_url should check if the url is safe for redirects.
@@ -151,12 +151,12 @@ def login():
                 #     return redirect(next)
                 return redirect(url_for('main'))
             else:
-                flash("Invalid login.  Try again.")
+                flash("Invalid login.  Try again.", 'danger')
                 return redirect(url_for('login'))
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error))
+                    flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error), 'danger')
             return redirect(url_for('register'))
     State = {'multiuser': MULTIUSER}
     return render_template('login.html', state=StateInfo(State), form=form)
@@ -184,15 +184,15 @@ def register():
                 send_email(user.email, subject, html)
                 db.session.add(user)
                 db.session.commit()
-                flash("Account registered.  An activation email was sent to you for further instructions.")
+                flash("Account registered.  An activation email was sent to you for further instructions.", 'success')
                 return redirect(url_for('login'))
             else:
-                flash("Email already registered.")
+                flash("Email already registered.", 'danger')
                 return redirect(url_for('register'))
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error))
+                    flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error), 'danger')
             return redirect(url_for('register'))
     State = {'multiuser': MULTIUSER}
     return render_template('register.html', state=StateInfo(State), form=form)
@@ -204,16 +204,16 @@ def confirm(token):
     try:
         email = confirm_token(token)
     except:
-        flash('The confirmation link is invalid or has expired.')
+        flash('The confirmation link is invalid or has expired.', 'danger')
     user = User.query.filter_by(email=email).first_or_404()
     if user.activated:
-        flash('Account already confirmed. Please login.')
+        flash('Account already confirmed. Please login.', 'success')
     else:
         user.activated = True
         user.activated_date = datetime.datetime.now()
         db.session.add(user)
         db.session.commit()
-        flash('You have confirmed your account. Thanks!')
+        flash('You have confirmed your account. Thanks!', 'success')
     return redirect(url_for('main'))
 
 
@@ -241,11 +241,11 @@ def submit():
         try:
             req = requests.post(url, files=files, data=data)
         except Exception as exc:
-            flash('Exception while sending file to API!')
+            flash('Exception while sending file to API!', 'danger')
             app.logger.exception('Error submitting sample: {0} - Exception: {1}'.format(s.sha256, exc))
             return redirect(url_for('submit'))
         if req.status_code != 200:
-            flash("API FAILURE - HTTP Code: {0}".format(req.status_code))
+            flash("API FAILURE - HTTP Code: {0}".format(req.status_code), 'danger')
             app.logger.error('Submit API did not return 200: {0}'.format(req))
             return redirect(url_for('submit'))
         submit_time = datetime.datetime.now()
@@ -259,7 +259,7 @@ def submit():
     else:
         for field, errors in form.errors.items():
             for error in errors:
-                flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error))
+                flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error), 'danger')
     State = {'multiuser': MULTIUSER}
     return render_template('submit.html', state=StateInfo(State), form=form)
 
@@ -274,11 +274,11 @@ def history():
     try:
         req = requests.get(url)
     except Exception as exc:
-        flash('Exception while pulling history from API!')
+        flash('Exception while pulling history from API!', 'danger')
         app.logger.exception('Exception while pulling history - Exception: {0}'.format(exc))
         return redirect(url_for('main'))
     if req.status_code != 200:
-        flash("API FAILURE - HTTP Code: {0}".format(req.status_code))
+        flash("API FAILURE - HTTP Code: {0}".format(req.status_code), 'danger')
         app.logger.error('History API did not return 200: {0}'.format(req))
         return redirect(url_for('main'))
     history = json.loads(req.text)
