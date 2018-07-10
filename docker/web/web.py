@@ -34,7 +34,7 @@ POSSIBLE_CLASSIFICATIONS = [
     ('Unknown', 'Unknown')
 ]
 MULTIUSER = bool(int(os.environ['MULTIUSER']))
-MAX_HISTORY = 100
+HISTORY_LENGTH = int(os.environ['HISTORY_LENGTH'])
 
 # Initialize and configure the Flask website.
 app = Flask(__name__)
@@ -283,7 +283,7 @@ def history():
         app.logger.error('History API did not return 200: {0}'.format(req))
         return redirect(url_for('main'))
     history = json.loads(req.text)
-    history = history[:MAX_HISTORY]
+    history = history[:HISTORY_LENGTH]
     State = {'multiuser': MULTIUSER}
     return render_template('history.html', state=StateInfo(State), history=history)
 
