@@ -2,7 +2,7 @@ from flask import Flask, render_template, abort, redirect, url_for, flash, reque
 from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
 from wtforms import RadioField, StringField, PasswordField
-from wtforms.validators import DataRequired, Email
+from wtforms.validators import DataRequired, Email, EqualTo, Length
 from flask_wtf.file import FileField, FileRequired
 from flask_wtf.csrf import CSRFProtect, CSRFError
 import requests
@@ -67,12 +67,23 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
 
 
+class RegisterForm(FlaskForm):
+    """
+    The register form.
+    """
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=64)])
+    password_confirm = PasswordField('Confirm Password', validators=[DataRequired(),
+                                                             EqualTo('password', message='Passwords must match')])
+
+
 @app.route('/')
 def main():
     """
     The main page.
     """
-    return render_template('main.html')
+    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    return render_template('main.html', state=State)
 
 
 @app.route('/login')
@@ -84,12 +95,20 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         pass
-    return render_template('login.html', form=form)
+    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    return render_template('login.html', state=State, form=form)
+
+
+@app.route('/logout')
+def logout():
+    return redirect(url_for('main'))
 
 
 @app.route('/register')
 def register():
-    return render_template('register.html')
+    form = RegisterForm()
+    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    return render_template('register.html', state=State, form=form)
 
 
 @app.route('/submit', methods=('GET', 'POST'))
@@ -123,7 +142,8 @@ def submit():
         db.session.commit()
         app.logger.info('Submitted sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
         return redirect(url_for('history'))
-    return render_template('submit.html', form=form)
+    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    return render_template('submit.html', state=State, form=form)
 
 
 @app.route('/history')
@@ -143,7 +163,8 @@ def history():
         app.logger.error('History API did not return 200: {0}'.format(req))
         return redirect(url_for('main'))
     history = json.loads(req.text)
-    return render_template('history.html', history=history)
+    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    return render_template('history.html', state=State, history=history)
 
 
 @app.route('/api')
