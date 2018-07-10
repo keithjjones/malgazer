@@ -43,6 +43,14 @@ services:
       - FLASK_ENV=${MALGAZER_WEB_FLASK_ENV}
       - MULTIUSER=${MALGAZER_MULTIUSER}
       - COMMAND=${MALGAZER_WEB_CMD}
+      - SECRET_KEY=${MALGAZER_WEB_SECRET_KEY}
+      - SECURITY_PASSWORD_SALT=${MALGAZER_WEB_SECURITY_PASSWORD_SALT}
+      - MAIL_USERNAME=registration@malgazer.com
+      - MAIL_PASSWORD=PASSWORD
+      - MAIL_PORT=465
+      - MAIL_SERVER=homie.mail.dreamhost.com
+      - MAIL_USE_SSL=1
+      - MAIL_USE_TLS=0
 
   db:
     image: postgres:latest

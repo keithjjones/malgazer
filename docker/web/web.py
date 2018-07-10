@@ -18,6 +18,8 @@ sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
 from library.files import Sample
 from docker.db_models.models import Submission, WebRequest, User, setup_database, db
+from ..common.token import generate_confirmation_token, confirm_token
+from ..common.email import mail, send_email
 
 
 # Global values
@@ -41,7 +43,16 @@ app.config.update(dict(
 ))
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
+app.config['MAIL_SERVER'] = os.environ['MAIL_SERVER']
+app.config['MAIL_USE_SSL'] = bool(int(os.environ['MAIL_USE_SSL']))
+app.config['MAIL_USE_TLS'] = bool(int(os.environ['MAIL_USE_TLS']))
+app.config['MAIL_PORT'] = int(os.environ['MAIL_PORT'])
+app.config['MAIL_USERNAME'] = os.environ['MAIL_USERNAME']
+app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
+
+
 db.init_app(app)
+mail.init_app(app)
 csrf = CSRFProtect(app)
 applogger = app.logger
 file_handler = logging.handlers.TimedRotatingFileHandler("/logs/web.log", when='midnight', backupCount=30)
@@ -166,9 +177,14 @@ def register():
             users = User.query.filter_by(email=form.email.data).all()
             if len(users) == 0:
                 user = User(email=form.email.data, password=form.password.data, registration=datetime.datetime.now())
+                token = generate_confirmation_token(user.email)
+                confirm_url = url_for('confirm', token=token, _external=True)
+                html = render_template('activationemail.html', confirm_url=confirm_url)
+                subject = "Please confirm your email"
+                send_email(user.email, subject, html)
                 db.session.add(user)
                 db.session.commit()
-                flash("Account registered.")
+                flash("Account registered.  An activation email was sent to you for further instructions.")
                 return redirect(url_for('login'))
             else:
                 flash("Email already registered.")
@@ -180,6 +196,25 @@ def register():
             return redirect(url_for('register'))
     State = {'multiuser': MULTIUSER}
     return render_template('register.html', state=StateInfo(State), form=form)
+
+
+@app.route('/confirm/<token>')
+@login_decorate
+def confirm(token):
+    try:
+        email = confirm_token(token)
+    except:
+        flash('The confirmation link is invalid or has expired.')
+    user = User.query.filter_by(email=email).first_or_404()
+    if user.activated:
+        flash('Account already confirmed. Please login.')
+    else:
+        user.activated = True
+        user.activated_date = datetime.datetime.now()
+        db.session.add(user)
+        db.session.commit()
+        flash('You have confirmed your account. Thanks!')
+    return redirect(url_for('main'))
 
 
 @app.route('/myaccount')
