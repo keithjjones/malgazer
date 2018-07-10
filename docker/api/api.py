@@ -112,9 +112,9 @@ def submit():
                    'status': submission.status}
     db.session.add(submission)
     db.session.commit()
+    app.logger.info('Submitted sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
     proc = multiprocessing.Process(target=process_sample, args=(submission.id,))
     proc.start()
-    app.logger.info('Submitted Sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
     # thread = threading.Thread(target=process_sample, args=(submission.id,))
     # thread.daemon = True
     # thread.start()

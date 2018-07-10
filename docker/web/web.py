@@ -96,7 +96,7 @@ def submit():
                          ip_address=ip_addr)
         db.session.add(req)
         db.session.commit()
-        app.logger.info('Submitted Sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
+        app.logger.info('Submitted sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
         return redirect(url_for('history'))
     return render_template('submit.html', form=form)
 
