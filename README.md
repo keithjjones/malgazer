@@ -19,8 +19,9 @@ Be aware that this code will change often as I add more functionality.  There wi
 # Docker
 
 To run the Docker portion of this project, you will need a trained classifier that will predict classifications
-with the "predict_sample" function, such as the library.ml.ML class.  Dill Pickle this classifier and place it in
-samples/ml.dill.
+with the "predict_sample" function, such as the library.ml.ML class.  Dill Pickle this classifier
+(or use train_classifier.py and the resulting saved classifier output from this script)
+and place it in samples/ml.dill.
 
 Next, copy ".env.template" to ".env" and fill in any information for your instance.
 
