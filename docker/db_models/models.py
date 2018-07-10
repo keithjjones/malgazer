@@ -37,14 +37,17 @@ class User(db.Model):
     The user class for database storage.
     """
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), nullable=False)
-    permissions = db.Column(db.String(100), nullable=False)
-    api_key = db.Column(db.String(200), nullable=True)
+    email = db.Column(db.Text, nullable=False, index=True)
+    config = db.Column(postgresql.JSON, nullable=True)
+    api_key = db.Column(db.Text, nullable=True)
     registration = db.Column(db.DateTime, nullable=False)
+    activated = db.Column(db.Boolean, default=False)
+    activated_date = db.Column(db.DateTime, nullable=True)
     last_login = db.Column(db.DateTime, nullable=True)
+    last_login_ip = db.Column(postgresql.INET, nullable=True)
 
 
-TABLES = [WebRequest, Submission]
+TABLES = [WebRequest, Submission, User]
 
 
 def generate_api_key(length=60):

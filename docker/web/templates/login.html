@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data" action="{{ url_for('login') }}">
+  {{ form.csrf_token }}
+  <table>
+  <tr>
+    <tr><td>Email:</td></tr>
+    <tr><td>{{ form.email }}</td></tr>
+    <tr><td>Password:</td></tr>
+    <tr><td>{{ form.password }}</td></tr>
+    <tr><td><input type="submit" class="btn btn-outline-primary" value="Login"></td></tr>
+  </table>
+  <br>
+  If you do not have an account, register instead:
+  <br>
+  <a class="btn btn-outline-primary" href="{{ url_for('register') }}">Register</a>
+</form>
+{% endblock %}

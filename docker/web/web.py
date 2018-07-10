@@ -1,8 +1,8 @@
 from flask import Flask, render_template, abort, redirect, url_for, flash, request
 from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
-from wtforms import RadioField, StringField
-from wtforms.validators import DataRequired
+from wtforms import RadioField, StringField, PasswordField
+from wtforms.validators import DataRequired, Email
 from flask_wtf.file import FileField, FileRequired
 from flask_wtf.csrf import CSRFProtect, CSRFError
 import requests
@@ -59,12 +59,37 @@ class SubmissionForm(FlaskForm):
     classification = RadioField('name', choices=POSSIBLE_CLASSIFICATIONS, default='Unknown', validators=[DataRequired()])
 
 
+class LoginForm(FlaskForm):
+    """
+    The login form.
+    """
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+
+
 @app.route('/')
 def main():
     """
     The main page.
     """
     return render_template('main.html')
+
+
+@app.route('/login')
+def login():
+    """
+    The login page.
+    """
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    form = LoginForm()
+    if form.validate_on_submit():
+        pass
+    return render_template('login.html', form=form)
+
+
+@app.route('/register')
+def register():
+    return render_template('register.html')
 
 
 @app.route('/submit', methods=('GET', 'POST'))
