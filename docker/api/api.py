@@ -35,6 +35,7 @@ applogger.addHandler(file_handler)
 
 # Global values
 SAMPLES_DIRECTORY = "/samples"
+MULTIUSER = bool(int(os.environ['MULTIUSER']))
 
 
 def setup_db():
