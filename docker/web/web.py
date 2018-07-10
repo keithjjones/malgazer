@@ -133,6 +133,12 @@ def register():
     return render_template('register.html', state=StateInfo(State), form=form)
 
 
+@app.route('/myaccount')
+def myaccount():
+    State = {'multiuser': MULTIUSER, 'loggedin': False}
+    return render_template('myaccount.html', state=StateInfo(State))
+
+
 @app.route('/submit', methods=('GET', 'POST'))
 def submit():
     """

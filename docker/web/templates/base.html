@@ -21,14 +21,17 @@
     <li class="nav-item">
       <a class="nav-link" href="https://github.com/keithjjones/malgazer">GitHub</a>
     </li>
+    {% if state.multiuser and state.loggedin %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('myaccount') }}">My Account</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+      </li>
+    {% endif %}
     {% if state.multiuser and not state.loggedin %}
       <li class="nav-item">
         <a class="nav-link" href="{{ url_for('login') }}">Log In</a>
-      </li>
-    {% endif %}
-    {% if state.multiuser and state.loggedin %}
-      <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
       </li>
     {% endif %}
   </ul>
