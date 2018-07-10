@@ -11,6 +11,7 @@ import json
 import datetime
 import sys
 import logging
+import logging.handlers
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
 from library.files import Sample
@@ -42,7 +43,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postg
 db.init_app(app)
 csrf = CSRFProtect(app)
 applogger = app.logger
-file_handler = logging.FileHandler("/logs/web.log")
+file_handler = logging.handlers.TimedRotatingFileHandler("/logs/web.log", when='midnight', backupCount=30)
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(logging.Formatter(
     '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'

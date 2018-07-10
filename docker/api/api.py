@@ -10,6 +10,7 @@ import multiprocessing
 import threading
 import sys
 import logging
+import logging.handlers
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
 from library.files import Sample
@@ -24,7 +25,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postg
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 db.init_app(app)
 applogger = app.logger
-file_handler = logging.FileHandler("/logs/api.log")
+file_handler = logging.handlers.TimedRotatingFileHandler("/logs/api.log", when='midnight', backupCount=30)
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(logging.Formatter(
     '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
