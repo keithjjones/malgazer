@@ -260,10 +260,12 @@ def submit():
             req = requests.post(url, files=files, data=data)
         except Exception as exc:
             flash('Exception while sending file to API!', 'danger')
-            app.logger.exception('Error submitting sample: {0} User: {1} ID: {2} - Exception: {3}'.format(s.sha256,
-                                                                                                          flask_login.current_user.email,
-                                                                                                          flask_login.current_user.id,
-                                                                                                          exc))
+            if MULTIUSER:
+                app.logger.exception('Error submitting sample: {0} from User: {1} ID: {2} IP: {3} - Exception: {4}'.format(
+                    s.sha256, flask_login.current_user.email, flask_login.current_user.id, ip_addr, exc))
+            else:
+                app.logger.exception('Error submitting sample: {0} from IP: {1} - Exception: {2}'.format(s.sha256,
+                                                                                                         ip_addr, exc))
             return redirect(url_for('submit'))
         if req.status_code != 200:
             flash("API FAILURE - HTTP Code: {0}".format(req.status_code), 'danger')
@@ -275,8 +277,11 @@ def submit():
                          ip_address=ip_addr)
         db.session.add(req)
         db.session.commit()
-        app.logger.info('Submitted sample: {0} from User: {1} ID: {2} IP: {3}'.format(s.sha256, flask_login.current_user.email,
-                                                                                      flask_login.current_user.id, ip_addr))
+        if MULTIUSER:
+            app.logger.info('Submitted sample: {0} from User: {1} ID: {2} IP: {3}'.format(s.sha256, flask_login.current_user.email,
+                                                                                          flask_login.current_user.id, ip_addr))
+        else:
+            app.logger.info('Submitted sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
         return redirect(url_for('history'))
     else:
         for field, errors in form.errors.items():
