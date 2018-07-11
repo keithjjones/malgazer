@@ -125,6 +125,7 @@ def main():
     """
     The main page.
     """
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     State = {'multiuser': MULTIUSER}
     return render_template('main.html', state=StateInfo(State))
 
@@ -142,7 +143,7 @@ def login():
             if user and user.validate_password(form.password.data):
                 flask_login.login_user(user)
                 flash("Successfully logged in.", 'success')
-
+                app.logger.info('User: {0} ID: {1} successful login from IP: {2}'.format(form.email.data, user.id, ip_addr))
                 # next = request.args.get('next')
                 # # is_safe_url should check if the url is safe for redirects.
                 # # See http://flask.pocoo.org/snippets/62/ for an example.
@@ -153,11 +154,13 @@ def login():
                 return redirect(url_for('main'))
             else:
                 flash("Invalid login.  Try again.", 'danger')
+                app.logger.info('User: {0} failed login from IP: {1}'.format(form.email.data, ip_addr))
                 return redirect(url_for('login'))
         else:
             for field, errors in form.errors.items():
                 for error in errors:
                     flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error), 'danger')
+            app.logger.info('User: {0} failed login from IP: {1}'.format(form.email.data, ip_addr))
             return redirect(url_for('register'))
     State = {'multiuser': MULTIUSER}
     return render_template('login.html', state=StateInfo(State), form=form)
@@ -166,12 +169,16 @@ def login():
 @app.route('/logout')
 @login_decorate
 def logout():
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    app.logger.info('User: {0} ID: {1} logout from IP: {2}'.format(flask_login.current_user.email,
+                                                                   flask_login.current_user.id, ip_addr))
     flask_login.logout_user()
     return redirect(url_for('main'))
 
 
 @app.route('/register', methods=('GET', 'POST'))
 def register():
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     form = RegisterForm()
     if request.method == 'POST':
         if form.validate():
@@ -186,9 +193,11 @@ def register():
                 db.session.add(user)
                 db.session.commit()
                 flash("Account registered.  An activation email was sent to you for further instructions.", 'success')
+                app.logger.info('User: {0} ID: {1} registered from IP: {2}'.format(user.email, user.id, ip_addr))
                 return redirect(url_for('login'))
             else:
                 flash("Email already registered.", 'danger')
+                app.logger.info('User: {0} already registered from IP: {1}'.format(form.email.data, ip_addr))
                 return redirect(url_for('register'))
         else:
             for field, errors in form.errors.items():
@@ -200,27 +209,35 @@ def register():
 
 
 @app.route('/confirm/<token>')
-@login_decorate
+# @login_decorate
 def confirm(token):
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     try:
         email = confirm_token(token)
     except:
         flash('The confirmation link is invalid or has expired.', 'danger')
+        app.logger.info('Confirmation link dead from IP: {1}'.format(ip_addr))
+        return redirect(url_for('login'))
     user = User.query.filter_by(email=email).first_or_404()
     if user.activated:
-        flash('Account already confirmed. Please login.', 'success')
+        flash('Account already confirmed.', 'success')
+        app.logger.info('User: {0} ID: {1} already activated from IP: {2}'.format(flask_login.current_user.email,
+                                                                                  flask_login.current_user.id, ip_addr))
     else:
         user.activated = True
         user.activated_date = datetime.datetime.now()
         db.session.add(user)
         db.session.commit()
         flash('You have confirmed your account. Thanks!', 'success')
+        app.logger.info('User: {0} ID: {1} confirmed from IP: {2}'.format(flask_login.current_user.email,
+                                                                          flask_login.current_user.id, ip_addr))
     return redirect(url_for('main'))
 
 
 @app.route('/myaccount')
 @login_decorate
 def myaccount():
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     State = {'multiuser': MULTIUSER}
     return render_template('myaccount.html', state=StateInfo(State))
 
@@ -243,7 +260,10 @@ def submit():
             req = requests.post(url, files=files, data=data)
         except Exception as exc:
             flash('Exception while sending file to API!', 'danger')
-            app.logger.exception('Error submitting sample: {0} - Exception: {1}'.format(s.sha256, exc))
+            app.logger.exception('Error submitting sample: {0} User: {1} ID: {2} - Exception: {3}'.format(s.sha256,
+                                                                                                          flask_login.current_user.email,
+                                                                                                          flask_login.current_user.id,
+                                                                                                          exc))
             return redirect(url_for('submit'))
         if req.status_code != 200:
             flash("API FAILURE - HTTP Code: {0}".format(req.status_code), 'danger')
@@ -255,7 +275,8 @@ def submit():
                          ip_address=ip_addr)
         db.session.add(req)
         db.session.commit()
-        app.logger.info('Submitted sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
+        app.logger.info('Submitted sample: {0} from User: {1} ID: {2} IP: {3}'.format(s.sha256, flask_login.current_user.email,
+                                                                                      flask_login.current_user.id, ip_addr))
         return redirect(url_for('history'))
     else:
         for field, errors in form.errors.items():
@@ -271,6 +292,7 @@ def history():
     """
     The submission history page.
     """
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     url = "{0}/history".format(API_URL)
     try:
         req = requests.get(url)
@@ -294,6 +316,7 @@ def api():
     """
     The API information page.
     """
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     State = {'multiuser': MULTIUSER}
     return render_template('api.html', state=StateInfo(State))
 
