@@ -64,8 +64,8 @@ class User(db.Model):
 
     @property
     def is_active(self):
-        # return self.activated
-        return True
+        return self.activated
+        # return True
 
     def get_id(self):
         return "{0}".format(self.id)
