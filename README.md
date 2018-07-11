@@ -49,6 +49,10 @@ Information about the API is on the "API" page of the website.
 
 After bringing it up in Docker, you can access the API portion of this project at http://localhost:8888
 
+## Portainer
+
+After bringing it up in Docker, you can access portainer at http://localhost:9000
+
 # Installation
 
 To use this module outside Docker, you will need the requirement.  The following command installs the requirements:
