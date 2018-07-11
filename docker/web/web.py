@@ -142,6 +142,10 @@ def login():
             user = User.query.filter_by(email=form.email.data).first()
             if user and user.activated and user.validate_password(form.password.data):
                 flask_login.login_user(user)
+                user.last_login = datetime.datetime.now()
+                user.last_login_ip = ip_addr
+                db.session.add(user)
+                db.session.commit()
                 flash("Successfully logged in.", 'success')
                 app.logger.info('User: {0} ID: {1} successful login from IP: {2}'.format(form.email.data, user.id, ip_addr))
                 # next = request.args.get('next')
