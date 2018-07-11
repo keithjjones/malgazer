@@ -56,10 +56,12 @@ def reset():
     """
     Put all cleaning logic here.
     """
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     clear_database()
     for f in glob.glob(os.path.join(SAMPLES_DIRECTORY, '*')):
         if os.path.isfile(f):
             os.remove(f)
+    app.logger.info('Database reset from IP: {0}'.format(ip_addr))
     return json.dumps({'status': 'reset'}), 200
 
 
