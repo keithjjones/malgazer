@@ -140,7 +140,7 @@ def login():
     if request.method == 'POST':
         if form.validate():
             user = User.query.filter_by(email=form.email.data).first()
-            if user and user.validate_password(form.password.data):
+            if user and user.activated and user.validate_password(form.password.data):
                 flask_login.login_user(user)
                 flash("Successfully logged in.", 'success')
                 app.logger.info('User: {0} ID: {1} successful login from IP: {2}'.format(form.email.data, user.id, ip_addr))
@@ -152,6 +152,10 @@ def login():
                 # if next:
                 #     return redirect(next)
                 return redirect(url_for('main'))
+            elif not user.activated:
+                flash("Not yet activated.  Check your email and click the activation link!", 'danger')
+                app.logger.info('User: {0} ID: {1} not activated yet from IP: {2}'.format(form.email.data,
+                                                                                          user.id, ip_addr))
             else:
                 flash("Invalid login.  Try again.", 'danger')
                 app.logger.info('User: {0} failed login from IP: {1}'.format(form.email.data, ip_addr))
@@ -194,7 +198,7 @@ def register():
                 db.session.commit()
                 flash("Account registered.  An activation email was sent to you for further instructions.", 'success')
                 app.logger.info('User: {0} ID: {1} registered from IP: {2}'.format(user.email, user.id, ip_addr))
-                return redirect(url_for('login'))
+                return redirect(url_for('main'))
             else:
                 flash("Email already registered.", 'danger')
                 app.logger.info('User: {0} already registered from IP: {1}'.format(form.email.data, ip_addr))
@@ -229,8 +233,7 @@ def confirm(token):
         db.session.add(user)
         db.session.commit()
         flash('You have confirmed your account. Thanks!', 'success')
-        app.logger.info('User: {0} ID: {1} confirmed from IP: {2}'.format(flask_login.current_user.email,
-                                                                          flask_login.current_user.id, ip_addr))
+        app.logger.info('User: {0} ID: {1} confirmed from IP: {2}'.format(user.email, user.id, ip_addr))
     return redirect(url_for('main'))
 
 
