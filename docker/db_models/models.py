@@ -75,8 +75,6 @@ class User(db.Model):
         return False
 
 
-
-
 TABLES = [WebRequest, Submission, User]
 
 
