@@ -30,7 +30,7 @@ POSSIBLE_CLASSIFICATIONS = [
     ('Worm', 'Worm'),
     ('Backdoor', 'Backdoor'),
     ('Ransomware', 'Ransomware'),
-    ('PUP', 'PUP'),
+    ('PUA', 'PUA'),
     ('Unknown', 'Unknown')
 ]
 MULTIUSER = bool(int(os.environ['MULTIUSER']))
