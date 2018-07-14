@@ -116,9 +116,16 @@ class RegisterForm(FlaskForm):
 
 class EmailOnlyForm(FlaskForm):
     """
-    The register form.
+    The email only form.
     """
     email = StringField('Email', validators=[DataRequired(), Email()], render_kw={"placeholder": "email@example.com"})
+
+
+class PasswordOnlyForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=64),
+                                                     EqualTo('password_confirm', message='Passwords must match')],
+                             render_kw={"placeholder": "Password"})
+    password_confirm = PasswordField('Confirm Password', render_kw={"placeholder": "Password"})
 
 
 class StateInfo(object):
@@ -284,6 +291,65 @@ def resend_activation_email():
             return redirect(url_for('resend_activation_email'))
     State = {'multiuser': MULTIUSER}
     return render_template('resend_activation_email.html', state=StateInfo(State), form=form)
+
+
+@app.route('/forgot_password', methods=('GET', 'POST'))
+def forgot_password():
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    form = EmailOnlyForm()
+    if request.method == 'POST':
+        if form.validate():
+            user = User.query.filter_by(email=form.email.data).first()
+            flash('If an account exists for this email address, an email with further instructions was sent.', 'success')
+            if user and user.email and user.activated:
+                token = generate_confirmation_token(user.email)
+                password_reset_url = url_for('reset_password', token=token, _external=True)
+                html = render_template('forgotpasswordemail.html', password_reset_url=password_reset_url)
+                subject = "Reset your password"
+                send_email(user.email, subject, html)
+                app.logger.info('User: {0} ID: {1} sending forgotten password email from IP: {2}'.format(user.email,
+                                                                                                         user.id,
+                                                                                                         ip_addr))
+            return redirect(url_for('main'))
+        else:
+            flash_errors(form)
+            return redirect(url_for('forgot_password'))
+    State = {'multiuser': MULTIUSER}
+    return render_template('forgot_password.html', state=StateInfo(State), form=form)
+
+
+@app.route('/reset_password/<token>', methods=('GET', 'POST'))
+def reset_password(token):
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    try:
+        email = confirm_token(token)
+    except:
+        flash('The password reset link is invalid or has expired.', 'danger')
+        app.logger.info('Password reset link dead from IP: {1}'.format(ip_addr))
+        return redirect(url_for('login'))
+    form = PasswordOnlyForm()
+    user = User.query.filter_by(email=email).first_or_404()
+    State = {'multiuser': MULTIUSER}
+    if request.method == 'GET':
+        if user.activated:
+            app.logger.info('User: {0} ID: {1} reset password from IP: {2}'.format(user.email,
+                                                                                   user.id, ip_addr))
+            return render_template('reset_password.html', state=StateInfo(State), form=form, token=token)
+        else:
+            flash('Your account has not been activated yet.  Resend the activation email first!', 'danger')
+            app.logger.info('User: {0} ID: {1} reset password but not confirmed from IP: {2}'.format(user.email,
+                                                                                                     user.id, ip_addr))
+            return redirect(url_for('main'))
+    elif request.method == 'POST':
+        if form.validate():
+            user.set_password(form.password.data)
+            db.session.add(user)
+            db.session.commit()
+            flash('Password has been reset.', 'success')
+            return redirect('login')
+        else:
+            flash_errors(form)
+            return redirect(url_for('reset_password', token=token))
 
 
 @app.route('/myaccount')

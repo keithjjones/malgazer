@@ -61,6 +61,10 @@ class User(db.Model):
         login = bcrypt.verify(password, self.password)
         return login
 
+    def set_password(self, newpassword):
+        """ This sets the password with encryption. """
+        self.password = bcrypt.encrypt(newpassword)
+
     @property
     def is_authenticated(self):
         return True

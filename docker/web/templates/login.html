@@ -2,6 +2,7 @@
 
 {% block content %}
 <form method="POST" enctype="multipart/form-data" action="{{ url_for('login') }}">
+  {{ form.csrf_token }}
   <div class="dropdown">
     <form class="px-4 py-3">
       <div class="form-group">
@@ -14,7 +15,7 @@
     </form>
     <div class="dropdown-divider"></div>
     <a class="dropdown-item" href="{{ url_for('register') }}">Need an account?</a>
-    <a class="dropdown-item" href="{{ url_for('register') }}">Forgot password?</a>
+    <a class="dropdown-item" href="{{ url_for('forgot_password') }}">Forgot password?</a>
     <a class="dropdown-item" href="{{ url_for('resend_activation_email') }}">Resend activation email?</a>
   </div>
 </form>
