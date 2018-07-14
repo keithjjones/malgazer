@@ -2,6 +2,7 @@ from flask import Flask, render_template, abort, redirect, url_for, flash, reque
 from urllib.parse import urlparse, urljoin
 from flask_wtf import FlaskForm
 from flask_sqlalchemy import SQLAlchemy
+from flask_limiter import Limiter
 from wtforms import RadioField, StringField, PasswordField, ValidationError
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 from flask_wtf.file import FileField, FileRequired
@@ -67,6 +68,25 @@ applogger.addHandler(file_handler)
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+
+def get_userid():
+    user_id = flask_login.current_user.id
+    return user_id
+
+
+if MULTIUSER:
+    limiter = Limiter(
+        app,
+        key_func=get_userid
+    )
+else:
+    limiter = None
+
+
+def limit_decorate():
+    """ Decorates functions depending on multiuser mode. """
+    return limiter.limit("1 per minute") if MULTIUSER else lambda x: x
 
 
 @app.context_processor
@@ -445,6 +465,7 @@ def set_email():
 
 @app.route('/generate_new_api_key')
 @login_decorate
+@limit_decorate()
 def generate_new_api_key():
     user = flask_login.current_user
     api_key = generate_api_key(API_KEY_LENGTH_BYTES)
@@ -473,24 +494,30 @@ def submit():
     """
     ip_addr = get_request_ip()
     form = SubmissionForm()
+    user = flask_login.current_user
     if form.validate_on_submit():
         f = form.sample.data
         s = Sample(frommemory=f.stream.read())
         files = {'file': s.rawdata}
         data = {'classification': form.classification.data}
         url = "{0}/submit".format(API_URL)
+        if MULTIUSER:
+            url = url+"?apikey={0}".format(user.api_key)
         try:
             req = requests.post(url, files=files, data=data)
         except Exception as exc:
             flash('Exception while sending file to API!', 'danger')
             if MULTIUSER:
                 app.logger.exception('Error submitting sample: {0} from User: {1} ID: {2} IP: {3} - Exception: {4}'.format(
-                    s.sha256, flask_login.current_user.email, flask_login.current_user.id, ip_addr, exc))
+                    s.sha256, user.email, user.id, ip_addr, exc))
             else:
                 app.logger.exception('Error submitting sample: {0} from IP: {1} - Exception: {2}'.format(s.sha256,
                                                                                                          ip_addr, exc))
             return redirect(url_for('submit'))
-        if req.status_code != 200:
+        if req.status_code == 429:
+            flash("You exceeded your rate limit of {0}.  Please wait a bit.".format(user.api_limits), 'danger')
+            return redirect(url_for('main'))
+        elif req.status_code != 200:
             flash("API FAILURE - HTTP Code: {0}".format(req.status_code), 'danger')
             app.logger.error('Submit API did not return 200: {0}'.format(req))
             return redirect(url_for('submit'))
@@ -505,8 +532,8 @@ def submit():
         db.session.add(req)
         db.session.commit()
         if MULTIUSER:
-            app.logger.info('Submitted sample: {0} from User: {1} ID: {2} IP: {3}'.format(s.sha256, flask_login.current_user.email,
-                                                                                          flask_login.current_user.id, ip_addr))
+            app.logger.info('Submitted sample: {0} from User: {1} ID: {2} IP: {3}'.format(s.sha256, user.email,
+                                                                                          user.id, ip_addr))
         else:
             app.logger.info('Submitted sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
         return redirect(url_for('history'))
@@ -523,14 +550,20 @@ def history():
     The submission history page.
     """
     ip_addr = get_request_ip()
+    user = flask_login.current_user
     url = "{0}/history".format(API_URL)
+    if MULTIUSER:
+        url = url + "?apikey={0}".format(user.api_key)
     try:
         req = requests.get(url)
     except Exception as exc:
         flash('Exception while pulling history from API!', 'danger')
         app.logger.exception('Exception while pulling history - Exception: {0}'.format(exc))
         return redirect(url_for('main'))
-    if req.status_code != 200:
+    if req.status_code == 429:
+            flash("You exceeded your rate limit of {0}.  Please wait a bit.".format(user.api_limits), 'danger')
+            return redirect(url_for('main'))
+    elif req.status_code != 200:
         flash("API FAILURE - HTTP Code: {0}".format(req.status_code), 'danger')
         app.logger.error('History API did not return 200: {0}'.format(req))
         return redirect(url_for('main'))
