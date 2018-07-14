@@ -111,6 +111,13 @@ class RegisterForm(FlaskForm):
     password_confirm = PasswordField('Confirm Password')
 
 
+class EmailOnlyForm(FlaskForm):
+    """
+    The register form.
+    """
+    email = StringField('Email', validators=[DataRequired(), Email()])
+
+
 class StateInfo(object):
     def __init__(self, data):
         if not isinstance(data, dict):
@@ -118,7 +125,15 @@ class StateInfo(object):
         self.__dict__ = data
 
 
+def flash_errors(form, flash_type='danger'):
+    """ Flashes form errors. """
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error), flash_type)
+
+
 def login_decorate(somefunc):
+    """ Decorates functions depending on multiuser mode. """
     if MULTIUSER:
         return flask_login.login_required(somefunc)
     else:
@@ -213,9 +228,7 @@ def register():
                 app.logger.info('User: {0} already registered from IP: {1}'.format(form.email.data, ip_addr))
                 return redirect(url_for('register'))
         else:
-            for field, errors in form.errors.items():
-                for error in errors:
-                    flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error), 'danger')
+            flash_errors(form)
             return redirect(url_for('register'))
     State = {'multiuser': MULTIUSER}
     return render_template('register.html', state=StateInfo(State), form=form)
@@ -244,6 +257,30 @@ def confirm(token):
         flash('You have confirmed your account. Thanks!', 'success')
         app.logger.info('User: {0} ID: {1} confirmed from IP: {2}'.format(user.email, user.id, ip_addr))
     return redirect(url_for('main'))
+
+
+@app.route('/resend_activation_email', methods=('GET', 'POST'))
+def resend_activation_email():
+    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    form = EmailOnlyForm()
+    if request.method == 'POST':
+        if form.validate():
+            user = User.query.filter_by(email=form.email.data).first()
+            flash('If a new registration exists for this email address, a new activation email was sent.', 'success')
+            if user and user.email and not user.activated:
+                token = generate_confirmation_token(user.email)
+                confirm_url = url_for('confirm', token=token, _external=True)
+                html = render_template('activationemail.html', confirm_url=confirm_url)
+                subject = "Please confirm your email"
+                send_email(user.email, subject, html)
+                app.logger.info('User: {0} ID: {1} resending activation email from IP: {2}'.format(user.email,
+                                                                                                   user.id, ip_addr))
+            return redirect(url_for('main'))
+        else:
+            flash_errors(form)
+            return redirect(url_for('resend_activation_email'))
+    State = {'multiuser': MULTIUSER}
+    return render_template('resend_activation_email.html', state=StateInfo(State), form=form)
 
 
 @app.route('/myaccount')
@@ -300,9 +337,7 @@ def submit():
             app.logger.info('Submitted sample: {0} from IP: {1}'.format(s.sha256, ip_addr))
         return redirect(url_for('history'))
     else:
-        for field, errors in form.errors.items():
-            for error in errors:
-                flash(u"Error in the {0} field - {1}".format(getattr(form, field).label.text, error), 'danger')
+        flash_errors(form)
     State = {'multiuser': MULTIUSER}
     return render_template('submit.html', state=StateInfo(State), form=form)
 
