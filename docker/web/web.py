@@ -15,6 +15,7 @@ import datetime
 import sys
 import logging
 import logging.handlers
+from functools import wraps
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
 from library.files import Sample
@@ -84,9 +85,19 @@ else:
     limiter = None
 
 
-def limit_decorate():
+def limit_api_resets(f):
     """ Decorates functions depending on multiuser mode. """
-    return limiter.limit("1 per minute") if MULTIUSER else lambda x: x
+    if MULTIUSER:
+        @limiter.limit("1 per minute")
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            return f(*args, **kwargs)
+        return wrapper
+    else:
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            return f(*args, **kwargs)
+        return wrapper
 
 
 @app.context_processor
@@ -465,7 +476,7 @@ def set_email():
 
 @app.route('/generate_new_api_key')
 @login_decorate
-@limit_decorate()
+@limit_api_resets
 def generate_new_api_key():
     user = flask_login.current_user
     api_key = generate_api_key(API_KEY_LENGTH_BYTES)
