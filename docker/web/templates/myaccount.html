@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<table>
-    <tr><td>Registered on:</td><td>{{ user.registration.date() }}</td></tr>
-    <tr><td>API Key:</td><td>{{ user.api_key }}</td></tr>
-    <tr><td><a class="btn btn-outline-primary" href="{{ url_for('history') }}">Create New API Key</a>
-</td></tr>
+<table class="table top-buffer" cellpadding="10">
+    <tr><td>Email:</td><td>{{ user.email }}</td>
+        <td><a class="btn btn-outline-primary" href="{{ url_for('set_email') }}">Change Email</a></td></tr>
+    <tr><td>Registered on:</td><td>{{ user.registration.date() }}</td>
+        <td><a class="btn btn-outline-primary" href="{{ url_for('set_password') }}">Change Password</a></td></tr>
+    <tr><td>API Key:</td><td>{{ user.api_key }}</td>
+        <td><a class="btn btn-outline-primary" href="{{ url_for('history') }}">Create New API Key</a></td></tr>
 </table>
 {% endblock %}

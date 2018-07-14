@@ -78,6 +78,14 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+def get_request_ip():
+    """
+    Gets the requester IP.
+    :return: The IP.
+    """
+    return request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+
+
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
@@ -125,7 +133,15 @@ class PasswordOnlyForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=64),
                                                      EqualTo('password_confirm', message='Passwords must match')],
                              render_kw={"placeholder": "Password"})
-    password_confirm = PasswordField('Confirm Password', render_kw={"placeholder": "Password"})
+    password_confirm = PasswordField('Confirm Password', render_kw={"placeholder": "Confirm"})
+
+
+class PasswordChangeForm(FlaskForm):
+    old_password = PasswordField('Old Password', render_kw={"placeholder": "Old Password"})
+    password = PasswordField('New Password', validators=[DataRequired(), Length(min=8, max=64),
+                                                         EqualTo('password_confirm', message='Passwords must match')],
+                             render_kw={"placeholder": "New Password"})
+    password_confirm = PasswordField('New Confirm Password', render_kw={"placeholder": "Confirm"})
 
 
 class StateInfo(object):
@@ -155,7 +171,7 @@ def main():
     """
     The main page.
     """
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     State = {'multiuser': MULTIUSER}
     return render_template('main.html', state=StateInfo(State))
 
@@ -165,7 +181,7 @@ def login():
     """
     The login page.
     """
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     form = LoginForm()
     if request.method == 'POST':
         if form.validate():
@@ -207,7 +223,7 @@ def login():
 @app.route('/logout')
 @login_decorate
 def logout():
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     app.logger.info('User: {0} ID: {1} logout from IP: {2}'.format(flask_login.current_user.email,
                                                                    flask_login.current_user.id, ip_addr))
     flask_login.logout_user()
@@ -216,7 +232,7 @@ def logout():
 
 @app.route('/register', methods=('GET', 'POST'))
 def register():
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     form = RegisterForm()
     if request.method == 'POST':
         if form.validate():
@@ -247,7 +263,7 @@ def register():
 @app.route('/confirm/<token>')
 # @login_decorate
 def confirm(token):
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     try:
         email = confirm_token(token)
     except:
@@ -275,7 +291,7 @@ def confirm(token):
 
 @app.route('/resend_activation_email', methods=('GET', 'POST'))
 def resend_activation_email():
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     form = EmailOnlyForm()
     if request.method == 'POST':
         if form.validate():
@@ -299,7 +315,7 @@ def resend_activation_email():
 
 @app.route('/forgot_password', methods=('GET', 'POST'))
 def forgot_password():
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     form = EmailOnlyForm()
     if request.method == 'POST':
         if form.validate():
@@ -324,7 +340,7 @@ def forgot_password():
 
 @app.route('/reset_password/<token>', methods=('GET', 'POST'))
 def reset_password(token):
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     try:
         email = confirm_token(token)
     except:
@@ -354,16 +370,80 @@ def reset_password(token):
             db.session.add(user)
             db.session.commit()
             flash('Password has been reset.', 'success')
+            app.logger.info('User: {0} ID: {1} reset password successfully from IP: {2}'.format(user.email,
+                                                                                                user.id, ip_addr))
             return redirect('login')
         else:
             flash_errors(form)
             return redirect(url_for('reset_password', token=token))
 
 
+@app.route('/set_password', methods=('GET', 'POST'))
+@login_decorate
+def set_password():
+    ip_addr = get_request_ip()
+    form = PasswordChangeForm()
+    State = {'multiuser': MULTIUSER}
+    user = flask_login.current_user
+    if request.method == 'GET':
+        return render_template('set_password.html', form=form, state=StateInfo(State))
+    elif request.method == 'POST':
+        if form.validate():
+            if user.validate_password(form.old_password.data):
+                user.set_password(form.password.data)
+                db.session.add(user)
+                db.session.commit()
+                app.logger.info('User: {0} ID: {1} set password successfully from IP: {2}'.format(user.email,
+                                                                                                  user.id, ip_addr))
+                flash('Password has been set.', 'success')
+            return redirect('myaccount')
+        else:
+            flash_errors(form)
+            return redirect(url_for('set_password'))
+
+
+@app.route('/set_email', methods=('GET', 'POST'))
+@login_decorate
+def set_email():
+    ip_addr = get_request_ip()
+    form = EmailOnlyForm()
+    State = {'multiuser': MULTIUSER}
+    user = flask_login.current_user
+    if request.method == 'GET':
+        return render_template('set_email.html', form=form, state=StateInfo(State))
+    elif request.method == 'POST':
+        if form.validate():
+            users = User.query.filter_by(email=form.email.data).all()
+            if len(users) == 0:
+                user.email = form.email.data.strip()
+                user.activated = False
+                token = generate_confirmation_token(user.email)
+                confirm_url = url_for('confirm', token=token, _external=True)
+                html = render_template('activationemail.html', confirm_url=confirm_url)
+                subject = "Please confirm your new email"
+                send_email(user.email, subject, html)
+                db.session.add(user)
+                db.session.commit()
+                flash("Email set.  An activation email was sent to you for further instructions before "
+                      "you can use this system.", 'success')
+                app.logger.info('User: {0} ID: {1} changed email from IP: {2}'.format(user.email, user.id, ip_addr))
+                return redirect(url_for('main'))
+            else:
+                flash("Email already registered.", 'danger')
+                app.logger.info('User: {0} ID: {1} changed email but already a registered email from IP: {2}'.format(user.email,
+                                                                                                                     user.id,
+                                                                                                                     ip_addr))
+                return redirect(url_for('set_email'))
+            return redirect('myaccount')
+        else:
+            flash_errors(form)
+            return redirect(url_for('set_email'))
+
+
 @app.route('/myaccount')
 @login_decorate
 def myaccount():
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     State = {'multiuser': MULTIUSER}
     return render_template('myaccount.html', state=StateInfo(State), user=flask_login.current_user)
 
@@ -374,7 +454,7 @@ def submit():
     """
     The sample submission page.
     """
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     form = SubmissionForm()
     if form.validate_on_submit():
         f = form.sample.data
@@ -425,7 +505,7 @@ def history():
     """
     The submission history page.
     """
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     url = "{0}/history".format(API_URL)
     try:
         req = requests.get(url)
@@ -449,7 +529,7 @@ def api():
     """
     The API information page.
     """
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     State = {'multiuser': MULTIUSER}
     return render_template('api.html', state=StateInfo(State))
 

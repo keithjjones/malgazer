@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data" action="{{ url_for('set_email') }}">
+  {{ form.csrf_token }}
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <table>
+          <tr><td>{{ form.email }}</td></tr>
+        </table>
+        <br>
+        <input type="submit" class="btn btn-outline-primary" value="Set Email">
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
