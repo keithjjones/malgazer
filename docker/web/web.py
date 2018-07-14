@@ -251,7 +251,7 @@ def register():
                 db.session.commit()
                 flash("Account registered.  An activation email was sent to you for further instructions.", 'success')
                 app.logger.info('User: {0} ID: {1} registered from IP: {2}'.format(user.email, user.id, ip_addr))
-                return redirect(url_for('main'))
+                return redirect(url_for('login'))
             else:
                 flash("Email already registered.", 'danger')
                 app.logger.info('User: {0} already registered from IP: {1}'.format(form.email.data, ip_addr))

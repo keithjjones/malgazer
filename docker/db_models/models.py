@@ -45,6 +45,7 @@ class User(db.Model):
     password = db.Column(db.Text, nullable=False)
     config = db.Column(postgresql.JSON, nullable=True)
     api_key = db.Column(db.Text, nullable=True, index=True, unique=True)
+    api_limits = db.Column(db.Text, nullable=True, default="6 per minute")
     registration = db.Column(db.DateTime, nullable=False)
     activated = db.Column(db.Boolean, default=False)
     activated_date = db.Column(db.DateTime, nullable=True)
