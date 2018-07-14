@@ -283,10 +283,14 @@ def submit():
             flash("API FAILURE - HTTP Code: {0}".format(req.status_code), 'danger')
             app.logger.error('Submit API did not return 200: {0}'.format(req))
             return redirect(url_for('submit'))
+        if MULTIUSER:
+            user_id = flask_login.current_user.id
+        else:
+            user_id = None
         submit_time = datetime.datetime.now()
         req = WebRequest(sha256=s.sha256, time=submit_time,
                          possible_classification=form.classification.data,
-                         ip_address=ip_addr)
+                         ip_address=ip_addr, user_id=user_id)
         db.session.add(req)
         db.session.commit()
         if MULTIUSER:

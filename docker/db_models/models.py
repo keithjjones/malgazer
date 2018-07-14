@@ -19,6 +19,7 @@ class WebRequest(db.Model):
     time = db.Column(db.DateTime, nullable=False)
     possible_classification = db.Column(db.String(120), nullable=True)
     ip_address = db.Column(postgresql.INET)
+    user_id = db.Column(db.Integer, nullable=True)
 
 
 class Submission(db.Model):
@@ -32,6 +33,7 @@ class Submission(db.Model):
     possible_classification = db.Column(db.String(120), nullable=True)
     ip_address = db.Column(postgresql.INET)
     status = db.Column(db.String(120), nullable=True)
+    user_id = db.Column(db.Integer, nullable=True)
 
 
 class User(db.Model):
@@ -42,12 +44,13 @@ class User(db.Model):
     email = db.Column(db.Text, nullable=False, index=True, unique=True)
     password = db.Column(db.Text, nullable=False)
     config = db.Column(postgresql.JSON, nullable=True)
-    api_key = db.Column(db.Text, nullable=True, index=True)
+    api_key = db.Column(db.Text, nullable=True, index=True, unique=True)
     registration = db.Column(db.DateTime, nullable=False)
     activated = db.Column(db.Boolean, default=False)
     activated_date = db.Column(db.DateTime, nullable=True)
     last_login = db.Column(db.DateTime, nullable=True)
     last_login_ip = db.Column(postgresql.INET, nullable=True)
+    disabled = db.Column(db.Boolean, default=False, nullable=False)
 
     def __init__(self, *args, **kwargs):
         if 'password' in kwargs:
