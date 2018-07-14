@@ -2,46 +2,20 @@
 
 {% block content %}
 <form method="POST" enctype="multipart/form-data" action="{{ url_for('login') }}">
-  {{ form.csrf_token }}
-  <div class="col-sm-6">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Existing accounts...</h5>
-        <table>
-          <tr><td>{{ form.email.label }}</td></tr>
-          <tr><td>{{ form.email }}</td></tr>
-          <tr><td>{{ form.password.label }}</td></tr>
-          <tr><td>{{ form.password }}</td></tr>
-        </table>
-        <br>
-        <input type="submit" class="btn btn-outline-primary" value="Login">
+  <div class="dropdown">
+    <form class="px-4 py-3">
+      <div class="form-group">
+        {{ form.email }}
       </div>
-    </div>
-  </div>
-  <div class="col-sm-6">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Need an account?</h5>
-        <a class="btn btn-outline-primary" href="{{ url_for('register') }}">Register</a>
+      <div class="form-group">
+        {{ form.password }}
       </div>
-    </div>
+      <button type="submit" class="btn btn-outline-primary">Sign in</button>
+    </form>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" href="{{ url_for('register') }}">Need an account?</a>
+    <a class="dropdown-item" href="{{ url_for('register') }}">Forgot password?</a>
+    <a class="dropdown-item" href="{{ url_for('resend_activation_email') }}">Resend activation email?</a>
   </div>
-  <div class="col-sm-6">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Forgot your password?</h5>
-        <a class="btn btn-outline-primary" href="{{ url_for('register') }}">Forgot Password</a>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-6">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Need to resend activation email?</h5>
-        <a class="btn btn-outline-primary" href="{{ url_for('resend_activation_email') }}">Resend Activation Email</a>
-      </div>
-    </div>
-  </div>
-  <br><br>
 </form>
 {% endblock %}

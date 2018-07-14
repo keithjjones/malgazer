@@ -97,25 +97,28 @@ class LoginForm(FlaskForm):
     """
     The login form.
     """
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    email = StringField('Email', id="email", validators=[DataRequired(), Email()],
+                        render_kw={"placeholder": "email@example.com"})
+    password = PasswordField('Password', id="password", validators=[DataRequired()],
+                             render_kw={"placeholder": "Password"})
 
 
 class RegisterForm(FlaskForm):
     """
     The register form.
     """
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={"placeholder": "email@example.com"})
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=64),
-                                                     EqualTo('password_confirm', message='Passwords must match')])
-    password_confirm = PasswordField('Confirm Password')
+                                                     EqualTo('password_confirm', message='Passwords must match')],
+                             render_kw={"placeholder": "Password"})
+    password_confirm = PasswordField('Confirm Password', render_kw={"placeholder": "Password"})
 
 
 class EmailOnlyForm(FlaskForm):
     """
     The register form.
     """
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={"placeholder": "email@example.com"})
 
 
 class StateInfo(object):
