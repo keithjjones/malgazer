@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-My Account Info
+<table>
+    <tr><td>Registered on:</td><td>{{ user.registration.date() }}</td></tr>
+    <tr><td>API Key:</td><td>{{ user.api_key }}</td></tr>
+    <tr><td><a class="btn btn-outline-primary" href="{{ url_for('history') }}">Create New API Key</a>
+</td></tr>
+</table>
 {% endblock %}

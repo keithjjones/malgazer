@@ -365,7 +365,7 @@ def reset_password(token):
 def myaccount():
     ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
     State = {'multiuser': MULTIUSER}
-    return render_template('myaccount.html', state=StateInfo(State))
+    return render_template('myaccount.html', state=StateInfo(State), user=flask_login.current_user)
 
 
 @app.route('/submit', methods=('GET', 'POST'))
