@@ -252,7 +252,11 @@ def confirm(token):
         email = confirm_token(token)
     except:
         flash('The confirmation link is invalid or has expired.', 'danger')
-        app.logger.info('Confirmation link dead from IP: {1}'.format(ip_addr))
+        app.logger.info('Confirmation link dead from IP: {0}'.format(ip_addr))
+        return redirect(url_for('login'))
+    if not email:
+        flash('The confirmation link is invalid or has expired.', 'danger')
+        app.logger.info('Confirmation link dead from IP: {0}'.format(ip_addr))
         return redirect(url_for('login'))
     user = User.query.filter_by(email=email).first_or_404()
     if user.activated:
@@ -325,7 +329,11 @@ def reset_password(token):
         email = confirm_token(token)
     except:
         flash('The password reset link is invalid or has expired.', 'danger')
-        app.logger.info('Password reset link dead from IP: {1}'.format(ip_addr))
+        app.logger.info('Password reset link dead from IP: {0}'.format(ip_addr))
+        return redirect(url_for('login'))
+    if not email:
+        flash('The password reset link is invalid or has expired.', 'danger')
+        app.logger.info('Password reset link dead from IP: {0}'.format(ip_addr))
         return redirect(url_for('login'))
     form = PasswordOnlyForm()
     user = User.query.filter_by(email=email).first_or_404()
