@@ -17,13 +17,14 @@ import logging.handlers
 sys.path.append('..')
 sys.path.append(os.path.join('..', '..'))
 from library.files import Sample
-from docker.db_models.models import Submission, WebRequest, User, setup_database, db
+from docker.db_models.models import Submission, WebRequest, User, setup_database, db, generate_api_key
 from ..common.token import generate_confirmation_token, confirm_token
 from ..common.email import mail, send_email
 
 
 # Global values
 API_URL = "http://api:8888"
+API_KEY_LENGTH_BYTES = 35
 POSSIBLE_CLASSIFICATIONS = [
     ('Trojan', 'Trojan'),
     ('Virus', 'Virus'),
@@ -238,7 +239,9 @@ def register():
         if form.validate():
             users = User.query.filter_by(email=form.email.data).all()
             if len(users) == 0:
-                user = User(email=form.email.data, password=form.password.data, registration=datetime.datetime.now())
+                api_key = generate_api_key(API_KEY_LENGTH_BYTES)
+                user = User(email=form.email.data, password=form.password.data, registration=datetime.datetime.now(),
+                            api_key=api_key)
                 token = generate_confirmation_token(user.email)
                 confirm_url = url_for('confirm', token=token, _external=True)
                 html = render_template('activationemail.html', confirm_url=confirm_url)
@@ -438,6 +441,20 @@ def set_email():
         else:
             flash_errors(form)
             return redirect(url_for('set_email'))
+
+
+@app.route('/generate_new_api_key')
+@login_decorate
+def generate_new_api_key():
+    user = flask_login.current_user
+    api_key = generate_api_key(API_KEY_LENGTH_BYTES)
+    user_check = User.query.filter_by(api_key=api_key).count()
+    while user_check > 0:
+        api_key = generate_api_key(API_KEY_LENGTH_BYTES)
+    user.api_key = api_key
+    db.session.add(user)
+    db.session.commit()
+    return redirect(url_for('myaccount'))
 
 
 @app.route('/myaccount')
