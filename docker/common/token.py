@@ -7,6 +7,12 @@ SECURITY_PASSWORD_SALT = os.environ['SECURITY_PASSWORD_SALT']
 
 
 def generate_confirmation_token(email):
+    """
+    Generates a confirmation token for an email address.
+
+    :param email:  The email to embed in the token.
+    :return: The token.
+    """
     serializer = URLSafeTimedSerializer(SECRET_KEY)
     return serializer.dumps(email, salt=SECURITY_PASSWORD_SALT)
 
