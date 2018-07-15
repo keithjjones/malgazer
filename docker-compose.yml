@@ -27,6 +27,7 @@ services:
 #    ports:
 #      - "8888:8888"
     volumes:
+      - ./docker/files/api/entrypoint.sh:/entrypoint.sh
       - .:/malgazer
       - ./docker/logs/api:/logs
       - ./samples:/samples
@@ -36,10 +37,8 @@ services:
     env_file:
       - ./.env
     environment:
-      - FLASK_APP=${MALGAZER_API_FLASK_APP}
-      - FLASK_ENV=${MALGAZER_API_FLASK_ENV}
+      - MALGAZER_RUN_ENV=${MALGAZER_RUN_ENV}
       - MULTIUSER=${MALGAZER_MULTIUSER}
-      - COMMAND=${MALGAZER_API_CMD}
 
   web:
     image:  malgazer_api:latest
@@ -49,6 +48,7 @@ services:
 #    ports:
 #      - "8080:8080"
     volumes:
+      - ./docker/files/web/entrypoint.sh:/entrypoint.sh
       - .:/malgazer
       - ./docker/logs/web:/logs
       - ./samples:/samples
@@ -57,10 +57,8 @@ services:
     env_file:
       - ./.env
     environment:
-      - FLASK_APP=${MALGAZER_WEB_FLASK_APP}
-      - FLASK_ENV=${MALGAZER_WEB_FLASK_ENV}
+      - MALGAZER_RUN_ENV=${MALGAZER_RUN_ENV}
       - MULTIUSER=${MALGAZER_MULTIUSER}
-      - COMMAND=${MALGAZER_WEB_CMD}
       - SECRET_KEY=${MALGAZER_WEB_SECRET_KEY}
       - SECURITY_PASSWORD_SALT=${MALGAZER_WEB_SECURITY_PASSWORD_SALT}
       - HISTORY_LENGTH=${MALGAZER_WEB_HISTORY_LENGTH}
