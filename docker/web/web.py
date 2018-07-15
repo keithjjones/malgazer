@@ -59,7 +59,8 @@ db.init_app(app)
 mail.init_app(app)
 csrf = CSRFProtect(app)
 applogger = app.logger
-file_handler = logging.handlers.TimedRotatingFileHandler("/logs/web.log", when='midnight', backupCount=30)
+# file_handler = logging.handlers.TimedRotatingFileHandler("/logs/web.log", when='midnight', backupCount=30)
+file_handler = logging.FileHandler("/logs/web.log")
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(logging.Formatter(
     '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'

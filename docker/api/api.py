@@ -27,7 +27,8 @@ app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 db.init_app(app)
 
 applogger = app.logger
-file_handler = logging.handlers.TimedRotatingFileHandler("/logs/api.log", when='midnight', backupCount=30)
+# file_handler = logging.handlers.TimedRotatingFileHandler("/logs/api.log", when='midnight', backupCount=30)
+file_handler = logging.FileHandler("/logs/api.log")
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(logging.Formatter(
     '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'
@@ -123,7 +124,6 @@ def process_sample(submission_id):
         ml = ML.load_classifier(os.path.join('..', '..', 'classifier'))
         s = Sample(fromfile=os.path.join('/samples', submission.sha256))
         y = ml.predict_sample(s)
-        submission = Submission.query.filter_by(id=submission_id).first()
         submission.status = 'Done'
         submission.classification = y
         app.logger.info('Finished processing sample: {0} as: {1}'.format(s.sha256, y))
