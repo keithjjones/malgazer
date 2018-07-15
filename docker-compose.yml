@@ -22,6 +22,7 @@ services:
     build:
       context: ./
       dockerfile: docker/Dockerfile-base
+    image: 127.0.0.1:5000/malgazer
     depends_on:
       - db
 #    ports:
@@ -34,9 +35,12 @@ services:
       - ./classifier:/classifier
     env_file:
       - ./.env
+    deploy:
+      replicas: 2
+#    entrypoint: ["sh", "-c", "sleep infinity"]
 
   web:
-    image:  malgazer_api:latest
+    image: 127.0.0.1:5000/malgazer
     depends_on:
       - db
       - api
@@ -49,6 +53,9 @@ services:
       - ./samples:/samples
     env_file:
       - ./.env
+    deploy:
+      replicas: 2
+#    entrypoint: ["sh", "-c", "sleep infinity"]
 
   db:
     image: postgres:latest
