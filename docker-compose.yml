@@ -9,8 +9,8 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - ./docker/logs/api:/logs
       - .:/malgazer
+      - ./docker/logs/api:/logs
       - ./samples:/samples
       - ./classifier:/classifier
     deploy:
@@ -31,8 +31,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./docker/logs/web:/logs
       - .:/malgazer
+      - ./docker/logs/web:/logs
       - ./samples:/samples
     deploy:
       replicas: 5

@@ -584,9 +584,9 @@ def history():
     return render_template('history.html', state=StateInfo(State), history=history)
 
 
-@app.route('/api')
+@app.route('/info_api')
 @login_decorate
-def api():
+def info_api():
     """
     The API information page.
     """

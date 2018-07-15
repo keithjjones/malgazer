@@ -1,5 +1,21 @@
 version: '3'
 services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+      - web
+      - db
+      - portainer
+    env_file:
+      - ./.env
+    volumes:
+      - ./docker/logs/nginx:/var/log/nginx
+      - ./docker/files/nginx/nginx.conf:/etc/nginx/nginx.conf
+
   api:
     build:
       context: ./
@@ -10,6 +26,7 @@ services:
       - "8888:8888"
     volumes:
       - .:/malgazer
+      - ./docker/logs/api:/logs
       - ./samples:/samples
       - ./classifier:/classifier
     env_file:
@@ -29,6 +46,7 @@ services:
       - "8080:8080"
     volumes:
       - .:/malgazer
+      - ./docker/logs/web:/logs
       - ./samples:/samples
     env_file:
       - ./.env
