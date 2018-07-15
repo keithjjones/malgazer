@@ -22,8 +22,8 @@ services:
       dockerfile: docker/Dockerfile-base
     depends_on:
       - db
-    ports:
-      - "8888:8888"
+#    ports:
+#      - "8888:8888"
     volumes:
       - .:/malgazer
       - ./docker/logs/api:/logs
@@ -42,8 +42,8 @@ services:
     depends_on:
       - db
       - api
-    ports:
-      - "8080:8080"
+#    ports:
+#      - "8080:8080"
     volumes:
       - .:/malgazer
       - ./docker/logs/web:/logs
@@ -74,8 +74,8 @@ services:
 
   portainer:
     image: portainer/portainer
-    ports:
-      - "9000:9000"
+#    ports:
+#      - "9000:9000"
     command: -H unix:///var/run/docker.sock
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
