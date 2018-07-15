@@ -36,8 +36,8 @@ POSSIBLE_CLASSIFICATIONS = [
     ('PUA', 'PUA'),
     ('Unknown', 'Unknown')
 ]
-MULTIUSER = bool(int(os.environ['MULTIUSER']))
-HISTORY_LENGTH = int(os.environ['HISTORY_LENGTH'])
+MULTIUSER = bool(int(os.environ['MALGAZER_MULTIUSER']))
+HISTORY_LENGTH = int(os.environ['MALGAZER_WEB_HISTORY_LENGTH'])
 
 # Initialize and configure the Flask website.
 app = Flask(__name__)
@@ -47,12 +47,12 @@ app.config.update(dict(
 ))
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:malgazer@db/postgres'
-app.config['MAIL_SERVER'] = os.environ['MAIL_SERVER']
-app.config['MAIL_USE_SSL'] = bool(int(os.environ['MAIL_USE_SSL']))
-app.config['MAIL_USE_TLS'] = bool(int(os.environ['MAIL_USE_TLS']))
-app.config['MAIL_PORT'] = int(os.environ['MAIL_PORT'])
-app.config['MAIL_USERNAME'] = os.environ['MAIL_USERNAME']
-app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
+app.config['MAIL_SERVER'] = os.environ['MALGAZER_WEB_MAIL_SERVER']
+app.config['MAIL_USE_SSL'] = bool(int(os.environ['MALGAZER_WEB_MAIL_USE_SSL']))
+app.config['MAIL_USE_TLS'] = bool(int(os.environ['MALGAZER_WEB_MAIL_USE_TLS']))
+app.config['MAIL_PORT'] = int(os.environ['MALGAZER_WEB_MAIL_PORT'])
+app.config['MAIL_USERNAME'] = os.environ['MALGAZER_WEB_MAIL_USERNAME']
+app.config['MAIL_PASSWORD'] = os.environ['MALGAZER_WEB_MAIL_PASSWORD']
 
 
 db.init_app(app)

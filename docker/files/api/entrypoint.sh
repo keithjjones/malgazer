@@ -15,5 +15,5 @@ then
     flask run --host=0.0.0.0 --port=8888
 elif [ $MALGAZER_RUN_ENV == 'prod' ]
 then
-    gunicorn -w 10 -t 60 -k gthread -b 0.0.0.0:8888 docker.api.api:app
+    gunicorn -w 4 -t 20 -k gthread -b 0.0.0.0:8888 docker.api.api:app
 fi

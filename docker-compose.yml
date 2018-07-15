@@ -32,13 +32,8 @@ services:
       - ./docker/logs/api:/logs
       - ./samples:/samples
       - ./classifier:/classifier
-    deploy:
-      replicas: 5
     env_file:
       - ./.env
-    environment:
-      - MALGAZER_RUN_ENV=${MALGAZER_RUN_ENV}
-      - MULTIUSER=${MALGAZER_MULTIUSER}
 
   web:
     image:  malgazer_api:latest
@@ -52,22 +47,8 @@ services:
       - .:/malgazer
       - ./docker/logs/web:/logs
       - ./samples:/samples
-    deploy:
-      replicas: 5
     env_file:
       - ./.env
-    environment:
-      - MALGAZER_RUN_ENV=${MALGAZER_RUN_ENV}
-      - MULTIUSER=${MALGAZER_MULTIUSER}
-      - SECRET_KEY=${MALGAZER_WEB_SECRET_KEY}
-      - SECURITY_PASSWORD_SALT=${MALGAZER_WEB_SECURITY_PASSWORD_SALT}
-      - HISTORY_LENGTH=${MALGAZER_WEB_HISTORY_LENGTH}
-      - MAIL_USERNAME=${MALGAZER_WEB_MAIL_USERNAME}
-      - MAIL_PASSWORD=${MALGAZER_WEB_MAIL_PASSWORD}
-      - MAIL_PORT=${MALGAZER_WEB_MAIL_PORT}
-      - MAIL_SERVER=${MALGAZER_WEB_MAIL_SERVER}
-      - MAIL_USE_SSL=${MALGAZER_WEB_MAIL_USE_SSL}
-      - MAIL_USE_TLS=${MALGAZER_WEB_MAIL_USE_TLS}
 
   db:
     image: postgres:latest

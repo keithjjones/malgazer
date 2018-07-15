@@ -37,7 +37,7 @@ applogger.addHandler(file_handler)
 
 # Global values
 SAMPLES_DIRECTORY = "/samples"
-MULTIUSER = bool(int(os.environ['MULTIUSER']))
+MULTIUSER = bool(int(os.environ['MALGAZER_MULTIUSER']))
 
 
 def get_request_ip():

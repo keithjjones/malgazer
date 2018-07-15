@@ -22,6 +22,7 @@ services:
     build:
       context: ./
       dockerfile: docker/Dockerfile-base
+    image: 127.0.0.1:5000/malgazer
     depends_on:
       - db
 #    ports:
@@ -34,12 +35,12 @@ services:
       - ./classifier:/classifier
     env_file:
       - ./.env
-    environment:
-      - MALGAZER_RUN_ENV=${MALGAZER_RUN_ENV}
-      - MULTIUSER=${MALGAZER_MULTIUSER}
+    deploy:
+      replicas: 2
+#    entrypoint: ["sh", "-c", "sleep infinity"]
 
   web:
-    image:  malgazer_api:latest
+    image: 127.0.0.1:5000/malgazer
     depends_on:
       - db
       - api
@@ -52,18 +53,9 @@ services:
       - ./samples:/samples
     env_file:
       - ./.env
-    environment:
-      - MALGAZER_RUN_ENV=${MALGAZER_RUN_ENV}
-      - MULTIUSER=${MALGAZER_MULTIUSER}
-      - SECRET_KEY=${MALGAZER_WEB_SECRET_KEY}
-      - SECURITY_PASSWORD_SALT=${MALGAZER_WEB_SECURITY_PASSWORD_SALT}
-      - HISTORY_LENGTH=${MALGAZER_WEB_HISTORY_LENGTH}
-      - MAIL_USERNAME=${MALGAZER_WEB_MAIL_USERNAME}
-      - MAIL_PASSWORD=${MALGAZER_WEB_MAIL_PASSWORD}
-      - MAIL_PORT=${MALGAZER_WEB_MAIL_PORT}
-      - MAIL_SERVER=${MALGAZER_WEB_MAIL_SERVER}
-      - MAIL_USE_SSL=${MALGAZER_WEB_MAIL_USE_SSL}
-      - MAIL_USE_TLS=${MALGAZER_WEB_MAIL_USE_TLS}
+    deploy:
+      replicas: 2
+#    entrypoint: ["sh", "-c", "sleep infinity"]
 
   db:
     image: postgres:latest
