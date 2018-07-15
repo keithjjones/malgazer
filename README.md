@@ -42,16 +42,20 @@ This was developed using Docker on a Mac.  Other operating systems have not been
 
 ## Web
 
-After bringing it up in Docker, you can access the web portion of this project at http://localhost:8080.
+After bringing it up in Docker, you can access the web portion of this project at https://localhost.
 Information about the API is on the "API" page of the website.
 
 ## API
 
-After bringing it up in Docker, you can access the API portion of this project at http://localhost:8888
+After bringing it up in Docker, you can access the API portion of this project at https://localhost/api
 
 ## Portainer
 
-After bringing it up in Docker, you can access portainer at http://localhost:9000
+After bringing it up in Docker, you can access portainer at https://localhost/portainer
+
+## Logs
+
+Logs can be found in docker/logs in a directory for each node in the docker stack.
 
 # Installation
 
