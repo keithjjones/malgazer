@@ -6,6 +6,10 @@
     <p>Note that Malgazer is running in multi-user mode, so there must be a URL parameter of apikey=YOURAPIKEYHERE, such as:
         https://{{ state.hostname }}/api/history?apikey=YOURAPIKEYHERE, or you will not be able to access the API.
         Your API key can be found under <a href="{{ url_for('myaccount') }}">My Account</a> when running in multi-user mode.</p>
+        {% if state.hostname == "localhost" %}
+          Since you are running this on localhost in multi-user mode, all curl commands should have the "-k" flag
+          to accept the self signed certificate!
+        {% endif %}
     {% endif %}
     <table class="table top-buffer">
         <thead>
