@@ -40,6 +40,14 @@ SAMPLES_DIRECTORY = "/samples"
 MULTIUSER = bool(int(os.environ['MULTIUSER']))
 
 
+def get_request_ip():
+    """
+    Gets the requester IP.
+    :return: The IP.
+    """
+    return request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+
+
 def get_apikey():
     api_key = request.args.get('apikey', None)
     if api_key:
@@ -92,7 +100,7 @@ def reset():
     """
     Put all cleaning logic here.
     """
-    ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
+    ip_addr = get_request_ip()
     clear_database()
     for f in glob.glob(os.path.join(SAMPLES_DIRECTORY, '*')):
         if os.path.isfile(f):
@@ -132,11 +140,11 @@ def submit():
     """
     Submits a sample and executes thread to process it.
     """
+    ip_addr = get_request_ip()
     if not MULTIUSER or (MULTIUSER and get_apikey()):
         api_key = get_apikey()
         user = User.query.filter_by(api_key=api_key).first()
         if user:
-            ip_addr = request.headers.get('X-Forwarded-For', request.environ['REMOTE_ADDR'])
             possible_classification = request.form.get('classification', 'Unknown')
             if 'file' not in request.files:
                 return "ERROR"
@@ -179,6 +187,7 @@ def history():
     """
     Lists the history of submissions.
     """
+    ip_addr = get_request_ip()
     if not MULTIUSER or (MULTIUSER and get_apikey()):
         api_key = get_apikey()
         user = User.query.filter_by(api_key=api_key).first()
@@ -205,6 +214,7 @@ def classification(sha256):
     """
     Provides the classifications for a specific hash.
     """
+    ip_addr = get_request_ip()
     if not MULTIUSER or (MULTIUSER and get_apikey()):
         api_key = get_apikey()
         user = User.query.filter_by(api_key=api_key).first()

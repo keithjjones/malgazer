@@ -1,37 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-    Malgazer also provides an API for programmatic access.  This page discusses the specifics with the API endpoints.
+    <p>Malgazer also provides an API for programmatic access.  This page discusses the specifics with the API endpoints.</p>
+    {% if state.multiuser %}
+    <p>Note that Malgazer is running in multi-user mode, so there must be a URL parameter of apikey=YOURAPIKEYHERE, such as:
+        https://{{ state.hostname }}/api/history?apikey=YOURAPIKEYHERE, or you will not be able to access the API.
+        Your API key can be found under <a href="{{ url_for('myaccount') }}">My Account</a> when running in multi-user mode.</p>
+    {% endif %}
     <table class="table top-buffer">
         <thead>
             <tr><th>Endpoint</th><th>Methods</th><th>Purpose</th><th>Input</th><th>Output</th><th>Curl Example</th></tr>
         </thead>
         <tbody>
-            <tr><td>http://localhost:8888/submit</td>
+            <tr><td>https://{{ state.hostname }}/api/submit</td>
                 <td>POST</td>
                 <td>Submit a sample for classification.</td>
                 <td>The binary sample in a form with the form field of "file".  An optional guess for the
                 classification can be provided as a string in the form field of "classification", if desired.</td>
                 <td>The sample metadata added to the database in JSON.</td>
-                <td>curl -F "file=@/some/path/mysample" http://localhost:8888/submit</td></tr>
-            <tr><td>http://localhost:8888/history</td>
+                <td>curl -F "file=@/some/path/mysample" https://{{ state.hostname }}/api/submit</td></tr>
+            <tr><td>https://{{ state.hostname }}/api/history</td>
                 <td>GET</td>
                 <td>Gets the history of the submitted samples.</td>
                 <td>Nothing</td>
                 <td>The metadata for the submitted samples in JSON.</td>
-                <td>curl http://localhost:8888/history</td></tr>
-            <tr><td>http://localhost:8888/classification/&ltSHA256&gt</td>
+                <td>curl https://{{ state.hostname }}/api/history</td></tr>
+            <tr><td>https://{{ state.hostname }}/api/classification/&ltSHA256&gt</td>
                 <td>GET</td>
                 <td>Gets the list of classifications for a specific hash.</td>
                 <td>The SHA256 value.</td>
                 <td>The metadata for the submissions matching the SHA256, in JSON.</td>
-                <td>curl http://localhost:8888/classification/&ltSOMEHASH&gt</td></tr>
-            <tr><td>http://localhost:8888/reset</td>
+                <td>curl https://{{ state.hostname }}/api/classification/&ltSOMEHASH&gt</td></tr>
+            <tr><td>https://{{ state.hostname }}/api/reset</td>
                 <td>GET</td>
                 <td>Resets the data such that the database and samples directory are empty.</td>
                 <td>Nothing</td>
                 <td>Nothing</td>
-                <td>curl http://localhost:8888/reset</td></tr>
+                <td>curl https://{{ state.hostname }}/api/reset</td></tr>
         </tbody>
     </table>
 {% endblock %}

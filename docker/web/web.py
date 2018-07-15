@@ -591,7 +591,7 @@ def info_api():
     The API information page.
     """
     ip_addr = get_request_ip()
-    State = {'multiuser': MULTIUSER}
+    State = {'multiuser': MULTIUSER, 'hostname': request.host}
     return render_template('api.html', state=StateInfo(State))
 
 
