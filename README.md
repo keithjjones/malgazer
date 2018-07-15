@@ -11,6 +11,10 @@ For now, this page is all of the documentation for this project.
 
 Please file any bugs or issues using the GitHub issues facility above.
 
+# Branches
+
+The "master" branch is for users.  The bleeding edge, and often broken, branch of "develop" is for new features.
+
 # Timeline
 
 This source code supports my dissertation.  The code is not production ready until that time.
