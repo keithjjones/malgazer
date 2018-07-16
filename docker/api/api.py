@@ -12,12 +12,12 @@ import threading
 import sys
 import logging
 import logging.handlers
-sys.path.append('..')
-sys.path.append(os.path.join('..', '..'))
-from library.files import Sample
-from library.ml import ML
-from docker.db_models.models import Submission, WebRequest, User, setup_database, clear_database, db
-import library
+# sys.path.append('..')
+# sys.path.append(os.path.join('..', '..'))
+from ...library.files import Sample
+from ...library.ml import ML
+from ..db_models.models import Submission, WebRequest, User, setup_database, clear_database, db
+from ... import library
 
 
 # Initialize and configure the Flask API

@@ -16,10 +16,10 @@ import sys
 import logging
 import logging.handlers
 from functools import wraps
-sys.path.append('..')
-sys.path.append(os.path.join('..', '..'))
-from library.files import Sample
-from docker.db_models.models import Submission, WebRequest, User, setup_database, db, generate_api_key
+# sys.path.append('..')
+# sys.path.append(os.path.join('..', '..'))
+from ...library.files import Sample
+from ..db_models.models import Submission, WebRequest, User, setup_database, db, generate_api_key
 from ..common.token import generate_confirmation_token, confirm_token
 from ..common.email import mail, send_email
 
