@@ -14,33 +14,33 @@ class WebRequest(db.Model):
     """
     The request class for database storage.
     """
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
     sha256 = db.Column(db.String(80), nullable=False)
     time = db.Column(db.DateTime, nullable=False)
     possible_classification = db.Column(db.String(120), nullable=True)
     ip_address = db.Column(postgresql.INET)
-    user_id = db.Column(db.Integer, nullable=True)
+    user_id = db.Column(db.BigInteger, nullable=True)
 
 
 class Submission(db.Model):
     """
     The submission class for database storage.
     """
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
     sha256 = db.Column(db.String(80), nullable=False)
     time = db.Column(db.DateTime, nullable=False)
     classification = db.Column(db.String(120), nullable=True)
     possible_classification = db.Column(db.String(120), nullable=True)
     ip_address = db.Column(postgresql.INET)
     status = db.Column(db.String(120), nullable=True)
-    user_id = db.Column(db.Integer, nullable=True)
+    user_id = db.Column(db.BigInteger, nullable=True)
 
 
 class User(db.Model):
     """
     The user class for database storage.
     """
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.BigInteger, primary_key=True)
     email = db.Column(db.Text, nullable=False, index=True, unique=True)
     password = db.Column(db.Text, nullable=False)
     config = db.Column(postgresql.JSON, nullable=True)
