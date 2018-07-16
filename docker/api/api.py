@@ -96,6 +96,11 @@ def setup():
     setup_db()
 
 
+@app.route('/healthcheck')
+def healthcheck():
+    return "OK", 200
+
+
 @app.route('/reset')
 def reset():
     """

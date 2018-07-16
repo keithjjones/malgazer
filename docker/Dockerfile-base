@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install -y \
   python-tk \
   libfftw3-dev \
   libhdf5-serial-dev \
-  libmagic-dev
+  libmagic-dev \
+  curl
 COPY ./requirements.txt ./requirements-manual.txt /
 RUN pip install --no-cache-dir -r /requirements.txt
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* && rm -rf ~/.cache/pip

@@ -1,7 +1,10 @@
 version: '3'
 services:
   nginx:
-    image: nginx:latest
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile-nginx
+    image: 127.0.0.1:5000/malgazer-nginx
     ports:
       - "80:80"
       - "443:443"
@@ -12,6 +15,11 @@ services:
       - portainer
     env_file:
       - ./.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://localhost"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
     volumes:
       - ./docker/logs/nginx:/var/log/nginx
       - ./docker/files/nginx/nginx.conf:/etc/nginx/nginx.conf
@@ -22,7 +30,7 @@ services:
     build:
       context: ./
       dockerfile: docker/Dockerfile-base
-    image: 127.0.0.1:5000/malgazer
+    image: 127.0.0.1:5000/malgazer-api
     depends_on:
       - db
 #    ports:
@@ -37,6 +45,11 @@ services:
       - ./.env
     deploy:
       replicas: 2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/healthcheck"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
 #    entrypoint: ["sh", "-c", "sleep infinity"]
 
   web:
@@ -55,6 +68,11 @@ services:
       - ./.env
     deploy:
       replicas: 2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthcheck"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
 #    entrypoint: ["sh", "-c", "sleep infinity"]
 
   db:
@@ -63,6 +81,11 @@ services:
       - ./docker/db:/var/lib/postgresql/data
     env_file:
       - ./.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   portainer:
     image: portainer/portainer

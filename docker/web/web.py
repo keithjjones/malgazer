@@ -72,6 +72,11 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 
+@app.route('/healthcheck')
+def healthcheck():
+    return "OK", 200
+
+
 def get_userid():
     user_id = flask_login.current_user.id
     return user_id
