@@ -399,6 +399,9 @@ def main(arguments=None):
             classifier = get_estimator_static(gridsearch_type.lower(), Xt, yt)
         elif gridsearch_type.lower() == 'cnn':
             classifier = get_estimator_static(gridsearch_type.lower(), Xt, yt)
+        if gridsearch_type.lower() == 'adaboost':
+            base_estimator = get_estimator_static(adaboost_type.lower())
+            classifier = get_estimator_static(gridsearch_type.lower(), base_estimator=base_estimator)
         else:
             classifier = get_estimator_static(gridsearch_type.lower())
 
