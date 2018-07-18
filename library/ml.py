@@ -341,10 +341,10 @@ class ML(object):
         :param y:  The y classifications
         :return:  The classifier
         """
-        if self.classifier_type in ['svm', 'nb', 'nc']:
+        if self.classifier_type in ['svm', 'nb', 'nc', 'adaboost']:
             Y = y.argmax(1)
-        elif self.classifier_type in ['adaboost', 'ovr', 'gridsearch']:
-            if self.base_classifier_type in ['svm', 'nb', 'nc']:
+        elif self.classifier_type in ['gridsearch']:
+            if self.base_classifier_type in ['svm', 'nb', 'nc', 'adaboost']:
                 Y = y.argmax(1)
             else:
                 Y = y
