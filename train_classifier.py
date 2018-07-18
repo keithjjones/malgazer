@@ -494,7 +494,7 @@ def main(arguments=None):
     # Save the classifier
     print("\n")
     if feature_type == 'rwe':
-        path = os.path.join(datadir,
+        path = os.path.join(datadir, "classifiers",
                             "classifiers_rwe_{0}_window_{1}_datapoints".format(windowsize, datapoints),
                             classifier_type.lower())
     else:
