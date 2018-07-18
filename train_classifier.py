@@ -156,6 +156,9 @@ def main(arguments=None):
     parser.add_argument("-rfn", "--rfnumestimators",
                         help="The number of estimators for rf."
                              "", type=int, default=20)
+    parser.add_argument("-rfj", "--rfjobs",
+                        help="The number of jobs for rf.  -1 uses all available CPU cores."
+                             "", type=int, default=-1)
     parser.add_argument("-gt", "--gridsearchtype",
                         help="The type of the base estimator for gridsearch."
                              "", type=str, default='dt')
@@ -220,6 +223,7 @@ def main(arguments=None):
     nc_shrink_threshold = args.ncshrink
     extra_estimator_params = json.loads(args.estimatorparams)
     rf_numestimators = args.rfnumestimators
+    rf_n_jobs = args.rfjobs
 
     if cross_fold_validation or classifier_type == 'gridsearch':
         test_percent = 0
@@ -431,7 +435,7 @@ def main(arguments=None):
         elif classifier_type.lower() == 'nb':
             pass
         elif classifier_type.lower() == 'rf':
-            estimator_params = {'n_estimators': rf_numestimators, 'criterion': 'entropy'}
+            estimator_params = {'n_estimators': rf_numestimators, 'criterion': 'entropy', 'n_jobs': rf_n_jobs}
         elif classifier_type.lower() == 'knn':
             estimator_params = {'n_neighbors': knn_neighbors, 'weights': knn_weights,
                                 'n_jobs': knn_n_jobs}
