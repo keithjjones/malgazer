@@ -3,6 +3,7 @@ import argparse
 import time
 import os
 import pandas as pd
+import numpy as np
 import json
 from library.utils import Utils
 from library.ml import ML
@@ -225,8 +226,8 @@ def main(arguments=None):
     rf_numestimators = args.rfnumestimators
     rf_n_jobs = args.rfjobs
 
-    if cross_fold_validation or classifier_type == 'gridsearch':
-        test_percent = 0
+    # if cross_fold_validation or classifier_type == 'gridsearch':
+    #         test_percent = 0
 
     print(DIVIDER)
     print("Loading data...")
@@ -251,6 +252,12 @@ def main(arguments=None):
     # Make the classifier
     ml = ML(feature_type=feature_type, classifier_type=classifier_type, n_classes=n_categories, rwe_windowsize=windowsize, datapoints=datapoints)
     X, y = ml.preprocess_data(X, y)
+
+    # Check for bad values...
+    if pd.DataFrame(X).isin([np.nan, np.inf, -np.inf]).any(1).any():
+        raise Exception("X has issues.")
+    if pd.DataFrame(y).isin([np.nan, np.inf, -np.inf]).any(1).any():
+        raise Exception("y has issues.")
 
     if test_percent > 0:
         X_train, X_test, y_train, y_test = ml.train_test_split(X, y, test_percent=test_percent)
