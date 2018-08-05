@@ -161,7 +161,7 @@ def submit():
 
     possible_classification = request.form.get('classification', 'Unknown')
     if 'file' not in request.files:
-        return "ERROR"
+        return "Bad Request 400: You did not provide a file.", 400
     file = request.files['file']
     f = file.stream.read()
     s = Sample(frommemory=f)
