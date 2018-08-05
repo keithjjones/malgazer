@@ -204,6 +204,37 @@ def login_decorate(somefunc):
         return somefunc
 
 
+def activated_decorate(somefunc):
+    if MULTIUSER:
+        @wraps(somefunc)
+        def wrapper(*args, **kwargs):
+            user = flask_login.current_user
+            if not user.activated:
+                flash("Activate your account first!", 'danger')
+                return redirect(url_for('login'))
+            return somefunc(*args, **kwargs)
+        return wrapper
+    else:
+        @wraps(somefunc)
+        def wrapper(*args, **kwargs):
+            return somefunc(*args, **kwargs)
+        return wrapper
+
+# def limit_api_resets(f):
+#     """ Decorates functions depending on multiuser mode. """
+#     if MULTIUSER:
+#         @limiter.limit("1 per minute")
+#         @wraps(f)
+#         def wrapper(*args, **kwargs):
+#             return f(*args, **kwargs)
+#         return wrapper
+#     else:
+#         @wraps(f)
+#         def wrapper(*args, **kwargs):
+#             return f(*args, **kwargs)
+#         return wrapper
+
+
 @app.route('/')
 def main():
     """
@@ -260,6 +291,7 @@ def login():
 
 @app.route('/logout')
 @login_decorate
+@activated_decorate
 def logout():
     ip_addr = get_request_ip()
     app.logger.info('User: {0} ID: {1} logout from IP: {2}'.format(flask_login.current_user.email,
@@ -420,6 +452,7 @@ def reset_password(token):
 
 @app.route('/set_password', methods=('GET', 'POST'))
 @login_decorate
+@activated_decorate
 def set_password():
     ip_addr = get_request_ip()
     form = PasswordChangeForm()
@@ -444,6 +477,7 @@ def set_password():
 
 @app.route('/set_email', methods=('GET', 'POST'))
 @login_decorate
+@activated_decorate
 def set_email():
     ip_addr = get_request_ip()
     form = EmailOnlyForm()
@@ -482,6 +516,7 @@ def set_email():
 
 @app.route('/generate_new_api_key')
 @login_decorate
+@activated_decorate
 @limit_api_resets
 def generate_new_api_key():
     user = flask_login.current_user
@@ -497,14 +532,15 @@ def generate_new_api_key():
 
 @app.route('/myaccount')
 @login_decorate
+@activated_decorate
 def myaccount():
-    ip_addr = get_request_ip()
     State = {'multiuser': MULTIUSER}
     return render_template('myaccount.html', state=StateInfo(State), user=flask_login.current_user)
 
 
 @app.route('/submit', methods=('GET', 'POST'))
 @login_decorate
+@activated_decorate
 def submit():
     """
     The sample submission page.
@@ -562,11 +598,11 @@ def submit():
 
 @app.route('/history')
 @login_decorate
+@activated_decorate
 def history():
     """
     The submission history page.
     """
-    ip_addr = get_request_ip()
     user = flask_login.current_user
     url = "{0}/history".format(API_URL)
     if MULTIUSER:
@@ -592,11 +628,11 @@ def history():
 
 @app.route('/info_api')
 @login_decorate
+@activated_decorate
 def info_api():
     """
     The API information page.
     """
-    ip_addr = get_request_ip()
     State = {'multiuser': MULTIUSER, 'hostname': request.host}
     return render_template('api.html', state=StateInfo(State))
 
