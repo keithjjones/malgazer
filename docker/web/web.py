@@ -36,7 +36,7 @@ POSSIBLE_CLASSIFICATIONS = [
     ('PUA', 'PUA'),
     ('Unknown', 'Unknown')
 ]
-MULTIUSER = bool(int(os.environ['MALGAZER_MULTIUSER']))
+MULTIUSER = bool(int(os.environ.get('MALGAZER_MULTIUSER', 0)))
 HISTORY_LENGTH = int(os.environ['MALGAZER_WEB_HISTORY_LENGTH'])
 
 # Initialize and configure the Flask website.

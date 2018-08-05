@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
 import json
 import os
+import portalocker
 from werkzeug.utils import secure_filename
 import datetime
 import sqlalchemy
@@ -38,7 +39,7 @@ applogger.addHandler(file_handler)
 
 # Global values
 SAMPLES_DIRECTORY = "/samples"
-MULTIUSER = bool(int(os.environ['MALGAZER_MULTIUSER']))
+MULTIUSER = bool(int(os.environ.get('MALGAZER_MULTIUSER', 0)))
 
 
 def get_request_ip():
@@ -167,9 +168,10 @@ def submit():
     s = Sample(frommemory=f)
     filename = secure_filename(s.sha256)
     filepath = os.path.join(SAMPLES_DIRECTORY, filename)
-    if not os.path.isfile(filepath):
-        with open(filepath, 'wb') as f_out:
-            f_out.write(s.rawdata)
+    with portalocker.Lock(filepath, 'wb', timeout=1) as f_out:
+    # if not os.path.isfile(filepath):
+    #     with open(filepath, 'wb') as f_out:
+        f_out.write(s.rawdata)
     submit_time = datetime.datetime.now()
     submission = Submission(sha256=s.sha256, time=submit_time, ip_address=ip_addr,
                             classification='', possible_classification=possible_classification,
