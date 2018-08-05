@@ -155,6 +155,8 @@ def submit():
             user = User.query.filter_by(api_key=api_key).first()
             if user:
                 user_id = user.id
+                if not user.activated:
+                    return "Bad Request 400: You did not activate your account.", 400
             else:
                 return "Bad Request 400: You did not supply a valid API key.", 400
         else:
@@ -206,6 +208,8 @@ def history():
             user = User.query.filter_by(api_key=api_key).first()
             if user:
                 user_id = user.id
+                if not user.activated:
+                    return "Bad Request 400: You did not activate your account.", 400
             else:
                 return "Bad Request 400: You did not supply a valid API key.", 400
         else:
@@ -240,6 +244,8 @@ def classification(sha256):
             user = User.query.filter_by(api_key=api_key).first()
             if user:
                 user_id = user.id
+                if not user.activated:
+                    return "Bad Request 400: You did not activate your account.", 400
             else:
                 return "Bad Request 400: You did not supply a valid API key.", 400
         else:

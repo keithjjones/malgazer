@@ -220,20 +220,6 @@ def activated_decorate(somefunc):
             return somefunc(*args, **kwargs)
         return wrapper
 
-# def limit_api_resets(f):
-#     """ Decorates functions depending on multiuser mode. """
-#     if MULTIUSER:
-#         @limiter.limit("1 per minute")
-#         @wraps(f)
-#         def wrapper(*args, **kwargs):
-#             return f(*args, **kwargs)
-#         return wrapper
-#     else:
-#         @wraps(f)
-#         def wrapper(*args, **kwargs):
-#             return f(*args, **kwargs)
-#         return wrapper
-
 
 @app.route('/')
 def main():
