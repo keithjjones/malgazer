@@ -169,8 +169,6 @@ def submit():
     filename = secure_filename(s.sha256)
     filepath = os.path.join(SAMPLES_DIRECTORY, filename)
     with portalocker.Lock(filepath, 'wb', timeout=1) as f_out:
-    # if not os.path.isfile(filepath):
-    #     with open(filepath, 'wb') as f_out:
         f_out.write(s.rawdata)
     submit_time = datetime.datetime.now()
     submission = Submission(sha256=s.sha256, time=submit_time, ip_address=ip_addr,
