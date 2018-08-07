@@ -40,6 +40,7 @@ applogger.addHandler(file_handler)
 # Global values
 SAMPLES_DIRECTORY = "/samples"
 MULTIUSER = bool(int(os.environ.get('MALGAZER_MULTIUSER', 0)))
+ALLOW_RESET = bool(int(os.environ.get('MALGAZER_ALLOW_RESET', 0)))
 
 
 def get_request_ip():
@@ -108,12 +109,15 @@ def reset():
     Put all cleaning logic here.
     """
     ip_addr = get_request_ip()
-    clear_database()
-    for f in glob.glob(os.path.join(SAMPLES_DIRECTORY, '*')):
-        if os.path.isfile(f):
-            os.remove(f)
-    app.logger.info('Database reset from IP: {0}'.format(ip_addr))
-    return json.dumps({'status': 'reset'}), 200
+    if ALLOW_RESET:
+        clear_database()
+        for f in glob.glob(os.path.join(SAMPLES_DIRECTORY, '*')):
+            if os.path.isfile(f):
+                os.remove(f)
+        app.logger.info('Database reset from IP: {0}'.format(ip_addr))
+        return json.dumps({'status': 'Reset'}), 200
+    else:
+        return json.dumps({'status': "Not Allowed"}), 400
 
 
 def process_sample(submission_id):
