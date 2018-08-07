@@ -117,7 +117,7 @@ def reset():
         app.logger.info('Database reset from IP: {0}'.format(ip_addr))
         return json.dumps({'status': 'Reset'}), 200
     else:
-        return json.dumps({'status': "Not Allowed"}), 400
+        return json.dumps({'status': "Not Allowed"}), 405
 
 
 def process_sample(submission_id):
