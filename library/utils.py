@@ -8,6 +8,7 @@ import gzip
 import csv
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from .files import Sample
 from .entropy import resample
 from tsfresh import extract_features, select_features, extract_relevant_features
@@ -838,3 +839,35 @@ class Utils(object):
         :return: A DataFrame of the filtered data.
         """
         return data.loc[data.index.isin(hashes)]
+
+
+    @staticmethod
+    def plot_rwe_from_binary(filename, window_size=256, normalize=True, title=None):
+        """
+        Plots a running window entropy graph of a binary.
+
+        :param filename:  The binary to plot.
+        :param window_size:  The RWE window size.
+        :param normalize:  Set to True to normalize between 0 and 1.
+        :param title:  The title for the plot.
+        :return:  Nothing
+        """
+        fig = plt.figure(1)
+        if title is None:
+            title = "Running Window Entropy ({0:,} byte window)".format(window_size)
+        s = Sample(fromfile=filename)
+        rwe = s.running_window_entropy(window_size=window_size, normalize=normalize)
+        size = len(rwe)
+        X = range(size)
+        # plt.xlim([0.0, 1.0])
+        # plt.ylim([0, 1.05])
+        X = np.array(X)
+        y = np.array(rwe)
+        plt.plot(X, y)
+        ax = plt.gca()
+        ax.get_xaxis().set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:,}".format(int(x))))
+        plt.xlabel('Offset', fontdict={'fontsize': 12})
+        plt.ylabel('Entropy', fontdict={'fontsize': 12})
+        plt.title(title, fontdict={'fontsize': 16})
+        # plt.legend(loc="lower right")
+        plt.show()
