@@ -218,7 +218,7 @@ class RunningEntropy(object):
         interp_rwe = interpolate.interp1d(x_rwe, rwe)
         ynew = interp_rwe(xnew)
         if len(ynew) != number_of_data_points:
-            raise Exception('Unhandled Exception')
+            raise Exception('Exception - This should not happen!')
         return xnew, ynew
 
 
@@ -238,7 +238,7 @@ def resample(data, number_of_data_points=1024):
     interp_rwe = interpolate.interp1d(x_rwe, rwe)
     ynew = interp_rwe(xnew)
     if len(ynew) != number_of_data_points:
-        raise Exception('Unhandled Exception - This should not happen!')
+        raise Exception('Exception - This should not happen!')
     return ynew
 
 
