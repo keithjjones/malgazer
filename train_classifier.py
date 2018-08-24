@@ -508,7 +508,7 @@ def main(arguments=None):
                             "classifiers_rwe_{0}_window_{1}_datapoints".format(windowsize, datapoints),
                             classifier_type.lower())
     else:
-        path = os.path.join(datadir, "classifiers", classifier_type.lower())
+        path = os.path.join(datadir, "classifiers", "GIST", classifier_type.lower())
 
     try:
         os.stat(path)
