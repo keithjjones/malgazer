@@ -409,6 +409,9 @@ def main(arguments=None):
         if gridsearch_type.lower() == 'adaboost':
             base_estimator = get_estimator_static(adaboost_type.lower())
             classifier = get_estimator_static(gridsearch_type.lower(), base_estimator=base_estimator)
+        if gridsearch_type.lower() == 'adaboost':
+            base_estimator = get_estimator_static(ovr_type.lower())
+            classifier = get_estimator_static(gridsearch_type.lower(), estimator=base_estimator)
         else:
             classifier = get_estimator_static(gridsearch_type.lower())
 
