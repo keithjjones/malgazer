@@ -278,6 +278,14 @@ def main(arguments=None):
         print("Grid Search Enabled!")
         print("Grid Search Type: {0}".format(CLASSIFIER_TO_STRING[gridsearch_type]))
         print("Grid Search Parameters: {0}".format(gridsearch_params))
+        if gridsearch_type == 'ovr':
+            print(DIVIDER)
+            print('OneVRest Enabled!')
+            print("OneVRest Type: {0}".format(CLASSIFIER_TO_STRING[ovr_type]))
+        if gridsearch_type == 'adaboost':
+            print(DIVIDER)
+            print("AdaBoost Enabled!")
+            print("AdaBoost Type: {0}".format(CLASSIFIER_TO_STRING[adaboost_type]))
     if cross_fold_validation:
         print(DIVIDER)
         print("Cross Fold Validation - {0} Fold(s) - Enabled!".format(cfv_groups))
