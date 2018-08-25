@@ -30,6 +30,7 @@ import os
 import dill
 from .entropy import resample
 from sklearn import tree
+from fractions import Fraction
 
 
 class ML(object):
@@ -363,7 +364,7 @@ class ML(object):
         return self.classifier.predict(X)
 
     @staticmethod
-    def build_ann_static(X, y, layers=[(".5", 'uniform', 'relu'), (100, 'uniform', 'relu')]):
+    def build_ann_static(X, y, layers=[("1/2", 'uniform', 'relu'), (100, 'uniform', 'relu')]):
         """
         Create a generic ANN.
 
@@ -387,7 +388,7 @@ class ML(object):
             if isinstance(value, int):
                 units = value
             else:
-                units = int(float(value) * datapoints)
+                units = int(Fraction(value) * datapoints)
 
             classifier.add(Dense(units=units,
                                  kernel_initializer=kernel_initializer,
@@ -401,7 +402,7 @@ class ML(object):
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_ann(self, X, y, layers=[(".5", 'uniform', 'relu'), (100, 'uniform', 'relu')]):
+    def build_ann(self, X, y, layers=[("1/2", 'uniform', 'relu'), (100, 'uniform', 'relu')]):
         """
         Create a generic ANN.
 
@@ -420,12 +421,23 @@ class ML(object):
         return self.classifier
 
     @staticmethod
-    def build_cnn_static(X, y):
+    def build_cnn_static(X, y, layers=[(10, "1/4", "relu", 10), (10, "1/30", "relu", 2),
+                                       (10, 2, 'relu', 2), None,
+                                       ("1/4", 'uniform', 'relu'), ("1/8", 'uniform', 'relu'),
+                                       ("1/16", 'uniform', 'relu')]):
         """
         Create a generic CNN.
 
         :param X:  The input to the CNN, used to find input shape.
         :param y:  The output to the CNN, used to find the output shape.
+        :param layers:  A list of layer descriptions for the CNN, where each item is a tuple of format:
+            (value, kernel_initializer, activation)
+            (filters, kernel_size, activation, pool_size)
+            None
+        ... where if the value, filters, kernel_size, pool_size is an int, the corresponding value will be used, or
+        if they are a a float or string they will be multiplied to the number of input data points.  kernel_initializer
+        and activation are passed to the Dense and/or CNN object as such.  It makes more sense if you look at the short
+        code below.
         :return:  The classifier.
         """
         datapoints = X.shape[1:]
@@ -433,16 +445,44 @@ class ML(object):
         output_shape = y.shape[1]
         classifier = Sequential()
         classifier.add(InputLayer(input_shape=datapoints))
-        classifier.add(Conv1D(filters=10, kernel_size=int(input_dim/4), activation='relu'))
-        classifier.add(MaxPooling1D(pool_size=10))
-        classifier.add(Conv1D(filters=10, kernel_size=int(input_dim/30), activation='relu'))
-        classifier.add(MaxPooling1D(pool_size=2))
-        classifier.add(Conv1D(filters=10, kernel_size=2, activation='relu'))
-        classifier.add(MaxPooling1D(pool_size=2))
-        classifier.add(Flatten())
-        classifier.add(Dense(units=int(input_dim/4), activation='relu'))
-        classifier.add(Dense(units=int(input_dim/8), activation='relu'))
-        classifier.add(Dense(units=int(input_dim/16), activation='relu'))
+
+        print("input_dim: {0} datapoints {1}".format(input_dim, datapoints))
+
+        for layer in layers:
+            if layer is None:
+                classifier.add(Flatten())
+            elif len(layer) == 4:
+                filters, kernel_size, activation, pool_size = layer
+                if not isinstance(filters, int):
+                    filters = int(Fraction(filters) * input_dim)
+                if not isinstance(kernel_size, int):
+                    kernel_size = int(Fraction(kernel_size) * input_dim)
+                if not isinstance(pool_size, int):
+                    pool_size = int(Fraction(pool_size) * input_dim)
+
+                classifier.add(Conv1D(filters=filters, kernel_size=kernel_size, activation='relu'))
+                classifier.add(MaxPooling1D(pool_size=pool_size))
+            elif len(layer) == 3:
+                value, kernel_initializer, activation = layer
+                if isinstance(value, int):
+                    units = value
+                else:
+                    units = int(Fraction(value) * input_dim)
+
+                classifier.add(Dense(units=units,
+                                     kernel_initializer=kernel_initializer,
+                                     activation=activation))
+
+        # classifier.add(Conv1D(filters=10, kernel_size=int(input_dim/4), activation='relu'))
+        # classifier.add(MaxPooling1D(pool_size=10))
+        # classifier.add(Conv1D(filters=10, kernel_size=int(input_dim/30), activation='relu'))
+        # classifier.add(MaxPooling1D(pool_size=2))
+        # classifier.add(Conv1D(filters=10, kernel_size=2, activation='relu'))
+        # classifier.add(MaxPooling1D(pool_size=2))
+        # classifier.add(Flatten())
+        # classifier.add(Dense(units=int(input_dim/4), activation='relu'))
+        # classifier.add(Dense(units=int(input_dim/8), activation='relu'))
+        # classifier.add(Dense(units=int(input_dim/16), activation='relu'))
         classifier.add(Dense(units=output_shape, activation='softmax'))
         classifier.compile(optimizer='adam', loss='categorical_crossentropy',
                            metrics=['categorical_accuracy', 'accuracy'])
