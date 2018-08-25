@@ -673,34 +673,38 @@ class ML(object):
         saved_futures = {}
         classifiers = {}
         print("Start Cross Fold Validation...")
+
         if n_jobs < 2:
-            for train, test in cvkfold.split(X, Y):
-                X_train = X[train]
-                X_test = X[test]
-                y_train = y[train]
-                y_test = y[test]
-                fold += 1
-                print("\tCalculating fold: {0}".format(fold))
-                result_dict = self._cfv_runner(X_train, y_train, X_test, y_test, batch_size=batch_size, epochs=epochs)
-                classifiers[fold] = result_dict
+            executor = None
         else:
-            with ProcessPoolExecutor(max_workers=n_jobs) as executor:
-                for train, test in cvkfold.split(X, Y):
-                    X_train = X[train]
-                    X_test = X[test]
-                    y_train = y[train]
-                    y_test = y[test]
-                    fold += 1
-                    print("\tCalculating fold: {0}".format(fold))
-                    future = executor.submit(self._cfv_runner,
-                                         X_train, y_train,
-                                         X_test, y_test,
-                                         batch_size=batch_size, epochs=epochs)
-                    saved_futures[future] = fold
-                for future in as_completed(saved_futures):
-                    print("\tFinished calculating fold: {0}".format(saved_futures[future]))
-                    result_dict = future.result()
-                    classifiers[saved_futures[future]] = result_dict
+            executor = ProcessPoolExecutor(max_workers=n_jobs)
+
+        for train, test in cvkfold.split(X, Y):
+            X_train = X[train]
+            X_test = X[test]
+            y_train = y[train]
+            y_test = y[test]
+            fold += 1
+            print("\tCalculating fold: {0}".format(fold))
+            if executor:
+                future = executor.submit(self._cfv_runner,
+                                     X_train, y_train,
+                                     X_test, y_test,
+                                     batch_size=batch_size, epochs=epochs)
+                saved_futures[future] = fold
+            else:
+                result_dict = self._cfv_runner(X_train, y_train, X_test, y_test, batch_size=batch_size, epochs=epochs)
+                print("\tFinished calculating fold: {0}".format(fold))
+                classifiers[fold] = result_dict
+
+        if executor:
+            classifiers = {}
+            for future in as_completed(saved_futures):
+                print("\tFinished calculating fold: {0}".format(saved_futures[future]))
+                result_dict = future.result()
+                classifiers[saved_futures[future]] = result_dict
+            executor.shutdown(wait=True)
+
         self.classifiers = classifiers
         accuracies = np.array([classifiers[f]['accuracy'] for f in classifiers])
         mean = accuracies.mean()
