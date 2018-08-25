@@ -1,0 +1,522 @@
+================================================================================
+Command Line:
+	train_classifier.py gridsearch gist /mnt/data/GIST/ -gt adaboost -at nc -gc 2 -gp {"base_estimator__shrink_threshold":[0, 1, 5, 10, 50], "algorithm":["SAMME", "SAMME.R"], "learning_rate":[1, 2, 5, 10], "n_estimators":[2, 5, 10, 50]}
+================================================================================
+================================================================================
+Loading data...
+================================================================================
+================================================================================
+Feature Type: gist
+Number of features: 320
+================================================================================
+
+
+================================================================================
+Classifier Type: Grid Search (gridsearch)
+================================================================================
+Grid Search Enabled!
+Grid Search Type: AdaBoost (adaboost)
+Grid Search Parameters: {'base_estimator__shrink_threshold': [0, 1, 5, 10, 50], 'algorithm': ['SAMME', 'SAMME.R'], 'learning_rate': [1, 2, 5, 10], 'n_estimators': [2, 5, 10, 50]}
+================================================================================
+Training Class Count:
+================================================================================
+	Trojan      9000
+	PUA         9000
+	Virus       9000
+	Backdoor    9000
+	Ransom      9000
+	Worm        9000
+================================================================================
+Testing Class Count:
+================================================================================
+	Trojan      1000
+	Virus       1000
+	PUA         1000
+	Ransom      1000
+	Backdoor    1000
+	Worm        1000
+================================================================================
+
+
+================================================================================
+Begin training...
+================================================================================
+Using TensorFlow backend.
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+multiprocessing.pool.RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/_parallel_backends.py", line 350, in __call__
+    return self.func(*args, **kwargs)
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py", line 131, in __call__
+    return [func(*args, **kwargs) for func, args, kwargs in self.items]
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py", line 131, in <listcomp>
+    return [func(*args, **kwargs) for func, args, kwargs in self.items]
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py", line 458, in _fit_and_score
+    estimator.fit(X_train, y_train, **fit_params)
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/ensemble/weight_boosting.py", line 413, in fit
+    return super(AdaBoostClassifier, self).fit(X, y, sample_weight)
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/ensemble/weight_boosting.py", line 130, in fit
+    self._validate_estimator()
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/ensemble/weight_boosting.py", line 431, in _validate_estimator
+    % self.base_estimator_.__class__.__name__)
+ValueError: NearestCentroid doesn't support sample_weight.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.6/multiprocessing/pool.py", line 119, in worker
+    result = (True, func(*args, **kwds))
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/_parallel_backends.py", line 359, in __call__
+    raise TransportableException(text, e_type)
+sklearn.externals.joblib.my_exceptions.TransportableException: TransportableException
+___________________________________________________________________________
+ValueError                                         Fri Aug 24 13:32:06 2018
+PID: 18039                                   Python 3.6.5: /usr/bin/python3
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in __call__(self=<sklearn.externals.joblib.parallel.BatchedCalls object>)
+    126     def __init__(self, iterator_slice):
+    127         self.items = list(iterator_slice)
+    128         self._size = len(self.items)
+    129 
+    130     def __call__(self):
+--> 131         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        self.items = [(<function _fit_and_score>, (AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), memmap([[ 0.3565714 ,  0.07690077,  0.11367327, ...        0.41028512, -1.455194  ]], dtype=float32), array([2, 3, 4, ..., 4, 3, 5]), {'score': <function _passthrough_scorer>}, array([26575, 26579, 26587, ..., 53997, 53998, 53999]), array([    0,     1,     2, ..., 27297, 27306, 27318]), 0, {'algorithm': 'SAMME', 'base_estimator__shrink_threshold': 0, 'learning_rate': 1, 'n_estimators': 2}), {'error_score': 'raise', 'fit_params': {}, 'return_n_test_samples': True, 'return_parameters': False, 'return_times': True, 'return_train_score': 'warn'})]
+    132 
+    133     def __len__(self):
+    134         return self._size
+    135 
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in <listcomp>(.0=<list_iterator object>)
+    126     def __init__(self, iterator_slice):
+    127         self.items = list(iterator_slice)
+    128         self._size = len(self.items)
+    129 
+    130     def __call__(self):
+--> 131         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        func = <function _fit_and_score>
+        args = (AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), memmap([[ 0.3565714 ,  0.07690077,  0.11367327, ...        0.41028512, -1.455194  ]], dtype=float32), array([2, 3, 4, ..., 4, 3, 5]), {'score': <function _passthrough_scorer>}, array([26575, 26579, 26587, ..., 53997, 53998, 53999]), array([    0,     1,     2, ..., 27297, 27306, 27318]), 0, {'algorithm': 'SAMME', 'base_estimator__shrink_threshold': 0, 'learning_rate': 1, 'n_estimators': 2})
+        kwargs = {'error_score': 'raise', 'fit_params': {}, 'return_n_test_samples': True, 'return_parameters': False, 'return_times': True, 'return_train_score': 'warn'}
+    132 
+    133     def __len__(self):
+    134         return self._size
+    135 
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py in _fit_and_score(estimator=AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), X=memmap([[ 0.3565714 ,  0.07690077,  0.11367327, ...        0.41028512, -1.455194  ]], dtype=float32), y=array([2, 3, 4, ..., 4, 3, 5]), scorer={'score': <function _passthrough_scorer>}, train=array([26575, 26579, 26587, ..., 53997, 53998, 53999]), test=array([    0,     1,     2, ..., 27297, 27306, 27318]), verbose=0, parameters={'algorithm': 'SAMME', 'base_estimator__shrink_threshold': 0, 'learning_rate': 1, 'n_estimators': 2}, fit_params={}, return_train_score='warn', return_parameters=False, return_n_test_samples=True, return_times=True, error_score='raise')
+    453 
+    454     try:
+    455         if y_train is None:
+    456             estimator.fit(X_train, **fit_params)
+    457         else:
+--> 458             estimator.fit(X_train, y_train, **fit_params)
+        estimator.fit = <bound method AdaBoostClassifier.fit of AdaBoost...rning_rate=1, n_estimators=2, random_state=None)>
+        X_train = memmap([[-0.7757712 , -0.85175484, -0.7720595 , ...        0.41028512, -1.455194  ]], dtype=float32)
+        y_train = array([0, 0, 0, ..., 4, 3, 5])
+        fit_params = {}
+    459 
+    460     except Exception as e:
+    461         # Note fit time as time until error
+    462         fit_time = time.time() - start_time
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/ensemble/weight_boosting.py in fit(self=AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), X=memmap([[-0.7757712 , -0.85175484, -0.7720595 , ...        0.41028512, -1.455194  ]], dtype=float32), y=array([0, 0, 0, ..., 4, 3, 5]), sample_weight=None)
+    408         # Check that algorithm is supported
+    409         if self.algorithm not in ('SAMME', 'SAMME.R'):
+    410             raise ValueError("algorithm %s is not supported" % self.algorithm)
+    411 
+    412         # Fit
+--> 413         return super(AdaBoostClassifier, self).fit(X, y, sample_weight)
+        self.fit = <bound method AdaBoostClassifier.fit of AdaBoost...rning_rate=1, n_estimators=2, random_state=None)>
+        X = memmap([[-0.7757712 , -0.85175484, -0.7720595 , ...        0.41028512, -1.455194  ]], dtype=float32)
+        y = array([0, 0, 0, ..., 4, 3, 5])
+        sample_weight = None
+    414 
+    415     def _validate_estimator(self):
+    416         """Check the estimator and set the base_estimator_ attribute."""
+    417         super(AdaBoostClassifier, self)._validate_estimator(
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/ensemble/weight_boosting.py in fit(self=AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), X=array([[-0.7757712 , -0.85175484, -0.7720595 , ....        0.41028512, -1.455194  ]], dtype=float32), y=array([0, 0, 0, ..., 4, 3, 5]), sample_weight=array([3.7037037e-05, 3.7037037e-05, 3.7037037e-...037037e-05,
+       3.7037037e-05, 3.7037037e-05]))
+    125                 raise ValueError(
+    126                     "Attempting to fit with a non-positive "
+    127                     "weighted number of samples.")
+    128 
+    129         # Check parameters
+--> 130         self._validate_estimator()
+        self._validate_estimator = <bound method AdaBoostClassifier._validate_estim...rning_rate=1, n_estimators=2, random_state=None)>
+    131 
+    132         # Clear any previous fit results
+    133         self.estimators_ = []
+    134         self.estimator_weights_ = np.zeros(self.n_estimators, dtype=np.float64)
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/ensemble/weight_boosting.py in _validate_estimator(self=AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None))
+    426                     "probabilities with a predict_proba method.\n"
+    427                     "Please change the base estimator or set "
+    428                     "algorithm='SAMME' instead.")
+    429         if not has_fit_parameter(self.base_estimator_, "sample_weight"):
+    430             raise ValueError("%s doesn't support sample_weight."
+--> 431                              % self.base_estimator_.__class__.__name__)
+        self.base_estimator_.__class__.__name__ = 'NearestCentroid'
+    432 
+    433     def _boost(self, iboost, X, y, sample_weight, random_state):
+    434         """Implement a single boost.
+    435 
+
+ValueError: NearestCentroid doesn't support sample_weight.
+___________________________________________________________________________
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py", line 699, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/usr/lib/python3.6/multiprocessing/pool.py", line 644, in get
+    raise self._value
+sklearn.externals.joblib.my_exceptions.TransportableException: TransportableException
+___________________________________________________________________________
+ValueError                                         Fri Aug 24 13:32:06 2018
+PID: 18039                                   Python 3.6.5: /usr/bin/python3
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in __call__(self=<sklearn.externals.joblib.parallel.BatchedCalls object>)
+    126     def __init__(self, iterator_slice):
+    127         self.items = list(iterator_slice)
+    128         self._size = len(self.items)
+    129 
+    130     def __call__(self):
+--> 131         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        self.items = [(<function _fit_and_score>, (AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), memmap([[ 0.3565714 ,  0.07690077,  0.11367327, ...        0.41028512, -1.455194  ]], dtype=float32), array([2, 3, 4, ..., 4, 3, 5]), {'score': <function _passthrough_scorer>}, array([26575, 26579, 26587, ..., 53997, 53998, 53999]), array([    0,     1,     2, ..., 27297, 27306, 27318]), 0, {'algorithm': 'SAMME', 'base_estimator__shrink_threshold': 0, 'learning_rate': 1, 'n_estimators': 2}), {'error_score': 'raise', 'fit_params': {}, 'return_n_test_samples': True, 'return_parameters': False, 'return_times': True, 'return_train_score': 'warn'})]
+    132 
+    133     def __len__(self):
+    134         return self._size
+    135 
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in <listcomp>(.0=<list_iterator object>)
+    126     def __init__(self, iterator_slice):
+    127         self.items = list(iterator_slice)
+    128         self._size = len(self.items)
+    129 
+    130     def __call__(self):
+--> 131         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        func = <function _fit_and_score>
+        args = (AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), memmap([[ 0.3565714 ,  0.07690077,  0.11367327, ...        0.41028512, -1.455194  ]], dtype=float32), array([2, 3, 4, ..., 4, 3, 5]), {'score': <function _passthrough_scorer>}, array([26575, 26579, 26587, ..., 53997, 53998, 53999]), array([    0,     1,     2, ..., 27297, 27306, 27318]), 0, {'algorithm': 'SAMME', 'base_estimator__shrink_threshold': 0, 'learning_rate': 1, 'n_estimators': 2})
+        kwargs = {'error_score': 'raise', 'fit_params': {}, 'return_n_test_samples': True, 'return_parameters': False, 'return_times': True, 'return_train_score': 'warn'}
+    132 
+    133     def __len__(self):
+    134         return self._size
+    135 
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py in _fit_and_score(estimator=AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), X=memmap([[ 0.3565714 ,  0.07690077,  0.11367327, ...        0.41028512, -1.455194  ]], dtype=float32), y=array([2, 3, 4, ..., 4, 3, 5]), scorer={'score': <function _passthrough_scorer>}, train=array([26575, 26579, 26587, ..., 53997, 53998, 53999]), test=array([    0,     1,     2, ..., 27297, 27306, 27318]), verbose=0, parameters={'algorithm': 'SAMME', 'base_estimator__shrink_threshold': 0, 'learning_rate': 1, 'n_estimators': 2}, fit_params={}, return_train_score='warn', return_parameters=False, return_n_test_samples=True, return_times=True, error_score='raise')
+    453 
+    454     try:
+    455         if y_train is None:
+    456             estimator.fit(X_train, **fit_params)
+    457         else:
+--> 458             estimator.fit(X_train, y_train, **fit_params)
+        estimator.fit = <bound method AdaBoostClassifier.fit of AdaBoost...rning_rate=1, n_estimators=2, random_state=None)>
+        X_train = memmap([[-0.7757712 , -0.85175484, -0.7720595 , ...        0.41028512, -1.455194  ]], dtype=float32)
+        y_train = array([0, 0, 0, ..., 4, 3, 5])
+        fit_params = {}
+    459 
+    460     except Exception as e:
+    461         # Note fit time as time until error
+    462         fit_time = time.time() - start_time
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/ensemble/weight_boosting.py in fit(self=AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), X=memmap([[-0.7757712 , -0.85175484, -0.7720595 , ...        0.41028512, -1.455194  ]], dtype=float32), y=array([0, 0, 0, ..., 4, 3, 5]), sample_weight=None)
+    408         # Check that algorithm is supported
+    409         if self.algorithm not in ('SAMME', 'SAMME.R'):
+    410             raise ValueError("algorithm %s is not supported" % self.algorithm)
+    411 
+    412         # Fit
+--> 413         return super(AdaBoostClassifier, self).fit(X, y, sample_weight)
+        self.fit = <bound method AdaBoostClassifier.fit of AdaBoost...rning_rate=1, n_estimators=2, random_state=None)>
+        X = memmap([[-0.7757712 , -0.85175484, -0.7720595 , ...        0.41028512, -1.455194  ]], dtype=float32)
+        y = array([0, 0, 0, ..., 4, 3, 5])
+        sample_weight = None
+    414 
+    415     def _validate_estimator(self):
+    416         """Check the estimator and set the base_estimator_ attribute."""
+    417         super(AdaBoostClassifier, self)._validate_estimator(
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/ensemble/weight_boosting.py in fit(self=AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), X=array([[-0.7757712 , -0.85175484, -0.7720595 , ....        0.41028512, -1.455194  ]], dtype=float32), y=array([0, 0, 0, ..., 4, 3, 5]), sample_weight=array([3.7037037e-05, 3.7037037e-05, 3.7037037e-...037037e-05,
+       3.7037037e-05, 3.7037037e-05]))
+    125                 raise ValueError(
+    126                     "Attempting to fit with a non-positive "
+    127                     "weighted number of samples.")
+    128 
+    129         # Check parameters
+--> 130         self._validate_estimator()
+        self._validate_estimator = <bound method AdaBoostClassifier._validate_estim...rning_rate=1, n_estimators=2, random_state=None)>
+    131 
+    132         # Clear any previous fit results
+    133         self.estimators_ = []
+    134         self.estimator_weights_ = np.zeros(self.n_estimators, dtype=np.float64)
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/ensemble/weight_boosting.py in _validate_estimator(self=AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None))
+    426                     "probabilities with a predict_proba method.\n"
+    427                     "Please change the base estimator or set "
+    428                     "algorithm='SAMME' instead.")
+    429         if not has_fit_parameter(self.base_estimator_, "sample_weight"):
+    430             raise ValueError("%s doesn't support sample_weight."
+--> 431                              % self.base_estimator_.__class__.__name__)
+        self.base_estimator_.__class__.__name__ = 'NearestCentroid'
+    432 
+    433     def _boost(self, iboost, X, y, sample_weight, random_state):
+    434         """Implement a single boost.
+    435 
+
+ValueError: NearestCentroid doesn't support sample_weight.
+___________________________________________________________________________
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "train_classifier.py", line 532, in <module>
+    main(args)
+  File "train_classifier.py", line 420, in main
+    classifier = ml.train(Xt, yt)
+  File "/Source/malgazer/library/ml.py", line 61, in train
+    return self.train_scikitlearn(*args, **kwargs)
+  File "/Source/malgazer/library/ml.py", line 353, in train_scikitlearn
+    self.classifier.fit(X, Y)
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_search.py", line 639, in fit
+    cv.split(X, y, groups)))
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py", line 789, in __call__
+    self.retrieve()
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py", line 740, in retrieve
+    raise exception
+sklearn.externals.joblib.my_exceptions.JoblibValueError: JoblibValueError
+___________________________________________________________________________
+Multiprocessing exception:
+...........................................................................
+/Source/malgazer/train_classifier.py in <module>()
+    527     args = sys.argv[1:]
+    528     print(DIVIDER)
+    529     print("Command Line:")
+    530     print("\t{0}".format(' '.join(sys.argv)))
+    531     print(DIVIDER)
+--> 532     main(args)
+
+...........................................................................
+/Source/malgazer/train_classifier.py in main(arguments=['gridsearch', 'gist', '/mnt/data/GIST/', '-gt', 'adaboost', '-at', 'nc', '-gc', '2', '-gp', '{"base_estimator__shrink_threshold":[0, 1, 5, 10...te":[1, 2, 5, 10], "n_estimators":[2, 5, 10, 50]}'])
+    415         classifier = ml.build_gridsearch(gridsearch_type=gridsearch_type, estimator=classifier,
+    416                                          param_grid=gridsearch_params,
+    417                                          cv=gridsearch_cv, n_jobs=gridsearch_njobs)
+    418         start_time = time.time()
+    419 
+--> 420         classifier = ml.train(Xt, yt)
+        classifier = GridSearchCV(cv=2, error_score='raise',
+       e...ain_score='warn',
+       scoring=None, verbose=0)
+        ml.train = <bound method ML.train of <library.ml.ML object>>
+        Xt = array([[ 0.3565714 ,  0.07690077,  0.11367327, ....        0.41028512, -1.455194  ]], dtype=float32)
+        yt = array([[0., 0., 1., 0., 0., 0.],
+       [0., 0.,...
+       [0., 0., 0., 0., 0., 1.]], dtype=float32)
+    421         print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+    422         print(DIVIDER)
+    423         print("\n")
+    424 
+
+...........................................................................
+/Source/malgazer/library/ml.py in train(self=<library.ml.ML object>, *args=(array([[ 0.3565714 ,  0.07690077,  0.11367327, ....        0.41028512, -1.455194  ]], dtype=float32), array([[0., 0., 1., 0., 0., 0.],
+       [0., 0.,...
+       [0., 0., 0., 0., 0., 1.]], dtype=float32)), **kwargs={})
+     56 
+     57     def train(self, *args, **kwargs):
+     58         if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
+     59             return self.train_nn(*args, **kwargs)
+     60         else:
+---> 61             return self.train_scikitlearn(*args, **kwargs)
+        self.train_scikitlearn = <bound method ML.train_scikitlearn of <library.ml.ML object>>
+        args = (array([[ 0.3565714 ,  0.07690077,  0.11367327, ....        0.41028512, -1.455194  ]], dtype=float32), array([[0., 0., 1., 0., 0., 0.],
+       [0., 0.,...
+       [0., 0., 0., 0., 0., 1.]], dtype=float32))
+        kwargs = {}
+     62 
+     63     def predict(self, *args, **kwargs):
+     64         """
+     65         Perform a prediction on input data.
+
+...........................................................................
+/Source/malgazer/library/ml.py in train_scikitlearn(self=<library.ml.ML object>, X=array([[ 0.3565714 ,  0.07690077,  0.11367327, ....        0.41028512, -1.455194  ]], dtype=float32), y=array([[0., 0., 1., 0., 0., 0.],
+       [0., 0.,...
+       [0., 0., 0., 0., 0., 1.]], dtype=float32))
+    348                 Y = y.argmax(1)
+    349             else:
+    350                 Y = y
+    351         else:
+    352             Y = y
+--> 353         self.classifier.fit(X, Y)
+        self.classifier.fit = <bound method BaseSearchCV.fit of GridSearchCV(c...in_score='warn',
+       scoring=None, verbose=0)>
+        X = array([[ 0.3565714 ,  0.07690077,  0.11367327, ....        0.41028512, -1.455194  ]], dtype=float32)
+        Y = array([2, 3, 4, ..., 4, 3, 5])
+    354         return self.classifier
+    355 
+    356     def predict_scikitlearn(self, X):
+    357         """
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_search.py in fit(self=GridSearchCV(cv=2, error_score='raise',
+       e...ain_score='warn',
+       scoring=None, verbose=0), X=array([[ 0.3565714 ,  0.07690077,  0.11367327, ....        0.41028512, -1.455194  ]], dtype=float32), y=array([2, 3, 4, ..., 4, 3, 5]), groups=None, **fit_params={})
+    634                                   return_train_score=self.return_train_score,
+    635                                   return_n_test_samples=True,
+    636                                   return_times=True, return_parameters=False,
+    637                                   error_score=self.error_score)
+    638           for parameters, (train, test) in product(candidate_params,
+--> 639                                                    cv.split(X, y, groups)))
+        cv.split = <bound method StratifiedKFold.split of Stratifie...ld(n_splits=2, random_state=None, shuffle=False)>
+        X = array([[ 0.3565714 ,  0.07690077,  0.11367327, ....        0.41028512, -1.455194  ]], dtype=float32)
+        y = array([2, 3, 4, ..., 4, 3, 5])
+        groups = None
+    640 
+    641         # if one choose to see train score, "out" will contain train score info
+    642         if self.return_train_score:
+    643             (train_score_dicts, test_score_dicts, test_sample_counts, fit_time,
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in __call__(self=Parallel(n_jobs=-1), iterable=<generator object BaseSearchCV.fit.<locals>.<genexpr>>)
+    784             if pre_dispatch == "all" or n_jobs == 1:
+    785                 # The iterable was consumed all at once by the above for loop.
+    786                 # No need to wait for async callbacks to trigger to
+    787                 # consumption.
+    788                 self._iterating = False
+--> 789             self.retrieve()
+        self.retrieve = <bound method Parallel.retrieve of Parallel(n_jobs=-1)>
+    790             # Make sure that we get a last message telling us we are done
+    791             elapsed_time = time.time() - self._start_time
+    792             self._print('Done %3i out of %3i | elapsed: %s finished',
+    793                         (len(self._output), len(self._output),
+
+---------------------------------------------------------------------------
+Sub-process traceback:
+---------------------------------------------------------------------------
+ValueError                                         Fri Aug 24 13:32:06 2018
+PID: 18039                                   Python 3.6.5: /usr/bin/python3
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in __call__(self=<sklearn.externals.joblib.parallel.BatchedCalls object>)
+    126     def __init__(self, iterator_slice):
+    127         self.items = list(iterator_slice)
+    128         self._size = len(self.items)
+    129 
+    130     def __call__(self):
+--> 131         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        self.items = [(<function _fit_and_score>, (AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), memmap([[ 0.3565714 ,  0.07690077,  0.11367327, ...        0.41028512, -1.455194  ]], dtype=float32), array([2, 3, 4, ..., 4, 3, 5]), {'score': <function _passthrough_scorer>}, array([26575, 26579, 26587, ..., 53997, 53998, 53999]), array([    0,     1,     2, ..., 27297, 27306, 27318]), 0, {'algorithm': 'SAMME', 'base_estimator__shrink_threshold': 0, 'learning_rate': 1, 'n_estimators': 2}), {'error_score': 'raise', 'fit_params': {}, 'return_n_test_samples': True, 'return_parameters': False, 'return_times': True, 'return_train_score': 'warn'})]
+    132 
+    133     def __len__(self):
+    134         return self._size
+    135 
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in <listcomp>(.0=<list_iterator object>)
+    126     def __init__(self, iterator_slice):
+    127         self.items = list(iterator_slice)
+    128         self._size = len(self.items)
+    129 
+    130     def __call__(self):
+--> 131         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        func = <function _fit_and_score>
+        args = (AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), memmap([[ 0.3565714 ,  0.07690077,  0.11367327, ...        0.41028512, -1.455194  ]], dtype=float32), array([2, 3, 4, ..., 4, 3, 5]), {'score': <function _passthrough_scorer>}, array([26575, 26579, 26587, ..., 53997, 53998, 53999]), array([    0,     1,     2, ..., 27297, 27306, 27318]), 0, {'algorithm': 'SAMME', 'base_estimator__shrink_threshold': 0, 'learning_rate': 1, 'n_estimators': 2})
+        kwargs = {'error_score': 'raise', 'fit_params': {}, 'return_n_test_samples': True, 'return_parameters': False, 'return_times': True, 'return_train_score': 'warn'}
+    132 
+    133     def __len__(self):
+    134         return self._size
+    135 
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py in _fit_and_score(estimator=AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), X=memmap([[ 0.3565714 ,  0.07690077,  0.11367327, ...        0.41028512, -1.455194  ]], dtype=float32), y=array([2, 3, 4, ..., 4, 3, 5]), scorer={'score': <function _passthrough_scorer>}, train=array([26575, 26579, 26587, ..., 53997, 53998, 53999]), test=array([    0,     1,     2, ..., 27297, 27306, 27318]), verbose=0, parameters={'algorithm': 'SAMME', 'base_estimator__shrink_threshold': 0, 'learning_rate': 1, 'n_estimators': 2}, fit_params={}, return_train_score='warn', return_parameters=False, return_n_test_samples=True, return_times=True, error_score='raise')
+    453 
+    454     try:
+    455         if y_train is None:
+    456             estimator.fit(X_train, **fit_params)
+    457         else:
+--> 458             estimator.fit(X_train, y_train, **fit_params)
+        estimator.fit = <bound method AdaBoostClassifier.fit of AdaBoost...rning_rate=1, n_estimators=2, random_state=None)>
+        X_train = memmap([[-0.7757712 , -0.85175484, -0.7720595 , ...        0.41028512, -1.455194  ]], dtype=float32)
+        y_train = array([0, 0, 0, ..., 4, 3, 5])
+        fit_params = {}
+    459 
+    460     except Exception as e:
+    461         # Note fit time as time until error
+    462         fit_time = time.time() - start_time
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/ensemble/weight_boosting.py in fit(self=AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), X=memmap([[-0.7757712 , -0.85175484, -0.7720595 , ...        0.41028512, -1.455194  ]], dtype=float32), y=array([0, 0, 0, ..., 4, 3, 5]), sample_weight=None)
+    408         # Check that algorithm is supported
+    409         if self.algorithm not in ('SAMME', 'SAMME.R'):
+    410             raise ValueError("algorithm %s is not supported" % self.algorithm)
+    411 
+    412         # Fit
+--> 413         return super(AdaBoostClassifier, self).fit(X, y, sample_weight)
+        self.fit = <bound method AdaBoostClassifier.fit of AdaBoost...rning_rate=1, n_estimators=2, random_state=None)>
+        X = memmap([[-0.7757712 , -0.85175484, -0.7720595 , ...        0.41028512, -1.455194  ]], dtype=float32)
+        y = array([0, 0, 0, ..., 4, 3, 5])
+        sample_weight = None
+    414 
+    415     def _validate_estimator(self):
+    416         """Check the estimator and set the base_estimator_ attribute."""
+    417         super(AdaBoostClassifier, self)._validate_estimator(
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/ensemble/weight_boosting.py in fit(self=AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None), X=array([[-0.7757712 , -0.85175484, -0.7720595 , ....        0.41028512, -1.455194  ]], dtype=float32), y=array([0, 0, 0, ..., 4, 3, 5]), sample_weight=array([3.7037037e-05, 3.7037037e-05, 3.7037037e-...037037e-05,
+       3.7037037e-05, 3.7037037e-05]))
+    125                 raise ValueError(
+    126                     "Attempting to fit with a non-positive "
+    127                     "weighted number of samples.")
+    128 
+    129         # Check parameters
+--> 130         self._validate_estimator()
+        self._validate_estimator = <bound method AdaBoostClassifier._validate_estim...rning_rate=1, n_estimators=2, random_state=None)>
+    131 
+    132         # Clear any previous fit results
+    133         self.estimators_ = []
+    134         self.estimator_weights_ = np.zeros(self.n_estimators, dtype=np.float64)
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/ensemble/weight_boosting.py in _validate_estimator(self=AdaBoostClassifier(algorithm='SAMME',
+          ...arning_rate=1, n_estimators=2, random_state=None))
+    426                     "probabilities with a predict_proba method.\n"
+    427                     "Please change the base estimator or set "
+    428                     "algorithm='SAMME' instead.")
+    429         if not has_fit_parameter(self.base_estimator_, "sample_weight"):
+    430             raise ValueError("%s doesn't support sample_weight."
+--> 431                              % self.base_estimator_.__class__.__name__)
+        self.base_estimator_.__class__.__name__ = 'NearestCentroid'
+    432 
+    433     def _boost(self, iboost, X, y, sample_weight, random_state):
+    434         """Implement a single boost.
+    435 
+
+ValueError: NearestCentroid doesn't support sample_weight.
+___________________________________________________________________________

@@ -1,0 +1,75 @@
+================================================================================
+Command Line:
+	train_classifier.py gridsearch rwe /mnt/data/RWE/ -gt ovr -ot dt -gc 2 -gp {"estimator__criterion":["gini", "entropy"], "estimator__splitter":["best", "random"]}
+================================================================================
+================================================================================
+Loading data...
+================================================================================
+================================================================================
+Feature Type: rwe
+	Window Size: 256
+	Data points: 1,024
+Number of features: 1,024
+================================================================================
+
+
+================================================================================
+Classifier Type: Grid Search (gridsearch)
+================================================================================
+Grid Search Enabled!
+Grid Search Type: OneVRest (ovr)
+Grid Search Parameters: {'estimator__criterion': ['gini', 'entropy'], 'estimator__splitter': ['best', 'random']}
+================================================================================
+Training Class Count:
+================================================================================
+	Virus       9000
+	Backdoor    9000
+	Trojan      9000
+	Ransom      9000
+	PUA         9000
+	Worm        9000
+================================================================================
+Testing Class Count:
+================================================================================
+	Virus       1000
+	Backdoor    1000
+	Ransom      1000
+	Trojan      1000
+	PUA         1000
+	Worm        1000
+================================================================================
+
+
+================================================================================
+Begin training...
+================================================================================
+Using TensorFlow backend.
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+Training time 641.249145 seconds
+================================================================================
+
+
+================================================================================
+Best Score: 0.8661111111111112
+================================================================================
+CV Results:
+{'mean_fit_time': array([317.61822534,  44.0922662 , 167.06191385,  27.507779  ]), 'std_fit_time': array([4.14375162, 5.01795661, 0.18072069, 0.33365452]), 'mean_score_time': array([0.38548172, 0.43574846, 0.37838054, 0.52940738]), 'std_score_time': array([0.00137341, 0.04051793, 0.0035584 , 0.0041877 ]), 'param_estimator__criterion': masked_array(data=['gini', 'gini', 'entropy', 'entropy'],
+             mask=[False, False, False, False],
+       fill_value='?',
+            dtype=object), 'param_estimator__splitter': masked_array(data=['best', 'random', 'best', 'random'],
+             mask=[False, False, False, False],
+       fill_value='?',
+            dtype=object), 'params': [{'estimator__criterion': 'gini', 'estimator__splitter': 'best'}, {'estimator__criterion': 'gini', 'estimator__splitter': 'random'}, {'estimator__criterion': 'entropy', 'estimator__splitter': 'best'}, {'estimator__criterion': 'entropy', 'estimator__splitter': 'random'}], 'split0_test_score': array([0.85607407, 0.86192593, 0.86874074, 0.86788889]), 'split1_test_score': array([0.85092593, 0.8542963 , 0.86348148, 0.863     ]), 'mean_test_score': array([0.8535    , 0.85811111, 0.86611111, 0.86544444]), 'std_test_score': array([0.00257407, 0.00381481, 0.00262963, 0.00244444]), 'rank_test_score': array([4, 3, 1, 2], dtype=int32), 'split0_train_score': array([0.99892593, 0.99892593, 0.99892593, 0.99892593]), 'split1_train_score': array([0.99892593, 0.99892593, 0.99892593, 0.99892593]), 'mean_train_score': array([0.99892593, 0.99892593, 0.99892593, 0.99892593]), 'std_train_score': array([0., 0., 0., 0.])}
+================================================================================
+Params:
+[{'estimator__criterion': 'gini', 'estimator__splitter': 'best'}, {'estimator__criterion': 'gini', 'estimator__splitter': 'random'}, {'estimator__criterion': 'entropy', 'estimator__splitter': 'best'}, {'estimator__criterion': 'entropy', 'estimator__splitter': 'random'}]
+================================================================================
+Mean Test Score: [0.8535     0.85811111 0.86611111 0.86544444]
+================================================================================
+Best Params: {'estimator__criterion': 'entropy', 'estimator__splitter': 'best'}
+================================================================================
+
+

@@ -1,0 +1,92 @@
+================================================================================
+Command Line:
+	train_classifier.py gridsearch rwe /mnt/data/RWE/ -gt ovr -ot knn -gc 2 -gp {"estimator__n_neighbors":[1, 5, 10, 50], "estimator__weights":["uniform", "distance"]}
+================================================================================
+================================================================================
+Loading data...
+================================================================================
+================================================================================
+Feature Type: rwe
+	Window Size: 256
+	Data points: 1,024
+Number of features: 1,024
+================================================================================
+
+
+================================================================================
+Classifier Type: Grid Search (gridsearch)
+================================================================================
+Grid Search Enabled!
+Grid Search Type: OneVRest (ovr)
+Grid Search Parameters: {'estimator__n_neighbors': [1, 5, 10, 50], 'estimator__weights': ['uniform', 'distance']}
+================================================================================
+OneVRest Enabled!
+OneVRest Type: k-Nearest Neighbors (knn)
+================================================================================
+Training Class Count:
+================================================================================
+	Backdoor    9000
+	Trojan      9000
+	Virus       9000
+	PUA         9000
+	Ransom      9000
+	Worm        9000
+================================================================================
+Testing Class Count:
+================================================================================
+	Trojan      1000
+	PUA         1000
+	Ransom      1000
+	Worm        1000
+	Backdoor    1000
+	Virus       1000
+================================================================================
+
+
+================================================================================
+Begin training...
+================================================================================
+Using TensorFlow backend.
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+Training time 10262.579243 seconds
+================================================================================
+
+
+================================================================================
+Best Score: 0.8890555555555556
+================================================================================
+CV Results:
+{'mean_fit_time': array([20.83258986, 24.39865005, 30.13191128, 25.91783941, 29.48198271,
+       27.13975668, 28.77625573, 30.75250959]), 'std_fit_time': array([0.71275353, 0.44068348, 0.24392366, 2.85557687, 0.94579911,
+       0.94454479, 1.91167748, 3.00342464]), 'mean_score_time': array([2653.50769031, 2663.98693025, 3614.61659694, 3576.9143765 ,
+       4129.85809326, 4188.72723341, 5715.32627988, 5712.40787935]), 'std_score_time': array([54.56579602, 39.26328504, 25.05040145, 53.73860908, 57.43324542,
+       10.69309449, 22.37629366, 24.84387183]), 'param_estimator__n_neighbors': masked_array(data=[1, 1, 5, 5, 10, 10, 50, 50],
+             mask=[False, False, False, False, False, False, False, False],
+       fill_value='?',
+            dtype=object), 'param_estimator__weights': masked_array(data=['uniform', 'distance', 'uniform', 'distance',
+                   'uniform', 'distance', 'uniform', 'distance'],
+             mask=[False, False, False, False, False, False, False, False],
+       fill_value='?',
+            dtype=object), 'params': [{'estimator__n_neighbors': 1, 'estimator__weights': 'uniform'}, {'estimator__n_neighbors': 1, 'estimator__weights': 'distance'}, {'estimator__n_neighbors': 5, 'estimator__weights': 'uniform'}, {'estimator__n_neighbors': 5, 'estimator__weights': 'distance'}, {'estimator__n_neighbors': 10, 'estimator__weights': 'uniform'}, {'estimator__n_neighbors': 10, 'estimator__weights': 'distance'}, {'estimator__n_neighbors': 50, 'estimator__weights': 'uniform'}, {'estimator__n_neighbors': 50, 'estimator__weights': 'distance'}], 'split0_test_score': array([0.89325926, 0.89325926, 0.83674074, 0.85125926, 0.79133333,
+       0.83011111, 0.70211111, 0.77362963]), 'split1_test_score': array([0.88485185, 0.88485185, 0.82596296, 0.84059259, 0.78322222,
+       0.81966667, 0.69337037, 0.76751852]), 'mean_test_score': array([0.88905556, 0.88905556, 0.83135185, 0.84592593, 0.78727778,
+       0.82488889, 0.69774074, 0.77057407]), 'std_test_score': array([0.0042037 , 0.0042037 , 0.00538889, 0.00533333, 0.00405556,
+       0.00522222, 0.00437037, 0.00305556]), 'rank_test_score': array([1, 1, 4, 3, 6, 5, 8, 7], dtype=int32), 'split0_train_score': array([0.99911111, 0.99911111, 0.86511111, 0.99907407, 0.79803704,
+       0.99907407, 0.69937037, 0.99907407]), 'split1_train_score': array([0.99881481, 0.99881481, 0.87022222, 0.99892593, 0.80774074,
+       0.99892593, 0.70648148, 0.99892593]), 'mean_train_score': array([0.99896296, 0.99896296, 0.86766667, 0.999     , 0.80288889,
+       0.999     , 0.70292593, 0.999     ]), 'std_train_score': array([1.48148148e-04, 1.48148148e-04, 2.55555556e-03, 7.40740741e-05,
+       4.85185185e-03, 7.40740741e-05, 3.55555556e-03, 7.40740741e-05])}
+================================================================================
+Params:
+[{'estimator__n_neighbors': 1, 'estimator__weights': 'uniform'}, {'estimator__n_neighbors': 1, 'estimator__weights': 'distance'}, {'estimator__n_neighbors': 5, 'estimator__weights': 'uniform'}, {'estimator__n_neighbors': 5, 'estimator__weights': 'distance'}, {'estimator__n_neighbors': 10, 'estimator__weights': 'uniform'}, {'estimator__n_neighbors': 10, 'estimator__weights': 'distance'}, {'estimator__n_neighbors': 50, 'estimator__weights': 'uniform'}, {'estimator__n_neighbors': 50, 'estimator__weights': 'distance'}]
+================================================================================
+Mean Test Score: [0.88905556 0.88905556 0.83135185 0.84592593 0.78727778 0.82488889
+ 0.69774074 0.77057407]
+================================================================================
+Best Params: {'estimator__n_neighbors': 1, 'estimator__weights': 'uniform'}
+================================================================================
+
+

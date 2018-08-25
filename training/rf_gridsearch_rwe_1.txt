@@ -1,0 +1,133 @@
+================================================================================
+Command Line:
+	train_classifier.py gridsearch rwe /mnt/data/RWE/ -gt rf -gc 2 -gp {"criterion":["gini", "entropy"], "n_estimators":[2, 5, 10, 50, 100], "oob_score":[true, false], "n_jobs":[-1]}
+================================================================================
+================================================================================
+Loading data...
+================================================================================
+================================================================================
+Feature Type: rwe
+	Window Size: 256
+	Data points: 1,024
+Number of features: 1,024
+================================================================================
+
+
+================================================================================
+Classifier Type: Grid Search (gridsearch)
+================================================================================
+Grid Search Enabled!
+Grid Search Type: Random Forest (rf)
+Grid Search Parameters: {'criterion': ['gini', 'entropy'], 'n_estimators': [2, 5, 10, 50, 100], 'oob_score': [True, False], 'n_jobs': [-1]}
+================================================================================
+Training Class Count:
+================================================================================
+	Ransom      10000
+	Trojan      10000
+	Virus       10000
+	Backdoor    10000
+	PUA         10000
+	Worm        10000
+================================================================================
+Testing Class Count:
+================================================================================
+	Ransom      10000
+	Trojan      10000
+	Virus       10000
+	Backdoor    10000
+	PUA         10000
+	Worm        10000
+================================================================================
+
+
+================================================================================
+Begin training...
+================================================================================
+Training time 2747.897859 seconds
+================================================================================
+
+
+================================================================================
+Best Score: 0.88075
+================================================================================
+CV Results:
+{'mean_fit_time': array([  12.37519419,   14.04234481,   23.54425764,   25.37042403,
+         56.05970526,   60.83979928,  399.79314327,  381.6116221 ,
+        856.05384934,  717.1557492 ,  167.28862739,  171.30274081,
+        184.8437922 ,  175.07604253,  276.76367378,  261.30188489,
+        882.96977079,  831.74638462, 1453.90746093, 1349.51465416]), 'std_fit_time': array([ 1.75796163,  0.67955565,  3.99390626,  2.03597927,  4.05443239,
+        0.90932095, 19.98967719, 14.53866029, 17.33264983, 11.01491249,
+        5.33200836,  5.36928868,  0.55696797,  4.13310945,  3.02490664,
+       15.34014869, 17.98031795, 11.42194486, 11.6239717 ,  8.6639452 ]), 'mean_score_time': array([ 1.27221584,  1.37145817,  1.99500668,  1.94981861,  2.89389229,
+        3.10906982, 10.81278074,  9.82316172, 14.64603209, 13.94435   ,
+        4.8927623 ,  4.32473409,  5.28447032,  4.13355422,  5.54242063,
+        5.86097991,  9.43378234,  9.18776107,  4.44728661,  5.68608153]), 'std_score_time': array([0.12303114, 0.28594697, 0.00919759, 0.51758957, 0.11026406,
+       0.33079767, 0.55085003, 0.43739736, 0.736938  , 0.52178454,
+       0.14764655, 0.16345799, 0.09356976, 0.20779014, 0.18683457,
+       1.10374081, 0.55675292, 0.61049628, 0.84991741, 1.24140728]), 'param_criterion': masked_array(data=['gini', 'gini', 'gini', 'gini', 'gini', 'gini', 'gini',
+                   'gini', 'gini', 'gini', 'entropy', 'entropy',
+                   'entropy', 'entropy', 'entropy', 'entropy', 'entropy',
+                   'entropy', 'entropy', 'entropy'],
+             mask=[False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False],
+       fill_value='?',
+            dtype=object), 'param_n_estimators': masked_array(data=[2, 2, 5, 5, 10, 10, 50, 50, 100, 100, 2, 2, 5, 5, 10,
+                   10, 50, 50, 100, 100],
+             mask=[False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False],
+       fill_value='?',
+            dtype=object), 'param_n_jobs': masked_array(data=[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                   -1, -1, -1, -1, -1, -1],
+             mask=[False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False],
+       fill_value='?',
+            dtype=object), 'param_oob_score': masked_array(data=[True, False, True, False, True, False, True, False,
+                   True, False, True, False, True, False, True, False,
+                   True, False, True, False],
+             mask=[False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False],
+       fill_value='?',
+            dtype=object), 'params': [{'criterion': 'gini', 'n_estimators': 2, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'gini', 'n_estimators': 2, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'gini', 'n_estimators': 5, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'gini', 'n_estimators': 5, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'gini', 'n_estimators': 10, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'gini', 'n_estimators': 10, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'gini', 'n_estimators': 50, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'gini', 'n_estimators': 50, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'gini', 'n_estimators': 100, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'gini', 'n_estimators': 100, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'entropy', 'n_estimators': 2, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'entropy', 'n_estimators': 2, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'entropy', 'n_estimators': 5, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'entropy', 'n_estimators': 5, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'entropy', 'n_estimators': 10, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'entropy', 'n_estimators': 10, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'entropy', 'n_estimators': 50, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'entropy', 'n_estimators': 50, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'entropy', 'n_estimators': 100, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'entropy', 'n_estimators': 100, 'n_jobs': -1, 'oob_score': False}], 'split0_test_score': array([0.793     , 0.793     , 0.86576667, 0.86576667, 0.8537    ,
+       0.8537    , 0.86053333, 0.86053333, 0.86143333, 0.86143333,
+       0.7978    , 0.7978    , 0.87283333, 0.87283333, 0.8554    ,
+       0.8554    , 0.8621    , 0.8621    , 0.86216667, 0.86216667]), 'split1_test_score': array([0.8241    , 0.8241    , 0.8845    , 0.8845    , 0.87866667,
+       0.87866667, 0.88306667, 0.88306667, 0.8833    , 0.8833    ,
+       0.81256667, 0.81256667, 0.88866667, 0.88866667, 0.87643333,
+       0.87643333, 0.8845    , 0.8845    , 0.88476667, 0.88473333]), 'mean_test_score': array([0.80855   , 0.80855   , 0.87513333, 0.87513333, 0.86618333,
+       0.86618333, 0.8718    , 0.8718    , 0.87236667, 0.87236667,
+       0.80518333, 0.80518333, 0.88075   , 0.88075   , 0.86591667,
+       0.86591667, 0.8733    , 0.8733    , 0.87346667, 0.87345   ]), 'std_test_score': array([0.01555   , 0.01555   , 0.00936667, 0.00936667, 0.01248333,
+       0.01248333, 0.01126667, 0.01126667, 0.01093333, 0.01093333,
+       0.00738333, 0.00738333, 0.00791667, 0.00791667, 0.01051667,
+       0.01051667, 0.0112    , 0.0112    , 0.0113    , 0.01128333]), 'rank_test_score': array([17, 17,  3,  3, 13, 13, 11, 11,  9,  9, 19, 19,  1,  1, 15, 15,  7,
+        7,  5,  6], dtype=int32), 'split0_train_score': array([0.9159    , 0.9159    , 0.98266667, 0.98266667, 0.98603333,
+       0.98603333, 0.99876667, 0.99876667, 0.99913333, 0.99913333,
+       0.9141    , 0.9141    , 0.98366667, 0.98366667, 0.98576667,
+       0.98576667, 0.999     , 0.999     , 0.99916667, 0.99916667]), 'split1_train_score': array([0.91353333, 0.91353333, 0.98233333, 0.98233333, 0.98583333,
+       0.98583333, 0.99863333, 0.99863333, 0.999     , 0.999     ,
+       0.9093    , 0.9093    , 0.9825    , 0.9825    , 0.98576667,
+       0.98576667, 0.99853333, 0.99853333, 0.99896667, 0.99896667]), 'mean_train_score': array([0.91471667, 0.91471667, 0.9825    , 0.9825    , 0.98593333,
+       0.98593333, 0.9987    , 0.9987    , 0.99906667, 0.99906667,
+       0.9117    , 0.9117    , 0.98308333, 0.98308333, 0.98576667,
+       0.98576667, 0.99876667, 0.99876667, 0.99906667, 0.99906667]), 'std_train_score': array([1.18333333e-03, 1.18333333e-03, 1.66666667e-04, 1.66666667e-04,
+       1.00000000e-04, 1.00000000e-04, 6.66666667e-05, 6.66666667e-05,
+       6.66666667e-05, 6.66666667e-05, 2.40000000e-03, 2.40000000e-03,
+       5.83333333e-04, 5.83333333e-04, 0.00000000e+00, 0.00000000e+00,
+       2.33333333e-04, 2.33333333e-04, 1.00000000e-04, 1.00000000e-04])}
+================================================================================
+Params:
+[{'criterion': 'gini', 'n_estimators': 2, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'gini', 'n_estimators': 2, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'gini', 'n_estimators': 5, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'gini', 'n_estimators': 5, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'gini', 'n_estimators': 10, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'gini', 'n_estimators': 10, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'gini', 'n_estimators': 50, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'gini', 'n_estimators': 50, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'gini', 'n_estimators': 100, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'gini', 'n_estimators': 100, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'entropy', 'n_estimators': 2, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'entropy', 'n_estimators': 2, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'entropy', 'n_estimators': 5, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'entropy', 'n_estimators': 5, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'entropy', 'n_estimators': 10, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'entropy', 'n_estimators': 10, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'entropy', 'n_estimators': 50, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'entropy', 'n_estimators': 50, 'n_jobs': -1, 'oob_score': False}, {'criterion': 'entropy', 'n_estimators': 100, 'n_jobs': -1, 'oob_score': True}, {'criterion': 'entropy', 'n_estimators': 100, 'n_jobs': -1, 'oob_score': False}]
+================================================================================
+Mean Test Score: [0.80855    0.80855    0.87513333 0.87513333 0.86618333 0.86618333
+ 0.8718     0.8718     0.87236667 0.87236667 0.80518333 0.80518333
+ 0.88075    0.88075    0.86591667 0.86591667 0.8733     0.8733
+ 0.87346667 0.87345   ]
+================================================================================
+Best Params: {'criterion': 'entropy', 'n_estimators': 5, 'n_jobs': -1, 'oob_score': True}
+================================================================================
+
+

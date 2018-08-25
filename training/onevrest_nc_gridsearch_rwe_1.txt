@@ -1,0 +1,832 @@
+================================================================================
+Command Line:
+	train_classifier.py gridsearch rwe /mnt/data/RWE/ -gt ovr -ot nc -gc 2 -gp {"estimator__shrink_threshold":[0, 1, 5, 10, 50]}
+================================================================================
+================================================================================
+Loading data...
+================================================================================
+================================================================================
+Feature Type: rwe
+	Window Size: 256
+	Data points: 1,024
+Number of features: 1,024
+================================================================================
+
+
+================================================================================
+Classifier Type: Grid Search (gridsearch)
+================================================================================
+Grid Search Enabled!
+Grid Search Type: OneVRest (ovr)
+Grid Search Parameters: {'estimator__shrink_threshold': [0, 1, 5, 10, 50]}
+================================================================================
+OneVRest Enabled!
+OneVRest Type: Nearest Centroid (nc)
+================================================================================
+Training Class Count:
+================================================================================
+	PUA         9000
+	Backdoor    9000
+	Trojan      9000
+	Ransom      9000
+	Worm        9000
+	Virus       9000
+================================================================================
+Testing Class Count:
+================================================================================
+	Worm        1000
+	Trojan      1000
+	Backdoor    1000
+	Virus       1000
+	PUA         1000
+	Ransom      1000
+================================================================================
+
+
+================================================================================
+Begin training...
+================================================================================
+Using TensorFlow backend.
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+multiprocessing.pool.RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/multiclass.py", line 95, in _predict_binary
+    score = np.ravel(estimator.decision_function(X))
+AttributeError: 'NearestCentroid' object has no attribute 'decision_function'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/_parallel_backends.py", line 350, in __call__
+    return self.func(*args, **kwargs)
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py", line 131, in __call__
+    return [func(*args, **kwargs) for func, args, kwargs in self.items]
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py", line 131, in <listcomp>
+    return [func(*args, **kwargs) for func, args, kwargs in self.items]
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py", line 488, in _fit_and_score
+    test_scores = _score(estimator, X_test, y_test, scorer, is_multimetric)
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py", line 523, in _score
+    return _multimetric_score(estimator, X_test, y_test, scorer)
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py", line 553, in _multimetric_score
+    score = scorer(estimator, X_test, y_test)
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/metrics/scorer.py", line 244, in _passthrough_scorer
+    return estimator.score(*args, **kwargs)
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/base.py", line 349, in score
+    return accuracy_score(y, self.predict(X), sample_weight=sample_weight)
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/multiclass.py", line 309, in predict
+    indices.extend(np.where(_predict_binary(e, X) > thresh)[0])
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/multiclass.py", line 98, in _predict_binary
+    score = estimator.predict_proba(X)[:, 1]
+AttributeError: 'NearestCentroid' object has no attribute 'predict_proba'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.6/multiprocessing/pool.py", line 119, in worker
+    result = (True, func(*args, **kwds))
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/_parallel_backends.py", line 359, in __call__
+    raise TransportableException(text, e_type)
+sklearn.externals.joblib.my_exceptions.TransportableException: TransportableException
+___________________________________________________________________________
+AttributeError                                     Fri Aug 24 21:10:32 2018
+PID: 19840                                   Python 3.6.5: /usr/bin/python3
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in __call__(self=<sklearn.externals.joblib.parallel.BatchedCalls object>)
+    126     def __init__(self, iterator_slice):
+    127         self.items = list(iterator_slice)
+    128         self._size = len(self.items)
+    129 
+    130     def __call__(self):
+--> 131         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        self.items = [(<function _fit_and_score>, (OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.51621581,
+          0.10497558,  0.47242182]]), memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), {'score': <function _passthrough_scorer>}, array([27000, 27001, 27002, ..., 53997, 53998, 53999]), array([    0,     1,     2, ..., 26997, 26998, 26999]), 0, {'estimator__shrink_threshold': 0}), {'error_score': 'raise', 'fit_params': {}, 'return_n_test_samples': True, 'return_parameters': False, 'return_times': True, 'return_train_score': 'warn'})]
+    132 
+    133     def __len__(self):
+    134         return self._size
+    135 
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in <listcomp>(.0=<list_iterator object>)
+    126     def __init__(self, iterator_slice):
+    127         self.items = list(iterator_slice)
+    128         self._size = len(self.items)
+    129 
+    130     def __call__(self):
+--> 131         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        func = <function _fit_and_score>
+        args = (OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.51621581,
+          0.10497558,  0.47242182]]), memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), {'score': <function _passthrough_scorer>}, array([27000, 27001, 27002, ..., 53997, 53998, 53999]), array([    0,     1,     2, ..., 26997, 26998, 26999]), 0, {'estimator__shrink_threshold': 0})
+        kwargs = {'error_score': 'raise', 'fit_params': {}, 'return_n_test_samples': True, 'return_parameters': False, 'return_times': True, 'return_train_score': 'warn'}
+    132 
+    133     def __len__(self):
+    134         return self._size
+    135 
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py in _fit_and_score(estimator=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.51621581,
+          0.10497558,  0.47242182]]), y=memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), scorer={'score': <function _passthrough_scorer>}, train=array([27000, 27001, 27002, ..., 53997, 53998, 53999]), test=array([    0,     1,     2, ..., 26997, 26998, 26999]), verbose=0, parameters={'estimator__shrink_threshold': 0}, fit_params={}, return_train_score='warn', return_parameters=False, return_n_test_samples=True, return_times=True, error_score='raise')
+    483                              " make sure that it has been spelled correctly.)")
+    484 
+    485     else:
+    486         fit_time = time.time() - start_time
+    487         # _score will return dict if is_multimetric is True
+--> 488         test_scores = _score(estimator, X_test, y_test, scorer, is_multimetric)
+        test_scores = {}
+        estimator = OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1)
+        X_test = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        y_test = memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)
+        scorer = {'score': <function _passthrough_scorer>}
+        is_multimetric = True
+    489         score_time = time.time() - start_time - fit_time
+    490         if return_train_score:
+    491             train_scores = _score(estimator, X_train, y_train, scorer,
+    492                                   is_multimetric)
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py in _score(estimator=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X_test=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), y_test=memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), scorer={'score': <function _passthrough_scorer>}, is_multimetric=True)
+    518 
+    519     Will return a single float if is_multimetric is False and a dict of floats,
+    520     if is_multimetric is True
+    521     """
+    522     if is_multimetric:
+--> 523         return _multimetric_score(estimator, X_test, y_test, scorer)
+        estimator = OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1)
+        X_test = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        y_test = memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)
+        scorer = {'score': <function _passthrough_scorer>}
+    524     else:
+    525         if y_test is None:
+    526             score = scorer(estimator, X_test)
+    527         else:
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py in _multimetric_score(estimator=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X_test=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), y_test=memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), scorers={'score': <function _passthrough_scorer>})
+    548 
+    549     for name, scorer in scorers.items():
+    550         if y_test is None:
+    551             score = scorer(estimator, X_test)
+    552         else:
+--> 553             score = scorer(estimator, X_test, y_test)
+        score = undefined
+        scorer = <function _passthrough_scorer>
+        estimator = OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1)
+        X_test = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        y_test = memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)
+    554 
+    555         if hasattr(score, 'item'):
+    556             try:
+    557                 # e.g. unwrap memmapped scalars
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/metrics/scorer.py in _passthrough_scorer(estimator=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), *args=(memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)), **kwargs={})
+    239     return scorer
+    240 
+    241 
+    242 def _passthrough_scorer(estimator, *args, **kwargs):
+    243     """Function that wraps estimator.score"""
+--> 244     return estimator.score(*args, **kwargs)
+        estimator.score = <bound method ClassifierMixin.score of OneVsRest...idean', shrink_threshold=0),
+          n_jobs=1)>
+        args = (memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32))
+        kwargs = {}
+    245 
+    246 
+    247 def check_scoring(estimator, scoring=None, allow_none=False):
+    248     """Determine scorer from user options.
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/base.py in score(self=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), y=memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), sample_weight=None)
+    344         score : float
+    345             Mean accuracy of self.predict(X) wrt. y.
+    346 
+    347         """
+    348         from .metrics import accuracy_score
+--> 349         return accuracy_score(y, self.predict(X), sample_weight=sample_weight)
+        accuracy_score = <function accuracy_score>
+        y = memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)
+        self.predict = <bound method OneVsRestClassifier.predict of One...idean', shrink_threshold=0),
+          n_jobs=1)>
+        X = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        sample_weight = None
+    350 
+    351 
+    352 ###############################################################################
+    353 class RegressorMixin(object):
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/multiclass.py in predict(self=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]))
+    304             return self.classes_[np.array(argmaxima.T)]
+    305         else:
+    306             indices = array.array('i')
+    307             indptr = array.array('i', [0])
+    308             for e in self.estimators_:
+--> 309                 indices.extend(np.where(_predict_binary(e, X) > thresh)[0])
+        indices.extend = <built-in method extend of array.array object>
+        e = NearestCentroid(metric='euclidean', shrink_threshold=0)
+        X = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        thresh = 0.5
+    310                 indptr.append(len(indices))
+    311             data = np.ones(len(indices), dtype=int)
+    312             indicator = sp.csc_matrix((data, indices, indptr),
+    313                                       shape=(n_samples, len(self.estimators_)))
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/multiclass.py in _predict_binary(estimator=NearestCentroid(metric='euclidean', shrink_threshold=0), X=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]))
+     93         return estimator.predict(X)
+     94     try:
+     95         score = np.ravel(estimator.decision_function(X))
+     96     except (AttributeError, NotImplementedError):
+     97         # probabilities of the positive class
+---> 98         score = estimator.predict_proba(X)[:, 1]
+        score = undefined
+        estimator.predict_proba = undefined
+        X = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+     99     return score
+    100 
+    101 
+    102 def _check_estimator(estimator):
+
+AttributeError: 'NearestCentroid' object has no attribute 'predict_proba'
+___________________________________________________________________________
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py", line 699, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/usr/lib/python3.6/multiprocessing/pool.py", line 644, in get
+    raise self._value
+sklearn.externals.joblib.my_exceptions.TransportableException: TransportableException
+___________________________________________________________________________
+AttributeError                                     Fri Aug 24 21:10:32 2018
+PID: 19840                                   Python 3.6.5: /usr/bin/python3
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in __call__(self=<sklearn.externals.joblib.parallel.BatchedCalls object>)
+    126     def __init__(self, iterator_slice):
+    127         self.items = list(iterator_slice)
+    128         self._size = len(self.items)
+    129 
+    130     def __call__(self):
+--> 131         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        self.items = [(<function _fit_and_score>, (OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.51621581,
+          0.10497558,  0.47242182]]), memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), {'score': <function _passthrough_scorer>}, array([27000, 27001, 27002, ..., 53997, 53998, 53999]), array([    0,     1,     2, ..., 26997, 26998, 26999]), 0, {'estimator__shrink_threshold': 0}), {'error_score': 'raise', 'fit_params': {}, 'return_n_test_samples': True, 'return_parameters': False, 'return_times': True, 'return_train_score': 'warn'})]
+    132 
+    133     def __len__(self):
+    134         return self._size
+    135 
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in <listcomp>(.0=<list_iterator object>)
+    126     def __init__(self, iterator_slice):
+    127         self.items = list(iterator_slice)
+    128         self._size = len(self.items)
+    129 
+    130     def __call__(self):
+--> 131         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        func = <function _fit_and_score>
+        args = (OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.51621581,
+          0.10497558,  0.47242182]]), memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), {'score': <function _passthrough_scorer>}, array([27000, 27001, 27002, ..., 53997, 53998, 53999]), array([    0,     1,     2, ..., 26997, 26998, 26999]), 0, {'estimator__shrink_threshold': 0})
+        kwargs = {'error_score': 'raise', 'fit_params': {}, 'return_n_test_samples': True, 'return_parameters': False, 'return_times': True, 'return_train_score': 'warn'}
+    132 
+    133     def __len__(self):
+    134         return self._size
+    135 
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py in _fit_and_score(estimator=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.51621581,
+          0.10497558,  0.47242182]]), y=memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), scorer={'score': <function _passthrough_scorer>}, train=array([27000, 27001, 27002, ..., 53997, 53998, 53999]), test=array([    0,     1,     2, ..., 26997, 26998, 26999]), verbose=0, parameters={'estimator__shrink_threshold': 0}, fit_params={}, return_train_score='warn', return_parameters=False, return_n_test_samples=True, return_times=True, error_score='raise')
+    483                              " make sure that it has been spelled correctly.)")
+    484 
+    485     else:
+    486         fit_time = time.time() - start_time
+    487         # _score will return dict if is_multimetric is True
+--> 488         test_scores = _score(estimator, X_test, y_test, scorer, is_multimetric)
+        test_scores = {}
+        estimator = OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1)
+        X_test = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        y_test = memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)
+        scorer = {'score': <function _passthrough_scorer>}
+        is_multimetric = True
+    489         score_time = time.time() - start_time - fit_time
+    490         if return_train_score:
+    491             train_scores = _score(estimator, X_train, y_train, scorer,
+    492                                   is_multimetric)
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py in _score(estimator=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X_test=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), y_test=memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), scorer={'score': <function _passthrough_scorer>}, is_multimetric=True)
+    518 
+    519     Will return a single float if is_multimetric is False and a dict of floats,
+    520     if is_multimetric is True
+    521     """
+    522     if is_multimetric:
+--> 523         return _multimetric_score(estimator, X_test, y_test, scorer)
+        estimator = OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1)
+        X_test = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        y_test = memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)
+        scorer = {'score': <function _passthrough_scorer>}
+    524     else:
+    525         if y_test is None:
+    526             score = scorer(estimator, X_test)
+    527         else:
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py in _multimetric_score(estimator=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X_test=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), y_test=memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), scorers={'score': <function _passthrough_scorer>})
+    548 
+    549     for name, scorer in scorers.items():
+    550         if y_test is None:
+    551             score = scorer(estimator, X_test)
+    552         else:
+--> 553             score = scorer(estimator, X_test, y_test)
+        score = undefined
+        scorer = <function _passthrough_scorer>
+        estimator = OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1)
+        X_test = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        y_test = memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)
+    554 
+    555         if hasattr(score, 'item'):
+    556             try:
+    557                 # e.g. unwrap memmapped scalars
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/metrics/scorer.py in _passthrough_scorer(estimator=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), *args=(memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)), **kwargs={})
+    239     return scorer
+    240 
+    241 
+    242 def _passthrough_scorer(estimator, *args, **kwargs):
+    243     """Function that wraps estimator.score"""
+--> 244     return estimator.score(*args, **kwargs)
+        estimator.score = <bound method ClassifierMixin.score of OneVsRest...idean', shrink_threshold=0),
+          n_jobs=1)>
+        args = (memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32))
+        kwargs = {}
+    245 
+    246 
+    247 def check_scoring(estimator, scoring=None, allow_none=False):
+    248     """Determine scorer from user options.
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/base.py in score(self=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), y=memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), sample_weight=None)
+    344         score : float
+    345             Mean accuracy of self.predict(X) wrt. y.
+    346 
+    347         """
+    348         from .metrics import accuracy_score
+--> 349         return accuracy_score(y, self.predict(X), sample_weight=sample_weight)
+        accuracy_score = <function accuracy_score>
+        y = memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)
+        self.predict = <bound method OneVsRestClassifier.predict of One...idean', shrink_threshold=0),
+          n_jobs=1)>
+        X = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        sample_weight = None
+    350 
+    351 
+    352 ###############################################################################
+    353 class RegressorMixin(object):
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/multiclass.py in predict(self=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]))
+    304             return self.classes_[np.array(argmaxima.T)]
+    305         else:
+    306             indices = array.array('i')
+    307             indptr = array.array('i', [0])
+    308             for e in self.estimators_:
+--> 309                 indices.extend(np.where(_predict_binary(e, X) > thresh)[0])
+        indices.extend = <built-in method extend of array.array object>
+        e = NearestCentroid(metric='euclidean', shrink_threshold=0)
+        X = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        thresh = 0.5
+    310                 indptr.append(len(indices))
+    311             data = np.ones(len(indices), dtype=int)
+    312             indicator = sp.csc_matrix((data, indices, indptr),
+    313                                       shape=(n_samples, len(self.estimators_)))
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/multiclass.py in _predict_binary(estimator=NearestCentroid(metric='euclidean', shrink_threshold=0), X=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]))
+     93         return estimator.predict(X)
+     94     try:
+     95         score = np.ravel(estimator.decision_function(X))
+     96     except (AttributeError, NotImplementedError):
+     97         # probabilities of the positive class
+---> 98         score = estimator.predict_proba(X)[:, 1]
+        score = undefined
+        estimator.predict_proba = undefined
+        X = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+     99     return score
+    100 
+    101 
+    102 def _check_estimator(estimator):
+
+AttributeError: 'NearestCentroid' object has no attribute 'predict_proba'
+___________________________________________________________________________
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "train_classifier.py", line 543, in <module>
+    main(args)
+  File "train_classifier.py", line 431, in main
+    classifier = ml.train(Xt, yt)
+  File "/Source/malgazer/library/ml.py", line 61, in train
+    return self.train_scikitlearn(*args, **kwargs)
+  File "/Source/malgazer/library/ml.py", line 353, in train_scikitlearn
+    self.classifier.fit(X, Y)
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_search.py", line 639, in fit
+    cv.split(X, y, groups)))
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py", line 789, in __call__
+    self.retrieve()
+  File "/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py", line 740, in retrieve
+    raise exception
+sklearn.externals.joblib.my_exceptions.JoblibAttributeError: JoblibAttributeError
+___________________________________________________________________________
+Multiprocessing exception:
+...........................................................................
+/Source/malgazer/train_classifier.py in <module>()
+    538     args = sys.argv[1:]
+    539     print(DIVIDER)
+    540     print("Command Line:")
+    541     print("\t{0}".format(' '.join(sys.argv)))
+    542     print(DIVIDER)
+--> 543     main(args)
+
+...........................................................................
+/Source/malgazer/train_classifier.py in main(arguments=['gridsearch', 'rwe', '/mnt/data/RWE/', '-gt', 'ovr', '-ot', 'nc', '-gc', '2', '-gp', '{"estimator__shrink_threshold":[0, 1, 5, 10, 50]}'])
+    426         classifier = ml.build_gridsearch(gridsearch_type=gridsearch_type, estimator=classifier,
+    427                                          param_grid=gridsearch_params,
+    428                                          cv=gridsearch_cv, n_jobs=gridsearch_njobs)
+    429         start_time = time.time()
+    430 
+--> 431         classifier = ml.train(Xt, yt)
+        classifier = GridSearchCV(cv=2, error_score='raise',
+       e...ain_score='warn',
+       scoring=None, verbose=0)
+        ml.train = <bound method ML.train of <library.ml.ML object>>
+        Xt = array([[-0.96232278, -0.65413417, -1.41705287, ....  0.51621581,
+         0.10497558,  0.47242182]])
+        yt = array([[0., 0., 1., 0., 0., 0.],
+       [0., 0.,...
+       [0., 0., 0., 0., 0., 1.]], dtype=float32)
+    432         print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
+    433         print(DIVIDER)
+    434         print("\n")
+    435 
+
+...........................................................................
+/Source/malgazer/library/ml.py in train(self=<library.ml.ML object>, *args=(array([[-0.96232278, -0.65413417, -1.41705287, ....  0.51621581,
+         0.10497558,  0.47242182]]), array([[0., 0., 1., 0., 0., 0.],
+       [0., 0.,...
+       [0., 0., 0., 0., 0., 1.]], dtype=float32)), **kwargs={})
+     56 
+     57     def train(self, *args, **kwargs):
+     58         if self.classifier_type == 'ann' or self.classifier_type == 'cnn':
+     59             return self.train_nn(*args, **kwargs)
+     60         else:
+---> 61             return self.train_scikitlearn(*args, **kwargs)
+        self.train_scikitlearn = <bound method ML.train_scikitlearn of <library.ml.ML object>>
+        args = (array([[-0.96232278, -0.65413417, -1.41705287, ....  0.51621581,
+         0.10497558,  0.47242182]]), array([[0., 0., 1., 0., 0., 0.],
+       [0., 0.,...
+       [0., 0., 0., 0., 0., 1.]], dtype=float32))
+        kwargs = {}
+     62 
+     63     def predict(self, *args, **kwargs):
+     64         """
+     65         Perform a prediction on input data.
+
+...........................................................................
+/Source/malgazer/library/ml.py in train_scikitlearn(self=<library.ml.ML object>, X=array([[-0.96232278, -0.65413417, -1.41705287, ....  0.51621581,
+         0.10497558,  0.47242182]]), y=array([[0., 0., 1., 0., 0., 0.],
+       [0., 0.,...
+       [0., 0., 0., 0., 0., 1.]], dtype=float32))
+    348                 Y = y.argmax(1)
+    349             else:
+    350                 Y = y
+    351         else:
+    352             Y = y
+--> 353         self.classifier.fit(X, Y)
+        self.classifier.fit = <bound method BaseSearchCV.fit of GridSearchCV(c...in_score='warn',
+       scoring=None, verbose=0)>
+        X = array([[-0.96232278, -0.65413417, -1.41705287, ....  0.51621581,
+         0.10497558,  0.47242182]])
+        Y = array([[0., 0., 1., 0., 0., 0.],
+       [0., 0.,...
+       [0., 0., 0., 0., 0., 1.]], dtype=float32)
+    354         return self.classifier
+    355 
+    356     def predict_scikitlearn(self, X):
+    357         """
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_search.py in fit(self=GridSearchCV(cv=2, error_score='raise',
+       e...ain_score='warn',
+       scoring=None, verbose=0), X=array([[-0.96232278, -0.65413417, -1.41705287, ....  0.51621581,
+         0.10497558,  0.47242182]]), y=array([[0., 0., 1., 0., 0., 0.],
+       [0., 0.,...
+       [0., 0., 0., 0., 0., 1.]], dtype=float32), groups=None, **fit_params={})
+    634                                   return_train_score=self.return_train_score,
+    635                                   return_n_test_samples=True,
+    636                                   return_times=True, return_parameters=False,
+    637                                   error_score=self.error_score)
+    638           for parameters, (train, test) in product(candidate_params,
+--> 639                                                    cv.split(X, y, groups)))
+        cv.split = <bound method _BaseKFold.split of KFold(n_splits=2, random_state=None, shuffle=False)>
+        X = array([[-0.96232278, -0.65413417, -1.41705287, ....  0.51621581,
+         0.10497558,  0.47242182]])
+        y = array([[0., 0., 1., 0., 0., 0.],
+       [0., 0.,...
+       [0., 0., 0., 0., 0., 1.]], dtype=float32)
+        groups = None
+    640 
+    641         # if one choose to see train score, "out" will contain train score info
+    642         if self.return_train_score:
+    643             (train_score_dicts, test_score_dicts, test_sample_counts, fit_time,
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in __call__(self=Parallel(n_jobs=-1), iterable=<generator object BaseSearchCV.fit.<locals>.<genexpr>>)
+    784             if pre_dispatch == "all" or n_jobs == 1:
+    785                 # The iterable was consumed all at once by the above for loop.
+    786                 # No need to wait for async callbacks to trigger to
+    787                 # consumption.
+    788                 self._iterating = False
+--> 789             self.retrieve()
+        self.retrieve = <bound method Parallel.retrieve of Parallel(n_jobs=-1)>
+    790             # Make sure that we get a last message telling us we are done
+    791             elapsed_time = time.time() - self._start_time
+    792             self._print('Done %3i out of %3i | elapsed: %s finished',
+    793                         (len(self._output), len(self._output),
+
+---------------------------------------------------------------------------
+Sub-process traceback:
+---------------------------------------------------------------------------
+AttributeError                                     Fri Aug 24 21:10:32 2018
+PID: 19840                                   Python 3.6.5: /usr/bin/python3
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in __call__(self=<sklearn.externals.joblib.parallel.BatchedCalls object>)
+    126     def __init__(self, iterator_slice):
+    127         self.items = list(iterator_slice)
+    128         self._size = len(self.items)
+    129 
+    130     def __call__(self):
+--> 131         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        self.items = [(<function _fit_and_score>, (OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.51621581,
+          0.10497558,  0.47242182]]), memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), {'score': <function _passthrough_scorer>}, array([27000, 27001, 27002, ..., 53997, 53998, 53999]), array([    0,     1,     2, ..., 26997, 26998, 26999]), 0, {'estimator__shrink_threshold': 0}), {'error_score': 'raise', 'fit_params': {}, 'return_n_test_samples': True, 'return_parameters': False, 'return_times': True, 'return_train_score': 'warn'})]
+    132 
+    133     def __len__(self):
+    134         return self._size
+    135 
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/externals/joblib/parallel.py in <listcomp>(.0=<list_iterator object>)
+    126     def __init__(self, iterator_slice):
+    127         self.items = list(iterator_slice)
+    128         self._size = len(self.items)
+    129 
+    130     def __call__(self):
+--> 131         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        func = <function _fit_and_score>
+        args = (OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.51621581,
+          0.10497558,  0.47242182]]), memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), {'score': <function _passthrough_scorer>}, array([27000, 27001, 27002, ..., 53997, 53998, 53999]), array([    0,     1,     2, ..., 26997, 26998, 26999]), 0, {'estimator__shrink_threshold': 0})
+        kwargs = {'error_score': 'raise', 'fit_params': {}, 'return_n_test_samples': True, 'return_parameters': False, 'return_times': True, 'return_train_score': 'warn'}
+    132 
+    133     def __len__(self):
+    134         return self._size
+    135 
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py in _fit_and_score(estimator=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.51621581,
+          0.10497558,  0.47242182]]), y=memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), scorer={'score': <function _passthrough_scorer>}, train=array([27000, 27001, 27002, ..., 53997, 53998, 53999]), test=array([    0,     1,     2, ..., 26997, 26998, 26999]), verbose=0, parameters={'estimator__shrink_threshold': 0}, fit_params={}, return_train_score='warn', return_parameters=False, return_n_test_samples=True, return_times=True, error_score='raise')
+    483                              " make sure that it has been spelled correctly.)")
+    484 
+    485     else:
+    486         fit_time = time.time() - start_time
+    487         # _score will return dict if is_multimetric is True
+--> 488         test_scores = _score(estimator, X_test, y_test, scorer, is_multimetric)
+        test_scores = {}
+        estimator = OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1)
+        X_test = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        y_test = memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)
+        scorer = {'score': <function _passthrough_scorer>}
+        is_multimetric = True
+    489         score_time = time.time() - start_time - fit_time
+    490         if return_train_score:
+    491             train_scores = _score(estimator, X_train, y_train, scorer,
+    492                                   is_multimetric)
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py in _score(estimator=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X_test=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), y_test=memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), scorer={'score': <function _passthrough_scorer>}, is_multimetric=True)
+    518 
+    519     Will return a single float if is_multimetric is False and a dict of floats,
+    520     if is_multimetric is True
+    521     """
+    522     if is_multimetric:
+--> 523         return _multimetric_score(estimator, X_test, y_test, scorer)
+        estimator = OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1)
+        X_test = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        y_test = memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)
+        scorer = {'score': <function _passthrough_scorer>}
+    524     else:
+    525         if y_test is None:
+    526             score = scorer(estimator, X_test)
+    527         else:
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/model_selection/_validation.py in _multimetric_score(estimator=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X_test=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), y_test=memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), scorers={'score': <function _passthrough_scorer>})
+    548 
+    549     for name, scorer in scorers.items():
+    550         if y_test is None:
+    551             score = scorer(estimator, X_test)
+    552         else:
+--> 553             score = scorer(estimator, X_test, y_test)
+        score = undefined
+        scorer = <function _passthrough_scorer>
+        estimator = OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1)
+        X_test = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        y_test = memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)
+    554 
+    555         if hasattr(score, 'item'):
+    556             try:
+    557                 # e.g. unwrap memmapped scalars
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/metrics/scorer.py in _passthrough_scorer(estimator=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), *args=(memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)), **kwargs={})
+    239     return scorer
+    240 
+    241 
+    242 def _passthrough_scorer(estimator, *args, **kwargs):
+    243     """Function that wraps estimator.score"""
+--> 244     return estimator.score(*args, **kwargs)
+        estimator.score = <bound method ClassifierMixin.score of OneVsRest...idean', shrink_threshold=0),
+          n_jobs=1)>
+        args = (memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32))
+        kwargs = {}
+    245 
+    246 
+    247 def check_scoring(estimator, scoring=None, allow_none=False):
+    248     """Determine scorer from user options.
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/base.py in score(self=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]), y=memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32), sample_weight=None)
+    344         score : float
+    345             Mean accuracy of self.predict(X) wrt. y.
+    346 
+    347         """
+    348         from .metrics import accuracy_score
+--> 349         return accuracy_score(y, self.predict(X), sample_weight=sample_weight)
+        accuracy_score = <function accuracy_score>
+        y = memmap([[0., 0., 1., 0., 0., 0.],
+        [0., 0...        [0., 0., 0., 0., 0., 1.]], dtype=float32)
+        self.predict = <bound method OneVsRestClassifier.predict of One...idean', shrink_threshold=0),
+          n_jobs=1)>
+        X = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        sample_weight = None
+    350 
+    351 
+    352 ###############################################################################
+    353 class RegressorMixin(object):
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/multiclass.py in predict(self=OneVsRestClassifier(estimator=NearestCentroid(me...lidean', shrink_threshold=0),
+          n_jobs=1), X=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]))
+    304             return self.classes_[np.array(argmaxima.T)]
+    305         else:
+    306             indices = array.array('i')
+    307             indptr = array.array('i', [0])
+    308             for e in self.estimators_:
+--> 309                 indices.extend(np.where(_predict_binary(e, X) > thresh)[0])
+        indices.extend = <built-in method extend of array.array object>
+        e = NearestCentroid(metric='euclidean', shrink_threshold=0)
+        X = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+        thresh = 0.5
+    310                 indptr.append(len(indices))
+    311             data = np.ones(len(indices), dtype=int)
+    312             indicator = sp.csc_matrix((data, indices, indptr),
+    313                                       shape=(n_samples, len(self.estimators_)))
+
+...........................................................................
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/multiclass.py in _predict_binary(estimator=NearestCentroid(metric='euclidean', shrink_threshold=0), X=memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]]))
+     93         return estimator.predict(X)
+     94     try:
+     95         score = np.ravel(estimator.decision_function(X))
+     96     except (AttributeError, NotImplementedError):
+     97         # probabilities of the positive class
+---> 98         score = estimator.predict_proba(X)[:, 1]
+        score = undefined
+        estimator.predict_proba = undefined
+        X = memmap([[-0.96232278, -0.65413417, -1.41705287, ... 0.32449191,
+          0.42078782,  0.54763595]])
+     99     return score
+    100 
+    101 
+    102 def _check_estimator(estimator):
+
+AttributeError: 'NearestCentroid' object has no attribute 'predict_proba'
+___________________________________________________________________________
