@@ -7,6 +7,10 @@ A Python malware analysis library.  Mostly for machine learning purposes.
 More info coming soon, along with my dissertation, which will go much deeper into what this is.
 For now, this page is all of the documentation for this project.
 
+## Training Logs
+
+You can find logs from different training session in the [training folder](training). 
+
 # Bugs and Issues
 
 Please file any bugs or issues using the GitHub issues facility above.
