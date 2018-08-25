@@ -123,8 +123,8 @@ def main(arguments=None):
     parser.add_argument('DataDirectory',
                         help='The directory containing the feature files.')
     parser.add_argument("-t", "--test",
-                        help="The percentage of samples used for testing (not valid for gridsearch or cross validation)."
-                             "", type=float, default=0.1)
+                        help="The percentage of samples used for testing (set to zero to use the whole data set)."
+                             "", type=float, default=0)
     parser.add_argument("-c", "--crossval",
                         help="The number of groups for cross validation.  Set to zero to disable cross validation.  "
                              "Cross validation will use all the samples if enabled.  "
