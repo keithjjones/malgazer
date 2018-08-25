@@ -363,12 +363,17 @@ class ML(object):
         return self.classifier.predict(X)
 
     @staticmethod
-    def build_ann_static(X, y):
+    def build_ann_static(X, y, layers=[(".5", 'uniform', 'relu'), (100, 'uniform', 'relu')]):
         """
         Create a generic ANN.
 
         :param X:  The input to the ANN, used to find input shape.
         :param y:  The output to the ANN, used to find the output shape.
+        :param layers:  A list of layer descriptions, where each item is a tuple:
+            (value, kernel_initializer, activation)
+        ... where if the value is an int, the value will be used for the number of units for that layer, or
+        if the value is a float or string it will be multiplied to the number of input data points.  kernel_initializer
+        and activation are passed to the Dense object as such.
         :return:  The classifier.
         """
         datapoints = X.shape[1]
@@ -376,12 +381,18 @@ class ML(object):
         classifier = Sequential()
         classifier.add(Dense(units=datapoints, kernel_initializer='uniform',
                              activation='relu', input_dim=datapoints))
-        classifier.add(Dense(units=int(datapoints / 2),
-                             kernel_initializer='uniform',
-                             activation='relu'))
-        classifier.add(Dense(units=100,
-                             kernel_initializer='uniform',
-                             activation='relu'))
+
+        for layer in layers:
+            value, kernel_initializer, activation = layer
+            if isinstance(value, int):
+                units = value
+            else:
+                units = int(float(value) * datapoints)
+
+            classifier.add(Dense(units=units,
+                                 kernel_initializer=kernel_initializer,
+                                 activation=activation))
+
         classifier.add(Dense(units=output_shape,
                              kernel_initializer='uniform',
                              activation='softmax'))
@@ -390,16 +401,21 @@ class ML(object):
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_ann(self, X, y):
+    def build_ann(self, X, y, layers=[(".5", 'uniform', 'relu'), (100, 'uniform', 'relu')]):
         """
         Create a generic ANN.
 
         :param X:  The input to the ANN, used to find input shape.
         :param y:  The output to the ANN, used to find the output shape.
+        :param layers:  A list of layer descriptions, where each item is a tuple:
+            (value, kernel_initializer, activation)
+        ... where if the value is an int, the value will be used for the number of units for that layer, or
+        if the value is a float or string it will be multiplied to the number of input data points.  kernel_initializer
+        and activation are passed to the Dense object as such.
         :return:  The classifier.
         """
         self.classifier_type = 'ann'
-        self.classifier = ML.build_ann_static(X, y)
+        self.classifier = ML.build_ann_static(X, y, layers=layers)
         self.classifier.summary()
         return self.classifier
 
