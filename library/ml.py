@@ -653,13 +653,14 @@ class ML(object):
                                                             stratify=y)
         return X_train, X_test, y_train, y_test
 
-    def cross_fold_validation(self, X, y, cv=10, batch_size=None, epochs=None):
+    def cross_fold_validation(self, X, y, cv=10, n_jobs=10, batch_size=None, epochs=None):
         """
         Calculates the cross fold validation mean and variance of models.
 
         :param X:  The X training data.
         :param y:  The y training data.
         :param cv:  The number of cfv groups.
+        :param n_jobs:  The number of jobs to run at once.
         :param batch_size:  The batch size for Keras classifiers.
         :param epochs:  The number of epochs for Keras classifiers.
         :return:  A tuple of mean, variance, classifiers (dict).
@@ -672,7 +673,7 @@ class ML(object):
         saved_futures = {}
         classifiers = {}
         print("Start Cross Fold Validation...")
-        with ProcessPoolExecutor(max_workers=cv) as executor:
+        with ProcessPoolExecutor(max_workers=n_jobs) as executor:
             for train, test in cvkfold.split(X, Y):
                 X_train = X[train]
                 X_test = X[test]

@@ -129,6 +129,9 @@ def main(arguments=None):
                         help="The number of groups for cross validation.  Set to zero to disable cross validation.  "
                              "Cross validation will use all the samples if enabled.  "
                              "Not available for gridsearch.", type=int, default=0)
+    parser.add_argument("-cj", "--crossvaljobs",
+                        help="The number jobs for cross validation."
+                             "", type=int, default=10)
     parser.add_argument("-n", "--numclasses",
                         help="The number of classes in the training data."
                              "", type=int, default=6)
@@ -180,6 +183,7 @@ def main(arguments=None):
     classifier_type = args.ClassifierType.lower()
     cross_fold_validation = args.crossval > 0
     cfv_groups = args.crossval
+    cfv_jobs = args.crossvaljobs
     generate_roc_curves = args.roccurves
     test_percent = args.test
     windowsize = args.rwewindowsize
@@ -316,7 +320,7 @@ def main(arguments=None):
             mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
                                                                    batch_size=batch_size,
                                                                    epochs=epochs,
-                                                                   cv=cfv_groups)
+                                                                   cv=cfv_groups, n_jobs=cfv_jobs)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print(DIVIDER)
             print("CFV Mean: {0}".format(mean))
@@ -364,7 +368,7 @@ def main(arguments=None):
             mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
                                                                    batch_size=batch_size,
                                                                    epochs=epochs,
-                                                                   cv=cfv_groups)
+                                                                   cv=cfv_groups, n_jobs=cfv_jobs)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print(DIVIDER)
             print("CFV Mean: {0}".format(mean))
@@ -457,7 +461,7 @@ def main(arguments=None):
         else:
             # Cross Fold Validation
             mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
-                                                                   cv=cfv_groups)
+                                                                   cv=cfv_groups, n_jobs=cfv_jobs)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print(DIVIDER)
             print("CFV Mean: {0}".format(mean))
