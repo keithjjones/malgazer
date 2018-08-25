@@ -525,7 +525,7 @@ def main(arguments=None):
         os.stat(path)
     except:
         os.makedirs(path)
-    if classifier_type.lower() != 'gridsearch':
+    if classifier_type.lower() != 'gridsearch' and cfv_groups < 1:
         print(DIVIDER)
         print("Saving the classifier...")
         ml.save_classifier(path)
