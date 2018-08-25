@@ -692,13 +692,18 @@ class ML(object):
                                      X_test, y_test,
                                      batch_size=batch_size, epochs=epochs)
                 saved_futures[future] = fold
+                if len(saved_futures) >= n_jobs:
+                    for future in as_completed(saved_futures):
+                        print("\tFinished calculating fold: {0}".format(saved_futures[future]))
+                        result_dict = future.result()
+                        classifiers[saved_futures[future]] = result_dict
+                    saved_futures = {}
             else:
                 result_dict = self._cfv_runner(X_train, y_train, X_test, y_test, batch_size=batch_size, epochs=epochs)
                 print("\tFinished calculating fold: {0}".format(fold))
                 classifiers[fold] = result_dict
 
         if executor:
-            classifiers = {}
             for future in as_completed(saved_futures):
                 print("\tFinished calculating fold: {0}".format(saved_futures[future]))
                 result_dict = future.result()
