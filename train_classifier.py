@@ -151,15 +151,6 @@ def main(arguments=None):
     parser.add_argument("-nne", "--nnepochs",
                         help="The epochs used for training neural networks."
                              "", type=int, default=10)
-    parser.add_argument("-ncs", "--ncshrink",
-                        help="The nc shrink threshold."
-                             "", type=float, default=0.2)
-    parser.add_argument("-rfn", "--rfnumestimators",
-                        help="The number of estimators for rf."
-                             "", type=int, default=20)
-    parser.add_argument("-rfj", "--rfjobs",
-                        help="The number of jobs for rf.  -1 uses all available CPU cores."
-                             "", type=int, default=-1)
     parser.add_argument("-gt", "--gridsearchtype",
                         help="The type of the base estimator for gridsearch."
                              "", type=str, default='dt')
@@ -176,18 +167,6 @@ def main(arguments=None):
     parser.add_argument("-at", "--adaboosttype",
                         help="The type of the base estimator for adaboost."
                              "", type=str, default='dt')
-    parser.add_argument("-aa", "--adaboostalgorithm",
-                        help="The algorithm of adaboost."
-                             "", type=str, default='SAMME')
-    parser.add_argument("-an", "--adaboostnumestimators",
-                        help="The number of estimators for adaboost."
-                             "", type=int, default=20)
-    parser.add_argument("-kn", "--knnneighbors",
-                        help="The number of neighbors for knn."
-                             "", type=int, default=1)
-    parser.add_argument("-kj", "--knnjobs",
-                        help="The number of jobs for knn.  -1 uses all available CPU cores."
-                             "", type=int, default=-1)
     parser.add_argument("-ot", "--ovrtype",
                         help="The type of the base estimator for ovr."
                              "", type=str, default='dt')
@@ -213,18 +192,10 @@ def main(arguments=None):
     gridsearch_njobs = args.gridsearchjobs
     gridsearch_cv = args.gridsearchcv
     adaboost_type = args.adaboosttype
-    adaboost_algorithm = args.adaboostalgorithm
-    adaboost_n_estimators = args.adaboostnumestimators
     adaboost_base_estimator = get_estimator_static(adaboost_type)
-    knn_weights = 'distance'
-    knn_neighbors = args.knnneighbors
-    knn_n_jobs = args.knnjobs
     ovr_type = args.ovrtype.lower()
     ovr_base_estimator = get_estimator_static(ovr_type)
-    nc_shrink_threshold = args.ncshrink
     extra_estimator_params = json.loads(args.estimatorparams)
-    rf_numestimators = args.rfnumestimators
-    rf_n_jobs = args.rfjobs
 
     # if cross_fold_validation or classifier_type == 'gridsearch':
     #         test_percent = 0
@@ -449,24 +420,12 @@ def main(arguments=None):
         print(DIVIDER)
     else:
         # This area is for scikit learn models
-        if classifier_type.lower() == 'svm':
-            estimator_params = {'kernel': 'rbf'}
-        elif classifier_type.lower() == 'dt':
-            estimator_params = {'criterion': 'entropy'}
-        elif classifier_type.lower() == 'nb':
-            pass
-        elif classifier_type.lower() == 'rf':
-            estimator_params = {'n_estimators': rf_numestimators, 'criterion': 'entropy', 'n_jobs': rf_n_jobs}
-        elif classifier_type.lower() == 'knn':
-            estimator_params = {'n_neighbors': knn_neighbors, 'weights': knn_weights,
-                                'n_jobs': knn_n_jobs}
-        elif classifier_type.lower() == 'nc':
-            estimator_params = {'shrink_threshold': nc_shrink_threshold}
-        elif classifier_type.lower() == 'adaboost':
-            estimator_params = {'n_estimators': adaboost_n_estimators, 'base_estimator': adaboost_base_estimator,
-                                'algorithm': adaboost_algorithm, 'adaboost_type': adaboost_type}
+        if classifier_type.lower() == 'adaboost':
+            estimator_params = {'base_estimator': adaboost_base_estimator, 'adaboost_type': adaboost_type}
         elif classifier_type.lower() == 'ovr':
-            estimator_params = {'ovr_type': ovr_type, 'estimator': ovr_base_estimator}
+            estimator_params = {'estimator': ovr_base_estimator, 'ovr_type': ovr_type}
+        else:
+            estimator_params = {}
         estimator_params.update(extra_estimator_params)
         print(DIVIDER)
         print("Model hyperparameters: {0}".format(estimator_params))
