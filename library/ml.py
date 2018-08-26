@@ -745,7 +745,11 @@ class ML(object):
             classifier.fit(X_train_in, label_binarize(y_train, classes=range(self.n_classes)), batch_size=batch_size, epochs=epochs, **kwargs)
         else:
             classifier = self.classifier
-            classifier.fit(X_train, y_train, **kwargs)
+            if self.classifier_type in ['svm', 'nb', 'nc', 'adaboost']:
+                Y = y_train.argmax(1)
+            else:
+                Y = y_train
+            classifier.fit(X_train, Y, **kwargs)
         # probas = classifier_type.predict_proba(X_test)
         if self.classifier_type == 'cnn':
             X_test_in = np.expand_dims(X_test, axis=2)
