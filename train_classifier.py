@@ -425,7 +425,8 @@ def main(arguments=None):
     else:
         # This area is for scikit learn models
         if classifier_type.lower() == 'adaboost':
-            estimator_params = {'base_estimator': adaboost_base_estimator, 'adaboost_type': adaboost_type}
+            base_estimator = get_estimator_static(adaboost_type.lower())
+            estimator_params = {'base_estimator': base_estimator, 'adaboost_type': adaboost_type}
         elif classifier_type.lower() == 'ovr':
             estimator_params = {'estimator': ovr_base_estimator, 'ovr_type': ovr_type}
         else:
