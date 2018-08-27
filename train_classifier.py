@@ -425,11 +425,14 @@ def main(arguments=None):
         # This area is for scikit learn models
         if classifier_type.lower() == 'adaboost':
             base_estimator_params = {}
+            keystodel = []
             for key in extra_estimator_params:
                 if "base_estimator__" in key:
                     newkey = key.split('__')[1]
                     base_estimator_params[newkey] = extra_estimator_params[key]
-                    del extra_estimator_params[key]
+                    keystodel.append(key)
+            for delkey in keystodel:
+                del extra_estimator_params[delkey]
             base_estimator = get_estimator_static(adaboost_type.lower(), base_estimator_params)
             estimator_params = {'base_estimator': base_estimator, 'adaboost_type': adaboost_type}
         elif classifier_type.lower() == 'ovr':
