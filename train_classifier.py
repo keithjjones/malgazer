@@ -196,7 +196,6 @@ def main(arguments=None):
     gridsearch_njobs = args.gridsearchjobs
     gridsearch_cv = args.gridsearchcv
     adaboost_type = args.adaboosttype
-    adaboost_base_estimator = get_estimator_static(adaboost_type)
     ovr_type = args.ovrtype.lower()
     ovr_base_estimator = get_estimator_static(ovr_type)
     extra_estimator_params = json.loads(args.estimatorparams)
@@ -425,7 +424,13 @@ def main(arguments=None):
     else:
         # This area is for scikit learn models
         if classifier_type.lower() == 'adaboost':
-            base_estimator = get_estimator_static(adaboost_type.lower())
+            base_estimator_params = {}
+            for key in extra_estimator_params:
+                if "base_estimator__" in key:
+                    newkey = key.split('__')[1]
+                    base_estimator_params[newkey] = extra_estimator_params[key]
+                    del extra_estimator_params[key]
+            base_estimator = get_estimator_static(adaboost_type.lower(), base_estimator_params)
             estimator_params = {'base_estimator': base_estimator, 'adaboost_type': adaboost_type}
         elif classifier_type.lower() == 'ovr':
             estimator_params = {'estimator': ovr_base_estimator, 'ovr_type': ovr_type}
