@@ -433,7 +433,7 @@ def main(arguments=None):
                     keystodel.append(key)
             for delkey in keystodel:
                 del extra_estimator_params[delkey]
-            base_estimator = get_estimator_static(adaboost_type.lower(), base_estimator_params)
+            base_estimator = get_estimator_static(adaboost_type.lower(), **base_estimator_params)
             estimator_params = {'base_estimator': base_estimator, 'adaboost_type': adaboost_type}
         elif classifier_type.lower() == 'ovr':
             estimator_params = {'estimator': ovr_base_estimator, 'ovr_type': ovr_type}
