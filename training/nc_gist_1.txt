@@ -1,7 +1,7 @@
 Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py gridsearch gist /mnt/data/GIST/ -t 0.80 -gt svm -gc 2 -gp {"kernel":["rbf","poly","linear","sigmoid"], "C":[0.1, 1, 10, 100, 1000, 10000, 100000]}
+	train_classifier.py nc gist /mnt/data/GIST/ -c 10 -e {"shrink_threshold":1}
 ================================================================================
 ================================================================================
 Loading data...
@@ -17,32 +17,61 @@ Number of features: 320
 
 
 ================================================================================
-Classifier Type: Grid Search (gridsearch)
+Classifier Type: Nearest Centroid (nc)
 ================================================================================
-Grid Search Enabled!
-Grid Search Type: Support Vector Machine (svm)
-Grid Search Parameters: {'kernel': ['rbf', 'poly', 'linear', 'sigmoid'], 'C': [0.1, 1, 10, 100, 1000, 10000, 100000]}
+Cross Fold Validation - 10 Fold(s) - Enabled!
 ================================================================================
 Training Class Count:
 ================================================================================
-	Backdoor    2000
-	Virus       2000
-	PUA         2000
-	Trojan      2000
-	Worm        2000
-	Ransom      2000
+	Backdoor    10000
+	Trojan      10000
+	Virus       10000
+	PUA         10000
+	Ransom      10000
+	Worm        10000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	Virus       8000
-	Backdoor    8000
-	Worm        8000
-	Ransom      8000
-	PUA         8000
-	Trojan      8000
+	Backdoor    10000
+	Trojan      10000
+	Virus       10000
+	PUA         10000
+	Ransom      10000
+	Worm        10000
 ================================================================================
 
 
 ================================================================================
 Begin training...
 ================================================================================
+================================================================================
+Model hyperparameters: {'shrink_threshold': 1}
+================================================================================
+Start Cross Fold Validation...
+	Calculating fold: 1
+	Calculating fold: 2
+	Calculating fold: 3
+	Calculating fold: 4
+	Calculating fold: 5
+	Calculating fold: 6
+	Calculating fold: 7
+	Calculating fold: 8
+	Calculating fold: 9
+	Calculating fold: 10
+	Finished calculating fold: 1
+	Finished calculating fold: 2
+	Finished calculating fold: 3
+	Finished calculating fold: 4
+	Finished calculating fold: 5
+	Finished calculating fold: 6
+	Finished calculating fold: 7
+	Finished calculating fold: 8
+	Finished calculating fold: 9
+	Finished calculating fold: 10
+Training time 2.226392 seconds
+================================================================================
+CFV Mean: 0.47945000000000004
+CFV Var: 0.00815068163475369
+================================================================================
+
+

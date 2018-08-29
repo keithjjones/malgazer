@@ -1,7 +1,7 @@
 Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py gridsearch gist /mnt/data/GIST/ -t 0.80 -gt svm -gc 2 -gp {"kernel":["rbf","poly","linear","sigmoid"], "C":[0.1, 1, 10, 100, 1000, 10000, 100000]}
+	train_classifier.py gridsearch gist /mnt/data/GIST/ -t 0.90 -gt ovr -ot svm -gc 2 -gp {"estimator__kernel":["rbf","poly","linear","sigmoid"], "estimator__C":[0.1, 1, 10, 100, 1000, 10000, 100000]}
 ================================================================================
 ================================================================================
 Loading data...
@@ -20,26 +20,29 @@ Number of features: 320
 Classifier Type: Grid Search (gridsearch)
 ================================================================================
 Grid Search Enabled!
-Grid Search Type: Support Vector Machine (svm)
-Grid Search Parameters: {'kernel': ['rbf', 'poly', 'linear', 'sigmoid'], 'C': [0.1, 1, 10, 100, 1000, 10000, 100000]}
+Grid Search Type: OneVRest (ovr)
+Grid Search Parameters: {'estimator__kernel': ['rbf', 'poly', 'linear', 'sigmoid'], 'estimator__C': [0.1, 1, 10, 100, 1000, 10000, 100000]}
+================================================================================
+OneVRest Enabled!
+OneVRest Type: Support Vector Machine (svm)
 ================================================================================
 Training Class Count:
 ================================================================================
-	Backdoor    2000
-	Virus       2000
-	PUA         2000
-	Trojan      2000
-	Worm        2000
-	Ransom      2000
+	Worm        1000
+	Backdoor    1000
+	PUA         1000
+	Virus       1000
+	Ransom      1000
+	Trojan      1000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	Virus       8000
-	Backdoor    8000
-	Worm        8000
-	Ransom      8000
-	PUA         8000
-	Trojan      8000
+	Virus       9000
+	PUA         9000
+	Trojan      9000
+	Backdoor    9000
+	Ransom      9000
+	Worm        9000
 ================================================================================
 
 

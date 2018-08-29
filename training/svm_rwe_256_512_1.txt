@@ -1,14 +1,16 @@
 Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py gridsearch gist /mnt/data/GIST/ -t 0.80 -gt svm -gc 2 -gp {"kernel":["rbf","poly","linear","sigmoid"], "C":[0.1, 1, 10, 100, 1000, 10000, 100000]}
+	train_classifier.py svm rwe /mnt/data/RWE/ -rwew 256 -rwed 512 -c 10 -cj 10 -e {"C":100, "kernel": "rbf"}
 ================================================================================
 ================================================================================
 Loading data...
 ================================================================================
 ================================================================================
-Feature Type: gist
-Number of features: 320
+Feature Type: rwe
+	Window Size: 256
+	Data points: 512
+Number of features: 512
 ================================================================================
 /home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
@@ -17,32 +19,61 @@ Number of features: 320
 
 
 ================================================================================
-Classifier Type: Grid Search (gridsearch)
+Classifier Type: Support Vector Machine (svm)
 ================================================================================
-Grid Search Enabled!
-Grid Search Type: Support Vector Machine (svm)
-Grid Search Parameters: {'kernel': ['rbf', 'poly', 'linear', 'sigmoid'], 'C': [0.1, 1, 10, 100, 1000, 10000, 100000]}
+Cross Fold Validation - 10 Fold(s) - Enabled!
 ================================================================================
 Training Class Count:
 ================================================================================
-	Backdoor    2000
-	Virus       2000
-	PUA         2000
-	Trojan      2000
-	Worm        2000
-	Ransom      2000
+	Trojan      10000
+	PUA         10000
+	Worm        10000
+	Backdoor    10000
+	Ransom      10000
+	Virus       10000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	Virus       8000
-	Backdoor    8000
-	Worm        8000
-	Ransom      8000
-	PUA         8000
-	Trojan      8000
+	Trojan      10000
+	PUA         10000
+	Worm        10000
+	Backdoor    10000
+	Ransom      10000
+	Virus       10000
 ================================================================================
 
 
 ================================================================================
 Begin training...
 ================================================================================
+================================================================================
+Model hyperparameters: {'C': 100, 'kernel': 'rbf'}
+================================================================================
+Start Cross Fold Validation...
+	Calculating fold: 1
+	Calculating fold: 2
+	Calculating fold: 3
+	Calculating fold: 4
+	Calculating fold: 5
+	Calculating fold: 6
+	Calculating fold: 7
+	Calculating fold: 8
+	Calculating fold: 9
+	Calculating fold: 10
+	Finished calculating fold: 5
+	Finished calculating fold: 8
+	Finished calculating fold: 3
+	Finished calculating fold: 2
+	Finished calculating fold: 1
+	Finished calculating fold: 4
+	Finished calculating fold: 10
+	Finished calculating fold: 6
+	Finished calculating fold: 7
+	Finished calculating fold: 9
+Training time 2655.569819 seconds
+================================================================================
+CFV Mean: 0.9301833333333333
+CFV Var: 0.006072913450542324
+================================================================================
+
+
