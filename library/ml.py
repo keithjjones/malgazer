@@ -859,7 +859,7 @@ class ML(object):
         try:
             plt.show()
         except Exception as exc:
-            print("UNHANDLED EXCEPTION - Trying to show Matplotlib plot")
+            print("UNHANDLED EXCEPTION - Trying to show Matplotlib plot: {0}".format(exc))
             raise
 
         # Save the figure...
