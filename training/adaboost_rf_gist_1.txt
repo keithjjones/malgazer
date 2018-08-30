@@ -1,16 +1,14 @@
 Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py adaboost rwe /mnt/data/RWE/ -rwew 1024 -rwed 1024 -at rf -c 10 -cj 1 -e {"base_estimator__criterion": "gini", "base_estimator__n_estimators": 100, "learning_rate": 5, "n_estimators": 50}
+	train_classifier.py adaboost gist /mnt/data/GIST/ -at rf -c 10 -cj 1 -e {"base_estimator__criterion": "gini", "base_estimator__n_estimators": 100, "learning_rate": 5, "n_estimators": 50}
 ================================================================================
 ================================================================================
 Loading data...
 ================================================================================
 ================================================================================
-Feature Type: rwe
-	Window Size: 1,024
-	Data points: 1,024
-Number of features: 1,024
+Feature Type: gist
+Number of features: 320
 ================================================================================
 /home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
@@ -28,21 +26,21 @@ AdaBoost Type: Random Forest (rf)
 ================================================================================
 Training Class Count:
 ================================================================================
-	PUA         10000
-	Ransom      10000
 	Worm        10000
-	Backdoor    10000
-	Virus       10000
 	Trojan      10000
+	PUA         10000
+	Backdoor    10000
+	Ransom      10000
+	Virus       10000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	PUA         10000
-	Ransom      10000
 	Worm        10000
-	Backdoor    10000
-	Virus       10000
 	Trojan      10000
+	PUA         10000
+	Backdoor    10000
+	Ransom      10000
+	Virus       10000
 ================================================================================
 
 
@@ -79,10 +77,10 @@ Start Cross Fold Validation...
 	Finished calculating fold: 9
 	Calculating fold: 10
 	Finished calculating fold: 10
-Training time 35537.897036 seconds
+Training time 11743.366792 seconds
 ================================================================================
-CFV Mean: 0.8176
-CFV Var: 0.16658783468989163
+CFV Mean: 0.61595
+CFV Var: 0.11710071757062618
 ================================================================================
 
 
