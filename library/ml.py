@@ -787,13 +787,14 @@ class ML(object):
         else:
             raise AttributeError("Must use CFV before there are classifiers to set.")
 
-    def plot_roc_curves(self, y_test, y_pred, fold=None):
+    def plot_roc_curves(self, y_test, y_pred, fold=None, filename=None):
         """
         Plot ROC curves for the data and classifier.
 
         :param y_test:  The y testing data.
         :param y_pred:  The y predicted data.
         :param fold:  An optional fold number to add to the title.
+        :param filename:  A PNG filename to save this to.  Set to None to not save to a file.
         :return: Nothing.  This plots the curve.
         """
         if isinstance(y_test, list):
@@ -854,4 +855,13 @@ class ML(object):
         else:
             plt.title('Receiver operating characteristic')
         plt.legend(loc="lower right")
-        plt.show()
+
+        try:
+            plt.show()
+        except Exception as exc:
+            print("UNHANDLED EXCEPTION - Trying to show Matplotlib plot")
+            raise
+
+        # Save the figure...
+        if filename:
+            plt.savefig(filename)

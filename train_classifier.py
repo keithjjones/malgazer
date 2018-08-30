@@ -312,7 +312,7 @@ def main(arguments=None):
             print(DIVIDER)
 
             if generate_roc_curves:
-                ml.plot_roc_curves(y_test, y_pred, n_categories)
+                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="cnn.png")
         else:
             # Cross Fold Validation
             start_time = time.time()
@@ -331,7 +331,7 @@ def main(arguments=None):
                     ml.set_classifier_by_fold(fold+1)
                     y_test = ml.classifiers[fold+1]['y_test']
                     y_pred = ml.classifiers[fold+1]['y_pred']
-                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1)
+                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1, filename="cnn-fold-{0}.png".format(fold+1))
 
     elif classifier_type.lower() == 'ann':
         if cross_fold_validation is False:
@@ -360,7 +360,7 @@ def main(arguments=None):
             print(DIVIDER)
 
             if generate_roc_curves:
-                ml.plot_roc_curves(y_test, y_pred, n_categories)
+                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="ann.png")
         else:
             # Cross Fold Validation
             start_time = time.time()
@@ -379,7 +379,7 @@ def main(arguments=None):
                     ml.set_classifier_by_fold(fold+1)
                     y_test = ml.classifiers[fold+1]['y_test']
                     y_pred = ml.classifiers[fold+1]['y_pred']
-                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1)
+                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1, filename="ann-fold-{0}.png".format(fold+1))
     elif classifier_type.lower() == 'gridsearch':
         Xt = X_train
         yt = y_train
@@ -423,6 +423,7 @@ def main(arguments=None):
         print(DIVIDER)
     else:
         # This area is for scikit learn models
+        classifier_short = ""
         if classifier_type.lower() == 'adaboost':
             base_estimator_params = {}
             keystodel = []
@@ -435,10 +436,14 @@ def main(arguments=None):
                 del extra_estimator_params[delkey]
             base_estimator = get_estimator_static(adaboost_type.lower(), **base_estimator_params)
             estimator_params = {'base_estimator': base_estimator, 'adaboost_type': adaboost_type}
+            classifier_short = "{0}-{1}".format(classifier_type.lower(), adaboost_type.lower())
         elif classifier_type.lower() == 'ovr':
             estimator_params = {'estimator': ovr_base_estimator, 'ovr_type': ovr_type}
+            classifier_short = "{0}-{1}".format(classifier_type.lower(), ovr_type.lower())
         else:
             estimator_params = {}
+            classifier_short = "{0}".format(classifier_type.lower())
+
         estimator_params.update(extra_estimator_params)
         print(DIVIDER)
         print("Model hyperparameters: {0}".format(estimator_params))
@@ -466,7 +471,7 @@ def main(arguments=None):
             print(DIVIDER)
 
             if generate_roc_curves:
-                ml.plot_roc_curves(y_test, y_pred, n_categories)
+                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="{0}.png".format(classifier_short))
         else:
             # Cross Fold Validation
             mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
@@ -482,7 +487,8 @@ def main(arguments=None):
                     ml.set_classifier_by_fold(fold+1)
                     y_test = ml.classifiers[fold+1]['y_test']
                     y_pred = ml.classifiers[fold+1]['y_pred']
-                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1)
+                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1,
+                                       filename="{0}-fold-{1}.png".format(classifier_short, fold+1))
 
     # Save the classifier
     print("\n")
