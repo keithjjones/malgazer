@@ -104,6 +104,28 @@ def get_estimator(classifier_type, ml, *args, **kwargs):
         return None
 
 
+def create_base_estimator_params(extra_estimator_params, search_phrase="estimator__"):
+    """
+    A function to create the extra and base estimator parameters for the classifiers that
+    require a base estimator.
+
+    :param extra_estimator_params:  The total params
+    :param search_phrase:  The search phrase with the base estimator params
+    :return: extra_params, base_estimator_params
+    """
+    keystodel = []
+    base_estimator_params = {}
+    extra_params = extra_estimator_params
+    for key in extra_estimator_params:
+        if search_phrase in key:
+            newkey = key.split('__')[1]
+            base_estimator_params[newkey] = extra_estimator_params[key]
+            keystodel.append(key)
+    for delkey in keystodel:
+        del extra_params[delkey]
+    return extra_params, base_estimator_params
+
+
 def main(arguments=None):
     # Argument parsing
     parser = argparse.ArgumentParser(
@@ -425,20 +447,16 @@ def main(arguments=None):
         # This area is for scikit learn models
         classifier_short = ""
         if classifier_type.lower() == 'adaboost':
-            base_estimator_params = {}
-            keystodel = []
-            for key in extra_estimator_params:
-                if "base_estimator__" in key:
-                    newkey = key.split('__')[1]
-                    base_estimator_params[newkey] = extra_estimator_params[key]
-                    keystodel.append(key)
-            for delkey in keystodel:
-                del extra_estimator_params[delkey]
+            extra_estimator_params, base_estimator_params = create_base_estimator_params(extra_estimator_params,
+                                                                                         "base_estimator__")
             base_estimator = get_estimator_static(adaboost_type.lower(), **base_estimator_params)
             estimator_params = {'base_estimator': base_estimator, 'adaboost_type': adaboost_type}
             classifier_short = "{0}-{1}".format(classifier_type.lower(), adaboost_type.lower())
         elif classifier_type.lower() == 'ovr':
-            estimator_params = {'estimator': ovr_base_estimator, 'ovr_type': ovr_type}
+            extra_estimator_params, base_estimator_params = create_base_estimator_params(extra_estimator_params,
+                                                                                         "estimator__")
+            base_estimator = get_estimator_static(ovr_type.lower(), **base_estimator_params)
+            estimator_params = {'estimator': base_estimator, 'ovr_type': ovr_type}
             classifier_short = "{0}-{1}".format(classifier_type.lower(), ovr_type.lower())
         else:
             estimator_params = {}
