@@ -1,10 +1,11 @@
 # Machine Learning Module
 import pandas as pd
 import numpy as np
-from keras.wrappers.scikit_learn import KerasClassifier
-from keras.models import model_from_json
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten, MaxPooling1D, Conv1D, InputLayer
+# from keras.wrappers.scikit_learn import KerasClassifier
+# from keras.models import model_from_json
+# from keras.models import Sequential
+# from keras.layers import Dense, Dropout, Flatten, MaxPooling1D, Conv1D, InputLayer
+# import keras.callbacks
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
@@ -25,7 +26,6 @@ from sklearn.model_selection import StratifiedKFold
 from scipy import interp
 import matplotlib.pyplot as plt
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
-import keras.callbacks
 import os
 import dill
 from .entropy import resample
@@ -128,6 +128,7 @@ class ML(object):
         :param filename:  Base file name of the classifier (without extensions)
         :return:  The classifier
         """
+        from keras.models import model_from_json
         with open(os.path.join(directory, "ml.dill"), 'rb') as file:
             myself = dill.load(file)
         if myself.classifier_type in ['ann', 'cnn']:
@@ -377,6 +378,8 @@ class ML(object):
         and activation are passed to the Dense object as such.
         :return:  The classifier.
         """
+        from keras.models import Sequential
+        from keras.layers import Dense, Dropout, Flatten, MaxPooling1D, Conv1D, InputLayer
         datapoints = X.shape[1]
         output_shape = y.shape[1]
         classifier = Sequential()
@@ -440,6 +443,8 @@ class ML(object):
         code below.
         :return:  The classifier.
         """
+        from keras.models import Sequential
+        from keras.layers import Dense, Dropout, Flatten, MaxPooling1D, Conv1D, InputLayer
         datapoints = X.shape[1:]
         input_dim = datapoints[0]
         output_shape = y.shape[1]
@@ -510,6 +515,7 @@ class ML(object):
         data in the local directory under ./Graph
         :return: The classifier after training.
         """
+        import keras.callbacks
         if len(X_train.shape) != 3 and self.classifier_type == 'cnn':
             X_in = np.expand_dims(X_train, axis=2)
         else:
@@ -728,6 +734,7 @@ class ML(object):
         :param epochs:  The number of epochs for Keras classifiers.
         :return:  A dictionary with the results.
         """
+        from keras.wrappers.scikit_learn import KerasClassifier
         if self.classifier_type in ['ann', 'cnn']:
             if self.classifier_type == 'cnn':
                 X_train_in = np.expand_dims(X_train, axis=2)
@@ -778,6 +785,7 @@ class ML(object):
         :param fold:  The classifier fold number.
         :return: Nothing.
         """
+        from keras.models import model_from_json
         if self.classifiers:
             if self.classifiers[fold]['type'] == 'keras':
                 self.classifier = model_from_json(self.classifiers[fold]['classifier']['json'])
