@@ -25,7 +25,7 @@ from sklearn.preprocessing import label_binarize
 from sklearn.model_selection import StratifiedKFold
 from scipy import interp
 import matplotlib.pyplot as plt
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed, wait, FIRST_COMPLETED
 import os
 import dill
 from .entropy import resample
@@ -699,11 +699,15 @@ class ML(object):
                                      batch_size=batch_size, epochs=epochs)
                 saved_futures[future] = fold
                 if len(saved_futures) >= n_jobs:
-                    for future in as_completed(saved_futures):
+                    keystodel = []
+                    futures = wait(saved_futures, FIRST_COMPLETED)
+                    for future in futures.done:
                         print("\tFinished calculating fold: {0}".format(saved_futures[future]))
                         result_dict = future.result()
                         classifiers[saved_futures[future]] = result_dict
-                    saved_futures = {}
+                        keystodel.append(future)
+                    for key in keystodel:
+                        del saved_futures[key]
             else:
                 result_dict = self._cfv_runner(X_train, y_train, X_test, y_test, batch_size=batch_size, epochs=epochs)
                 print("\tFinished calculating fold: {0}".format(fold))
