@@ -1,16 +1,14 @@
 Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py adaboost rwe /mnt/data/RWE/ -rwew 256 -rwed 4096 -at dt -c 10 -cj 1 -e {"algorithm": "SAMME", "base_estimator__criterion": "entropy", "base_estimator__splitter": "random", "learning_rate": 1, "n_estimators": 50}
+	train_classifier.py ovr gist /mnt/data/GIST/ -ot svm -c 10 -cj 10 -e {"estimator__C": 100, "estimator__kernel": "rbf"}
 ================================================================================
 ================================================================================
 Loading data...
 ================================================================================
 ================================================================================
-Feature Type: rwe
-	Window Size: 256
-	Data points: 4,096
-Number of features: 4,096
+Feature Type: gist
+Number of features: 320
 ================================================================================
 /home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
@@ -19,30 +17,30 @@ Number of features: 4,096
 
 
 ================================================================================
-Classifier Type: AdaBoost (adaboost)
+Classifier Type: OneVRest (ovr)
 ================================================================================
 Cross Fold Validation - 10 Fold(s) - Enabled!
 ================================================================================
-AdaBoost Enabled!
-AdaBoost Type: Decision Tree (dt)
+OneVRest Enabled!
+OneVRest Type: Support Vector Machine (svm)
 ================================================================================
 Training Class Count:
 ================================================================================
-	Trojan      10000
-	Virus       10000
 	Ransom      10000
-	Worm        10000
-	Backdoor    10000
 	PUA         10000
+	Virus       10000
+	Backdoor    10000
+	Worm        10000
+	Trojan      10000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	Trojan      10000
-	Virus       10000
 	Ransom      10000
-	Worm        10000
-	Backdoor    10000
 	PUA         10000
+	Virus       10000
+	Backdoor    10000
+	Worm        10000
+	Trojan      10000
 ================================================================================
 
 
@@ -50,14 +48,19 @@ Testing Class Count:
 Begin training...
 ================================================================================
 ================================================================================
-Model hyperparameters: {'learning_rate': 1, 'algorithm': 'SAMME', 'base_estimator': DecisionTreeClassifier(class_weight=None, criterion='entropy', max_depth=None,
-            max_features=None, max_leaf_nodes=None,
-            min_impurity_decrease=0.0, min_impurity_split=None,
-            min_samples_leaf=1, min_samples_split=2,
-            min_weight_fraction_leaf=0.0, presort=False, random_state=None,
-            splitter='random'), 'n_estimators': 50, 'adaboost_type': 'dt'}
+Model hyperparameters: {'ovr_type': 'svm', 'estimator': SVC(C=100, cache_size=200, class_weight=None, coef0=0.0,
+  decision_function_shape='ovr', degree=3, gamma='auto', kernel='rbf',
+  max_iter=-1, probability=False, random_state=None, shrinking=True,
+  tol=0.001, verbose=False)}
 ================================================================================
 Start Cross Fold Validation...
 	Calculating fold: 1
-	Finished calculating fold: 1
 	Calculating fold: 2
+	Calculating fold: 3
+	Calculating fold: 4
+	Calculating fold: 5
+	Calculating fold: 6
+	Calculating fold: 7
+	Calculating fold: 8
+	Calculating fold: 9
+	Calculating fold: 10
