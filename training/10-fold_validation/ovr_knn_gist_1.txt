@@ -1,7 +1,7 @@
 Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py ovr gist /mnt/data/GIST/ -ot knn -c 10 -cj 10 -e {"estimator__n_neighbors": 1, "estimator__weights": "uniform"}
+	train_classifier.py ovr gist /mnt/data/GIST/ -ot knn -c 10 -cj 5 -e {"estimator__n_neighbors": 1, "estimator__weights": "uniform"}
 ================================================================================
 ================================================================================
 Loading data...
@@ -26,21 +26,21 @@ OneVRest Type: k-Nearest Neighbors (knn)
 ================================================================================
 Training Class Count:
 ================================================================================
-	Virus       10000
-	Worm        10000
-	Ransom      10000
 	PUA         10000
-	Trojan      10000
 	Backdoor    10000
+	Worm        10000
+	Virus       10000
+	Trojan      10000
+	Ransom      10000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	Virus       10000
-	Worm        10000
-	Ransom      10000
 	PUA         10000
-	Trojan      10000
 	Backdoor    10000
+	Worm        10000
+	Virus       10000
+	Trojan      10000
+	Ransom      10000
 ================================================================================
 
 
@@ -58,22 +58,25 @@ Start Cross Fold Validation...
 	Calculating fold: 3
 	Calculating fold: 4
 	Calculating fold: 5
+	Finished calculating fold: 1
 	Calculating fold: 6
+	Finished calculating fold: 2
 	Calculating fold: 7
+	Finished calculating fold: 5
 	Calculating fold: 8
+	Finished calculating fold: 3
 	Calculating fold: 9
+	Finished calculating fold: 4
 	Calculating fold: 10
-Traceback (most recent call last):
-  File "train_classifier.py", line 539, in <module>
-    main(args)
-  File "train_classifier.py", line 496, in main
-    cv=cfv_groups, n_jobs=cfv_jobs)
-  File "/Source/malgazer/library/ml.py", line 703, in cross_fold_validation
-    futures = wait(saved_futures, FIRST_COMPLETED)
-  File "/usr/lib/python3.5/concurrent/futures/_base.py", line 274, in wait
-    waiter.event.wait(timeout)
-  File "/usr/lib/python3.5/threading.py", line 549, in wait
-    signaled = self._cond.wait(timeout)
-  File "/usr/lib/python3.5/threading.py", line 296, in wait
-    if timeout > 0:
-TypeError: unorderable types: str() > int()
+	Finished calculating fold: 6
+	Finished calculating fold: 7
+	Finished calculating fold: 9
+	Finished calculating fold: 8
+	Finished calculating fold: 10
+Training time 257.636898 seconds
+================================================================================
+CFV Mean: 0.9424333333333333
+CFV Var: 0.0073387101500649605
+================================================================================
+
+
