@@ -1,16 +1,14 @@
 Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py adaboost rwe /mnt/data/RWE/ -rwew 256 -rwed 1024 -at dt -c 10 -cj 10 -e {"algorithm": "SAMME", "base_estimator__criterion": "entropy", "base_estimator__splitter": "random", "learning_rate": 1, "n_estimators": 50}
+	train_classifier.py ovr gist /mnt/data/GIST/ -ot knn -c 10 -cj 10 -e {"estimator__n_neighbors": 1, "estimator__weights": "uniform"}
 ================================================================================
 ================================================================================
 Loading data...
 ================================================================================
 ================================================================================
-Feature Type: rwe
-	Window Size: 256
-	Data points: 1,024
-Number of features: 1,024
+Feature Type: gist
+Number of features: 320
 ================================================================================
 /home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
@@ -19,30 +17,30 @@ Number of features: 1,024
 
 
 ================================================================================
-Classifier Type: AdaBoost (adaboost)
+Classifier Type: OneVRest (ovr)
 ================================================================================
 Cross Fold Validation - 10 Fold(s) - Enabled!
 ================================================================================
-AdaBoost Enabled!
-AdaBoost Type: Decision Tree (dt)
+OneVRest Enabled!
+OneVRest Type: k-Nearest Neighbors (knn)
 ================================================================================
 Training Class Count:
 ================================================================================
-	PUA         10000
-	Worm        10000
 	Virus       10000
-	Backdoor    10000
-	Trojan      10000
+	Worm        10000
 	Ransom      10000
+	PUA         10000
+	Trojan      10000
+	Backdoor    10000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	PUA         10000
-	Worm        10000
 	Virus       10000
-	Backdoor    10000
-	Trojan      10000
+	Worm        10000
 	Ransom      10000
+	PUA         10000
+	Trojan      10000
+	Backdoor    10000
 ================================================================================
 
 
@@ -50,12 +48,9 @@ Testing Class Count:
 Begin training...
 ================================================================================
 ================================================================================
-Model hyperparameters: {'base_estimator': DecisionTreeClassifier(class_weight=None, criterion='entropy', max_depth=None,
-            max_features=None, max_leaf_nodes=None,
-            min_impurity_decrease=0.0, min_impurity_split=None,
-            min_samples_leaf=1, min_samples_split=2,
-            min_weight_fraction_leaf=0.0, presort=False, random_state=None,
-            splitter='random'), 'learning_rate': 1, 'n_estimators': 50, 'algorithm': 'SAMME', 'adaboost_type': 'dt'}
+Model hyperparameters: {'ovr_type': 'knn', 'estimator': KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=1, p=2,
+           weights='uniform')}
 ================================================================================
 Start Cross Fold Validation...
 	Calculating fold: 1
@@ -68,20 +63,17 @@ Start Cross Fold Validation...
 	Calculating fold: 8
 	Calculating fold: 9
 	Calculating fold: 10
-	Finished calculating fold: 3
-	Finished calculating fold: 2
-	Finished calculating fold: 5
-	Finished calculating fold: 4
-	Finished calculating fold: 6
-	Finished calculating fold: 1
-	Finished calculating fold: 7
-	Finished calculating fold: 8
-	Finished calculating fold: 9
-	Finished calculating fold: 10
-Training time 1767.318551 seconds
-================================================================================
-CFV Mean: 0.9476166666666668
-CFV Var: 0.0050089087301194305
-================================================================================
-
-
+Traceback (most recent call last):
+  File "train_classifier.py", line 539, in <module>
+    main(args)
+  File "train_classifier.py", line 496, in main
+    cv=cfv_groups, n_jobs=cfv_jobs)
+  File "/Source/malgazer/library/ml.py", line 703, in cross_fold_validation
+    futures = wait(saved_futures, FIRST_COMPLETED)
+  File "/usr/lib/python3.5/concurrent/futures/_base.py", line 274, in wait
+    waiter.event.wait(timeout)
+  File "/usr/lib/python3.5/threading.py", line 549, in wait
+    signaled = self._cond.wait(timeout)
+  File "/usr/lib/python3.5/threading.py", line 296, in wait
+    if timeout > 0:
+TypeError: unorderable types: str() > int()
