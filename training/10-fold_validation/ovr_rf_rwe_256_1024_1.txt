@@ -1,7 +1,7 @@
 Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py adaboost rwe /mnt/data/RWE/ -rwew 256 -rwed 4096 -at rf -c 10 -cj 1 -e {"base_estimator__criterion": "gini", "base_estimator__n_estimators": 100, "learning_rate": 2, "n_estimators": 2}
+	train_classifier.py ovr rwe /mnt/data/RWE/ -rwew 256 -rwed 1024 -ot rf -c 10 -cj 5 -e {"estimator__criterion": "entropy", "estimator__n_estimators": 100, "estimator__n_jobs": -1, "estimator__oob_score": true}
 ================================================================================
 ================================================================================
 Loading data...
@@ -9,8 +9,8 @@ Loading data...
 ================================================================================
 Feature Type: rwe
 	Window Size: 256
-	Data points: 4,096
-Number of features: 4,096
+	Data points: 1,024
+Number of features: 1,024
 ================================================================================
 /home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
@@ -19,30 +19,30 @@ Number of features: 4,096
 
 
 ================================================================================
-Classifier Type: AdaBoost (adaboost)
+Classifier Type: OneVRest (ovr)
 ================================================================================
 Cross Fold Validation - 10 Fold(s) - Enabled!
 ================================================================================
-AdaBoost Enabled!
-AdaBoost Type: Random Forest (rf)
+OneVRest Enabled!
+OneVRest Type: Random Forest (rf)
 ================================================================================
 Training Class Count:
 ================================================================================
-	Worm        10000
 	Ransom      10000
-	Backdoor    10000
 	Trojan      10000
+	Worm        10000
 	PUA         10000
 	Virus       10000
+	Backdoor    10000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	Worm        10000
 	Ransom      10000
-	Backdoor    10000
 	Trojan      10000
+	Worm        10000
 	PUA         10000
 	Virus       10000
+	Backdoor    10000
 ================================================================================
 
 
@@ -50,39 +50,16 @@ Testing Class Count:
 Begin training...
 ================================================================================
 ================================================================================
-Model hyperparameters: {'learning_rate': 2, 'n_estimators': 2, 'base_estimator': RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+Model hyperparameters: {'ovr_type': 'rf', 'estimator': RandomForestClassifier(bootstrap=True, class_weight=None, criterion='entropy',
             max_depth=None, max_features='auto', max_leaf_nodes=None,
             min_impurity_decrease=0.0, min_impurity_split=None,
             min_samples_leaf=1, min_samples_split=2,
-            min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=1,
-            oob_score=False, random_state=None, verbose=0,
-            warm_start=False), 'adaboost_type': 'rf'}
+            min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=-1,
+            oob_score=True, random_state=None, verbose=0, warm_start=False)}
 ================================================================================
 Start Cross Fold Validation...
 	Calculating fold: 1
-	Finished calculating fold: 1
 	Calculating fold: 2
-	Finished calculating fold: 2
 	Calculating fold: 3
-	Finished calculating fold: 3
 	Calculating fold: 4
-	Finished calculating fold: 4
 	Calculating fold: 5
-	Finished calculating fold: 5
-	Calculating fold: 6
-	Finished calculating fold: 6
-	Calculating fold: 7
-	Finished calculating fold: 7
-	Calculating fold: 8
-	Finished calculating fold: 8
-	Calculating fold: 9
-	Finished calculating fold: 9
-	Calculating fold: 10
-	Finished calculating fold: 10
-Training time 5678.224548 seconds
-================================================================================
-CFV Mean: 0.9476166666666666
-CFV Var: 0.004437247645406648
-================================================================================
-
-

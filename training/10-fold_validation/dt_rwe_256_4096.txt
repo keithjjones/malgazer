@@ -1,7 +1,7 @@
 Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py dt rwe /mnt/data/RWE/ -rwew 256 -rwed 4096 -c 10 -cj 1 -e {"criterion": "entropy", "splitter": "random"}
+	train_classifier.py dt rwe /mnt/data/RWE/ -rwew 256 -rwed 4096 -c 10 -cj 1 -e {"criterion": "entropy", "splitter": "best"}
 ================================================================================
 ================================================================================
 Loading data...
@@ -12,9 +12,9 @@ Feature Type: rwe
 	Data points: 4,096
 Number of features: 4,096
 ================================================================================
-/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
-/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
 
 
@@ -25,21 +25,21 @@ Cross Fold Validation - 10 Fold(s) - Enabled!
 ================================================================================
 Training Class Count:
 ================================================================================
-	Backdoor    10000
 	Virus       10000
-	Worm        10000
-	Trojan      10000
-	PUA         10000
 	Ransom      10000
+	PUA         10000
+	Worm        10000
+	Backdoor    10000
+	Trojan      10000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	Backdoor    10000
 	Virus       10000
-	Worm        10000
-	Trojan      10000
-	PUA         10000
 	Ransom      10000
+	PUA         10000
+	Worm        10000
+	Backdoor    10000
+	Trojan      10000
 ================================================================================
 
 
@@ -47,7 +47,7 @@ Testing Class Count:
 Begin training...
 ================================================================================
 ================================================================================
-Model hyperparameters: {'criterion': 'entropy', 'splitter': 'random'}
+Model hyperparameters: {'criterion': 'entropy', 'splitter': 'best'}
 ================================================================================
 Start Cross Fold Validation...
 	Calculating fold: 1
@@ -70,10 +70,10 @@ Start Cross Fold Validation...
 	Finished calculating fold: 9
 	Calculating fold: 10
 	Finished calculating fold: 10
-Training time 393.492491 seconds
+Training time 32444.092915 seconds
 ================================================================================
-CFV Mean: 0.92275
-CFV Var: 0.006659683843013044
+CFV Mean: 0.9233666666666667
+CFV Var: 0.007209869778451085
 ================================================================================
 
 

@@ -1,0 +1,91 @@
+Using TensorFlow backend.
+================================================================================
+Command Line:
+	train_classifier.py gridsearch rwe /mnt/data/RWE/ -gt ovr -ot svm -gc 2 -gp {"estimator__kernel":["rbf"], "estimator__C":[0.1, 1, 10, 100, 1000, 10000, 100000]}
+================================================================================
+================================================================================
+Loading data...
+================================================================================
+================================================================================
+Feature Type: rwe
+	Window Size: 256
+	Data points: 1,024
+Number of features: 1,024
+================================================================================
+/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+
+
+================================================================================
+Classifier Type: Grid Search (gridsearch)
+================================================================================
+Grid Search Enabled!
+Grid Search Type: OneVRest (ovr)
+Grid Search Parameters: {'estimator__C': [0.1, 1, 10, 100, 1000, 10000, 100000], 'estimator__kernel': ['rbf']}
+================================================================================
+OneVRest Enabled!
+OneVRest Type: Support Vector Machine (svm)
+================================================================================
+Training Class Count:
+================================================================================
+	PUA         10000
+	Ransom      10000
+	Trojan      10000
+	Virus       10000
+	Backdoor    10000
+	Worm        10000
+================================================================================
+Testing Class Count:
+================================================================================
+	PUA         10000
+	Ransom      10000
+	Trojan      10000
+	Virus       10000
+	Backdoor    10000
+	Worm        10000
+================================================================================
+
+
+================================================================================
+Begin training...
+================================================================================
+Training time 25644.948799 seconds
+================================================================================
+
+
+================================================================================
+Best Score: 0.8930333333333333
+================================================================================
+CV Results:
+{'mean_fit_time': array([3331.32362068, 3409.24621534, 5814.68063116, 6297.4586854 ,
+       5640.67753053, 5373.97681665, 4700.55373001]), 'mean_train_score': array([0.68858333, 0.85496667, 0.96691667, 0.99201667, 0.99788333,
+       0.99818333, 0.99838333]), 'param_estimator__kernel': masked_array(data=['rbf', 'rbf', 'rbf', 'rbf', 'rbf', 'rbf', 'rbf'],
+             mask=[False, False, False, False, False, False, False],
+       fill_value='?',
+            dtype=object), 'split1_train_score': array([0.68153333, 0.85086667, 0.96516667, 0.99226667, 0.9978    ,
+       0.99803333, 0.99826667]), 'split0_train_score': array([0.69563333, 0.85906667, 0.96866667, 0.99176667, 0.99796667,
+       0.99833333, 0.9985    ]), 'rank_test_score': array([7, 6, 3, 1, 2, 4, 5], dtype=int32), 'std_score_time': array([59.07876813, 79.53980219, 22.22791374, 48.72408736, 17.31479132,
+       24.02625668, 40.09989393]), 'params': [{'estimator__kernel': 'rbf', 'estimator__C': 0.1}, {'estimator__kernel': 'rbf', 'estimator__C': 1}, {'estimator__kernel': 'rbf', 'estimator__C': 10}, {'estimator__kernel': 'rbf', 'estimator__C': 100}, {'estimator__kernel': 'rbf', 'estimator__C': 1000}, {'estimator__kernel': 'rbf', 'estimator__C': 10000}, {'estimator__kernel': 'rbf', 'estimator__C': 100000}], 'param_estimator__C': masked_array(data=[0.1, 1, 10, 100, 1000, 10000, 100000],
+             mask=[False, False, False, False, False, False, False],
+       fill_value='?',
+            dtype=object), 'mean_score_time': array([2870.64638174, 2122.74339974, 1823.80958736, 1578.00024521,
+       1572.96879423, 1558.10950148, 1389.76297915]), 'split1_test_score': array([0.69403333, 0.83676667, 0.8934    , 0.8978    , 0.89373333,
+       0.8915    , 0.87116667]), 'std_test_score': array([0.01711667, 0.00868333, 0.00628333, 0.00476667, 0.00595   ,
+       0.00736667, 0.00486667]), 'std_train_score': array([7.05000000e-03, 4.10000000e-03, 1.75000000e-03, 2.50000000e-04,
+       8.33333333e-05, 1.50000000e-04, 1.16666667e-04]), 'split0_test_score': array([0.6598    , 0.8194    , 0.88083333, 0.88826667, 0.88183333,
+       0.87676667, 0.86143333]), 'std_fit_time': array([ 81.38019264, 132.09792209, 225.7599957 , 394.81466794,
+       415.48615766, 308.54659271, 298.66537619]), 'mean_test_score': array([0.67691667, 0.82808333, 0.88711667, 0.89303333, 0.88778333,
+       0.88413333, 0.8663    ])}
+================================================================================
+Params:
+[{'estimator__kernel': 'rbf', 'estimator__C': 0.1}, {'estimator__kernel': 'rbf', 'estimator__C': 1}, {'estimator__kernel': 'rbf', 'estimator__C': 10}, {'estimator__kernel': 'rbf', 'estimator__C': 100}, {'estimator__kernel': 'rbf', 'estimator__C': 1000}, {'estimator__kernel': 'rbf', 'estimator__C': 10000}, {'estimator__kernel': 'rbf', 'estimator__C': 100000}]
+================================================================================
+Mean Test Score: [0.67691667 0.82808333 0.88711667 0.89303333 0.88778333 0.88413333
+ 0.8663    ]
+================================================================================
+Best Params: {'estimator__kernel': 'rbf', 'estimator__C': 100}
+================================================================================
+
+

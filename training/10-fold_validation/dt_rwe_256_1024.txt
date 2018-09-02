@@ -1,7 +1,7 @@
 Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py dt rwe /mnt/data/RWE/ -rwew 256 -rwed 1024 -c 10 -cj 10 -e {"criterion": "entropy", "splitter": "random"}
+	train_classifier.py dt rwe /mnt/data/RWE/ -rwew 256 -rwed 1024 -c 10 -cj 5 -e {"criterion": "entropy", "splitter": "best"}
 ================================================================================
 ================================================================================
 Loading data...
@@ -12,9 +12,9 @@ Feature Type: rwe
 	Data points: 1,024
 Number of features: 1,024
 ================================================================================
-/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
-/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
 
 
@@ -25,20 +25,20 @@ Cross Fold Validation - 10 Fold(s) - Enabled!
 ================================================================================
 Training Class Count:
 ================================================================================
-	Worm        10000
 	Virus       10000
-	Backdoor    10000
-	Trojan      10000
 	PUA         10000
+	Trojan      10000
+	Backdoor    10000
+	Worm        10000
 	Ransom      10000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	Worm        10000
 	Virus       10000
-	Backdoor    10000
-	Trojan      10000
 	PUA         10000
+	Trojan      10000
+	Backdoor    10000
+	Worm        10000
 	Ransom      10000
 ================================================================================
 
@@ -47,7 +47,7 @@ Testing Class Count:
 Begin training...
 ================================================================================
 ================================================================================
-Model hyperparameters: {'criterion': 'entropy', 'splitter': 'random'}
+Model hyperparameters: {'criterion': 'entropy', 'splitter': 'best'}
 ================================================================================
 Start Cross Fold Validation...
 	Calculating fold: 1
@@ -55,25 +55,25 @@ Start Cross Fold Validation...
 	Calculating fold: 3
 	Calculating fold: 4
 	Calculating fold: 5
+	Finished calculating fold: 5
+	Finished calculating fold: 4
+	Finished calculating fold: 2
+	Finished calculating fold: 1
+	Finished calculating fold: 3
 	Calculating fold: 6
 	Calculating fold: 7
 	Calculating fold: 8
 	Calculating fold: 9
 	Calculating fold: 10
-	Finished calculating fold: 1
-	Finished calculating fold: 2
-	Finished calculating fold: 3
-	Finished calculating fold: 4
-	Finished calculating fold: 6
-	Finished calculating fold: 5
 	Finished calculating fold: 7
+	Finished calculating fold: 6
+	Finished calculating fold: 9
 	Finished calculating fold: 8
 	Finished calculating fold: 10
-	Finished calculating fold: 9
-Training time 26.175585 seconds
+Training time 3588.688908 seconds
 ================================================================================
-CFV Mean: 0.9199833333333333
-CFV Var: 0.00533512990573904
+CFV Mean: 0.9225166666666667
+CFV Var: 0.005935977875071075
 ================================================================================
 
 
