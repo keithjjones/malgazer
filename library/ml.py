@@ -700,7 +700,7 @@ class ML(object):
                 saved_futures[future] = fold
                 if len(saved_futures) >= n_jobs:
                     keystodel = []
-                    futures = wait(saved_futures, FIRST_COMPLETED)
+                    futures = wait(saved_futures, return_when=FIRST_COMPLETED)
                     for future in futures.done:
                         print("\tFinished calculating fold: {0}".format(saved_futures[future]))
                         result_dict = future.result()
