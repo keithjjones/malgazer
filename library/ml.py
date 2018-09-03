@@ -64,7 +64,7 @@ class ML(object):
         self.X_sc = None
         # y label encoder
         self.y_labelencoder = None
-        self.y_labelonehotencoder = None
+        # self.y_labelonehotencoder = None
         self.rwe_windowsize = rwe_windowsize
         self.datapoints = datapoints
         self.nnlayers = nnlayers
