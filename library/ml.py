@@ -6,10 +6,10 @@ import numpy as np
 # from keras.models import Sequential
 # from keras.layers import Dense, Dropout, Flatten, MaxPooling1D, Conv1D, InputLayer
 # import keras.callbacks
+# from keras.utils import to_categorical
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-from keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
@@ -31,6 +31,13 @@ import dill
 from .entropy import resample
 from sklearn import tree
 from fractions import Fraction
+from collections import namedtuple
+
+
+Keras_Dense_Parameters = namedtuple('Keras_Dense_Parameters', ['value', 'kernel_initializer', 'activation'])
+Keras_Dropout_Parameters = namedtuple('Keras_Dropout_Parameters', 'rate')
+Keras_Flatten_Parameters = namedtuple('Keras_Flatten_Parameters', [])
+Keras_Conv1D_Parameters = namedtuple('Keras_Conv1D_Parameters', ['filters', 'kernel_size', 'activation', 'pool_size'])
 
 
 class ML(object):
@@ -365,21 +372,23 @@ class ML(object):
         return self.classifier.predict(X)
 
     @staticmethod
-    def build_ann_static(X, y, layers=[("1/2", 'uniform', 'relu'), (100, 'uniform', 'relu')]):
+    def build_ann_static(X, y, layers=[
+        Keras_Dense_Parameters(value="1/2", kernel_initializer='uniform', activation='relu'),
+        Keras_Dense_Parameters(value=100, kernel_initializer='uniform', activation='relu')
+    ]):
         """
         Create a generic ANN.
 
         :param X:  The input to the ANN, used to find input shape.
         :param y:  The output to the ANN, used to find the output shape.
-        :param layers:  A list of layer descriptions, where each item is a tuple:
-            (value, kernel_initializer, activation)
-        ... where if the value is an int, the value will be used for the number of units for that layer, or
+        :param layers:  A list of layer descriptions, where each item is a named tuple defined at the top of this
+        file... where if the value is an int, the value will be used for the number of units for that layer, or
         if the value is a float or string it will be multiplied to the number of input data points.  kernel_initializer
         and activation are passed to the Dense object as such.
         :return:  The classifier.
         """
         from keras.models import Sequential
-        from keras.layers import Dense, Dropout, Flatten, MaxPooling1D, Conv1D, InputLayer
+        from keras.layers import Dense, Dropout
         datapoints = X.shape[1]
         output_shape = y.shape[1]
         classifier = Sequential()
@@ -387,15 +396,20 @@ class ML(object):
                              activation='relu', input_dim=datapoints))
 
         for layer in layers:
-            value, kernel_initializer, activation = layer
-            if isinstance(value, int):
-                units = value
+            if isinstance(layer, Keras_Dense_Parameters):
+                value, kernel_initializer, activation = layer.value, layer.kernel_initializer, layer.activation
+                if isinstance(value, int):
+                    units = value
+                else:
+                    units = int(Fraction(value) * datapoints)
+                classifier.add(Dense(units=units,
+                                     kernel_initializer=kernel_initializer,
+                                     activation=activation))
+            elif isinstance(layer, Keras_Dropout_Parameters):
+                rate = layer.rate
+                classifier.add(Dropout(rate))
             else:
-                units = int(Fraction(value) * datapoints)
-
-            classifier.add(Dense(units=units,
-                                 kernel_initializer=kernel_initializer,
-                                 activation=activation))
+                raise ValueError('Invalid layer type!')
 
         classifier.add(Dense(units=output_shape,
                              kernel_initializer='uniform',
@@ -424,20 +438,22 @@ class ML(object):
         return self.classifier
 
     @staticmethod
-    def build_cnn_static(X, y, layers=[(10, "1/4", "relu", 10), (10, "1/30", "relu", 2),
-                                       (10, 2, 'relu', 2), None,
-                                       ("1/4", 'uniform', 'relu'), ("1/8", 'uniform', 'relu'),
-                                       ("1/16", 'uniform', 'relu')]):
+    def build_cnn_static(X, y, layers=[
+        Keras_Conv1D_Parameters(filters=10, kernel_size="1/4", activation="relu", pool_size=10),
+        Keras_Conv1D_Parameters(filters=10, kernel_size="1/30", activation="relu", pool_size=2),
+        Keras_Conv1D_Parameters(filters=10, kernel_size=2, activation='relu', pool_size=2),
+        Keras_Flatten_Parameters(),
+        Keras_Dense_Parameters(value="1/4", kernel_initializer='uniform', activation='relu'),
+        Keras_Dense_Parameters(value="1/8", kernel_initializer='uniform', activation='relu'),
+        Keras_Dense_Parameters(value="1/16", kernel_initializer='uniform', activation='relu')
+    ]):
         """
         Create a generic CNN.
 
         :param X:  The input to the CNN, used to find input shape.
         :param y:  The output to the CNN, used to find the output shape.
-        :param layers:  A list of layer descriptions for the CNN, where each item is a tuple of format:
-            (value, kernel_initializer, activation)
-            (filters, kernel_size, activation, pool_size)
-            None
-        ... where if the value, filters, kernel_size, pool_size is an int, the corresponding value will be used, or
+        :param layers:  A list of layer descriptions for the CNN, where each item is a namedtuple from the top of
+        this file... where if the value, filters, kernel_size, pool_size is an int, the corresponding value will be used, or
         if they are a a float or string they will be multiplied to the number of input data points.  kernel_initializer
         and activation are passed to the Dense and/or CNN object as such.  It makes more sense if you look at the short
         code below.
@@ -454,10 +470,11 @@ class ML(object):
         print("input_dim: {0} datapoints {1}".format(input_dim, datapoints))
 
         for layer in layers:
-            if layer is None:
+            if isinstance(layer, Keras_Flatten_Parameters):
                 classifier.add(Flatten())
-            elif len(layer) == 4:
-                filters, kernel_size, activation, pool_size = layer
+            elif isinstance(layer, Keras_Conv1D_Parameters):
+                filters, kernel_size, activation, pool_size = layer.filters, layer.kernel_size, \
+                                                              layer.activation, layer.pool_size
                 if not isinstance(filters, int):
                     filters = int(Fraction(filters) * input_dim)
                 if not isinstance(kernel_size, int):
@@ -467,8 +484,8 @@ class ML(object):
 
                 classifier.add(Conv1D(filters=filters, kernel_size=kernel_size, activation='relu'))
                 classifier.add(MaxPooling1D(pool_size=pool_size))
-            elif len(layer) == 3:
-                value, kernel_initializer, activation = layer
+            elif isinstance(layer, Keras_Dense_Parameters):
+                value, kernel_initializer, activation = layer.value, layer.kernel_initializer, layer.activation
                 if isinstance(value, int):
                     units = value
                 else:
@@ -477,6 +494,11 @@ class ML(object):
                 classifier.add(Dense(units=units,
                                      kernel_initializer=kernel_initializer,
                                      activation=activation))
+            elif isinstance(layer, Keras_Dropout_Parameters):
+                rate = layer.rate
+                classifier.add(Dropout(rate))
+            else:
+                raise ValueError('Invalid layer type!')
 
         classifier.add(Dense(units=output_shape, activation='softmax'))
         classifier.compile(optimizer='adam', loss='categorical_crossentropy',
@@ -620,6 +642,7 @@ class ML(object):
         :return:  A tuple of the encoded data y and the encoder (for inverting)
         as y,encoder.
         """
+        from keras.utils import to_categorical
         if self.y_labelencoder is None:
             self.y_labelencoder = LabelEncoder()
             y[:, 0] = self.y_labelencoder.fit_transform(y[:, 0])

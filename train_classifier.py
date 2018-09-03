@@ -7,7 +7,6 @@ import numpy as np
 import json
 from library.utils import Utils
 from library.ml import ML
-from keras.wrappers.scikit_learn import KerasClassifier
 
 
 pd.set_option('max_colwidth', 64)
@@ -59,10 +58,12 @@ def get_estimator_static(classifier_type, *args, **kwargs):
     elif classifier_type.lower() == 'ovr':
         return ML.build_ovr_static(*args, **kwargs)
     elif classifier_type.lower() == 'ann':
+        from keras.wrappers.scikit_learn import KerasClassifier
         def create_model():
             return ML.build_ann_static(*args, **kwargs)
         return KerasClassifier(build_fn=create_model)
     elif classifier_type.lower() == 'cnn':
+        from keras.wrappers.scikit_learn import KerasClassifier
         def create_model():
             return ML.build_cnn_static(*args, **kwargs)
         return KerasClassifier(build_fn=create_model)
