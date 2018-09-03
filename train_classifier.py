@@ -267,8 +267,8 @@ def main(arguments=None):
     # Check for bad values...
     if pd.DataFrame(X).isin([np.nan, np.inf, -np.inf]).any(1).any():
         raise Exception("X has issues.")
-    if pd.DataFrame(y).isin([np.nan, np.inf, -np.inf]).any(1).any():
-        raise Exception("y has issues.")
+    # if pd.DataFrame(y).isin([np.nan, np.inf, -np.inf]).any(1).any():
+    #     raise Exception("y has issues.")
 
     if test_percent > 0:
         X_train, X_test, y_train, y_test = ml.train_test_split(X, y, test_percent=test_percent)

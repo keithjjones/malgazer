@@ -662,17 +662,18 @@ class ML(object):
         """
         if self.y_labelencoder is None:
             self.y_labelencoder = LabelEncoder()
-            y[:, 0] = self.y_labelencoder.fit_transform(y[:, 0])
+            Y = self.y_labelencoder.fit_transform(y)
         else:
-            y[:, 0] = self.y_labelencoder.transform(y[:, 0])
+            Y = self.y_labelencoder.transform(y)
         # from keras.utils import to_categorical
         # y = to_categorical(y)
-        if self.y_labelonehotencoder is None:
-            self.y_labelonehotencoder = OneHotEncoder(n_values=self.n_classes, sparse=False)
-            y = self.y_labelonehotencoder.fit_transform(y[:, 0].reshape(-1, 1))
-        else:
-            y = self.y_labelonehotencoder.transform(y[:, 0].reshape(-1, 1))
-        return y, self.y_labelencoder
+        # if self.y_labelonehotencoder is None:
+        #     self.y_labelonehotencoder = OneHotEncoder(n_values=self.n_classes, sparse=False)
+        #     Y = self.y_labelonehotencoder.fit_transform(Y)
+        # else:
+        #     Y = self.y_labelonehotencoder.transform(y[:, 0].reshape(-1, 1))
+        Y = label_binarize(Y, classes=range(self.n_classes))
+        return Y, self.y_labelencoder
 
     def decode_classifications(self, y):
         """
