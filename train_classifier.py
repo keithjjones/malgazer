@@ -146,7 +146,8 @@ def main(arguments=None):
     parser.add_argument('DataDirectory',
                         help='The directory containing the feature files.')
     parser.add_argument("-t", "--test",
-                        help="The percentage of samples used for testing (set to zero to use the whole data set)."
+                        help="The percentage of samples used for testing (set to zero to use the whole data set).  "
+                             "This should be 0.1 for 10%, etc."
                              "", type=float, default=0)
     parser.add_argument("-c", "--crossval",
                         help="The number of groups for cross validation.  Set to zero to disable cross validation.  "
@@ -222,6 +223,9 @@ def main(arguments=None):
     ovr_type = args.ovrtype.lower()
     ovr_base_estimator = get_estimator_static(ovr_type)
     extra_estimator_params = json.loads(args.estimatorparams)
+
+    if test_percent < 0 or test_percent > 1:
+        raise ValueError("Test percent should be between 0 and 1!")
 
     # if cross_fold_validation or classifier_type == 'gridsearch':
     #         test_percent = 0
