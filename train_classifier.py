@@ -326,7 +326,7 @@ def main(arguments=None):
         if cross_fold_validation is False:
             # Create the CNN
             if nnlayers:
-                classifier = ml.build_cnn(X_train, y_train, layers=eval(nnlayers))
+                classifier = ml.build_cnn(X_train, y_train, layers=nnlayers)
             else:
                 classifier = ml.build_cnn(X_train, y_train)
 
@@ -377,7 +377,7 @@ def main(arguments=None):
         if cross_fold_validation is False:
             # Create the ANN
             if nnlayers:
-                classifier = ml.build_ann(X_train, y_train, layers=eval(nnlayers))
+                classifier = ml.build_ann(X_train, y_train, layers=nnlayers)
             else:
                 classifier = ml.build_ann(X_train, y_train)
 
