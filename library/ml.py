@@ -420,15 +420,17 @@ class ML(object):
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_ann(self, X, y, layers=[("1/2", 'uniform', 'relu'), (100, 'uniform', 'relu')]):
+    def build_ann(self, X, y, layers=[
+        Keras_Dense_Parameters(value="1/2", kernel_initializer='uniform', activation='relu'),
+        Keras_Dense_Parameters(value=100, kernel_initializer='uniform', activation='relu')
+    ]):
         """
         Create a generic ANN.
 
         :param X:  The input to the ANN, used to find input shape.
         :param y:  The output to the ANN, used to find the output shape.
-        :param layers:  A list of layer descriptions, where each item is a tuple:
-            (value, kernel_initializer, activation)
-        ... where if the value is an int, the value will be used for the number of units for that layer, or
+        :param layers:  A list of layer descriptions, where each item is a named tuple defined at the top of this
+        file... where if the value is an int, the value will be used for the number of units for that layer, or
         if the value is a float or string it will be multiplied to the number of input data points.  kernel_initializer
         and activation are passed to the Dense object as such.
         :return:  The classifier.
@@ -506,12 +508,25 @@ class ML(object):
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_cnn(self, X, y):
+    def build_cnn(self, X, y, layers=[
+        Keras_Conv1D_Parameters(filters=10, kernel_size="1/4", activation="relu", pool_size=10),
+        Keras_Conv1D_Parameters(filters=10, kernel_size="1/30", activation="relu", pool_size=2),
+        Keras_Conv1D_Parameters(filters=10, kernel_size=2, activation='relu', pool_size=2),
+        Keras_Flatten_Parameters(),
+        Keras_Dense_Parameters(value="1/4", kernel_initializer='uniform', activation='relu'),
+        Keras_Dense_Parameters(value="1/8", kernel_initializer='uniform', activation='relu'),
+        Keras_Dense_Parameters(value="1/16", kernel_initializer='uniform', activation='relu')
+    ]):
         """
         Create a generic CNN.
 
         :param X:  The input to the CNN, used to find input shape.
         :param y:  The output to the CNN, used to find the output shape.
+        :param layers:  A list of layer descriptions for the CNN, where each item is a namedtuple from the top of
+        this file... where if the value, filters, kernel_size, pool_size is an int, the corresponding value will be used, or
+        if they are a a float or string they will be multiplied to the number of input data points.  kernel_initializer
+        and activation are passed to the Dense and/or CNN object as such.  It makes more sense if you look at the short
+        code below.
         :return:  The classifier.
         """
         if len(X.shape) != 3:
@@ -519,7 +534,7 @@ class ML(object):
         else:
             X = X
         self.classifier_type = 'cnn'
-        self.classifier = ML.build_cnn_static(X, y)
+        self.classifier = ML.build_cnn_static(X, y, layers=layers)
         self.classifier.summary()
         return self.classifier
 
