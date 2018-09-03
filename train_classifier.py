@@ -6,7 +6,8 @@ import pandas as pd
 import numpy as np
 import json
 from library.utils import Utils
-from library.ml import ML
+from library.ml import ML, Keras_Dense_Parameters, Keras_Conv1D_Parameters, \
+    Keras_Flatten_Parameters, Keras_Dropout_Parameters
 
 
 pd.set_option('max_colwidth', 64)
@@ -178,6 +179,9 @@ def main(arguments=None):
     parser.add_argument("-nne", "--nnepochs",
                         help="The epochs used for training neural networks."
                              "", type=int, default=10)
+    parser.add_argument("-nnl", "--nnlayers",
+                        help="The file containing the Python code to instantiate neural network layers."
+                             "", type=str, default="")
     parser.add_argument("-gt", "--gridsearchtype",
                         help="The type of the base estimator for gridsearch."
                              "", type=str, default='dt')
@@ -223,6 +227,10 @@ def main(arguments=None):
     ovr_type = args.ovrtype.lower()
     ovr_base_estimator = get_estimator_static(ovr_type)
     extra_estimator_params = json.loads(args.estimatorparams)
+    if len(args.nnlayers.strip()) > 0:
+        nnlayers = open(args.nnlayers.strip(), 'r').read()
+    else:
+        nnlayers = None
 
     if test_percent < 0 or test_percent > 1:
         raise ValueError("Test percent should be between 0 and 1!")
@@ -315,7 +323,10 @@ def main(arguments=None):
     if classifier_type.lower() == 'cnn':
         if cross_fold_validation is False:
             # Create the CNN
-            classifier = ml.build_cnn(X_train, y_train)
+            if nnlayers:
+                classifier = ml.build_cnn(X_train, y_train, layers=eval(nnlayers))
+            else:
+                classifier = ml.build_cnn(X_train, y_train)
 
             # Train the CNN
             start_time = time.time()
@@ -363,7 +374,10 @@ def main(arguments=None):
     elif classifier_type.lower() == 'ann':
         if cross_fold_validation is False:
             # Create the ANN
-            classifier = ml.build_ann(X_train, y_train)
+            if nnlayers:
+                classifier = ml.build_ann(X_train, y_train, layers=eval(nnlayers))
+            else:
+                classifier = ml.build_ann(X_train, y_train)
 
             # Train the NN
             start_time = time.time()
