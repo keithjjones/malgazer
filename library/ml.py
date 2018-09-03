@@ -41,11 +41,17 @@ Keras_Conv1D_Parameters = namedtuple('Keras_Conv1D_Parameters', ['filters', 'ker
 
 
 class ML(object):
-    def __init__(self, feature_type='rwe', classifier_type='dt', n_classes=6, *args, **kwargs):
+    def __init__(self, feature_type='rwe', classifier_type='dt', n_classes=6, rwe_windowsize=None, datapoints=None,
+                 nnlayers=None, *args, **kwargs):
         """
         A machine learning class to hold information about classifiers.
 
         :param feature_type:  Type of features for this ML package.
+        :param classifier_type:  The classifier type.
+        :param n_classes:  The number of classes in the data.
+        :param rwe_windowsize:  The RWE window size.
+        :param datapoints:  The datapoints for RWE.
+        :param nnlayers:  The neural network layers.
         """
         super(ML, self).__init__()
         self.classifer = None
@@ -59,9 +65,9 @@ class ML(object):
         # y label encoder
         self.y_labelencoder = None
         self.y_labelonehotencoder = None
-        self.rwe_windowsize = kwargs.get('rwe_windowsize', None)
-        self.datapoints = kwargs.get('datapoints', None)
-        self.nnlayers = kwargs.get('nnlayers', None)
+        self.rwe_windowsize = rwe_windowsize
+        self.datapoints = datapoints
+        self.nnlayers = nnlayers
         self.feature_type = feature_type
 
     def train(self, *args, **kwargs):
