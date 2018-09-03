@@ -58,6 +58,7 @@ class ML(object):
         self.X_sc = None
         # y label encoder
         self.y_labelencoder = None
+        self.y_labelonehotencoder = None
         self.rwe_windowsize = kwargs.get('rwe_windowsize', None)
         self.datapoints = kwargs.get('datapoints', None)
         self.feature_type = feature_type
@@ -642,13 +643,18 @@ class ML(object):
         :return:  A tuple of the encoded data y and the encoder (for inverting)
         as y,encoder.
         """
-        from keras.utils import to_categorical
         if self.y_labelencoder is None:
             self.y_labelencoder = LabelEncoder()
             y[:, 0] = self.y_labelencoder.fit_transform(y[:, 0])
         else:
             y[:, 0] = self.y_labelencoder.transform(y[:, 0])
-        y = to_categorical(y)
+        # from keras.utils import to_categorical
+        # y = to_categorical(y)
+        if self.y_labelonehotencoder is None:
+            self.y_labelonehotencoder = OneHotEncoder(n_values=self.n_classes)
+            y[:, 0] = self.y_labelonehotencoder.fit_transform(y[:, 0])
+        else:
+            y[:, 0] = self.y_labelonehotencoder.transform(y[:, 0])
         return y, self.y_labelencoder
 
     def decode_classifications(self, y):
