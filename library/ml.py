@@ -651,10 +651,10 @@ class ML(object):
         # from keras.utils import to_categorical
         # y = to_categorical(y)
         if self.y_labelonehotencoder is None:
-            self.y_labelonehotencoder = OneHotEncoder(n_values=self.n_classes)
-            y[:, 0] = self.y_labelonehotencoder.fit_transform(y[:, 0])
+            self.y_labelonehotencoder = OneHotEncoder(n_values=self.n_classes, sparse=False)
+            y = self.y_labelonehotencoder.fit_transform(y[:, 0].reshape(-1, 1))
         else:
-            y[:, 0] = self.y_labelonehotencoder.transform(y[:, 0])
+            y = self.y_labelonehotencoder.transform(y[:, 0].reshape(-1, 1))
         return y, self.y_labelencoder
 
     def decode_classifications(self, y):
