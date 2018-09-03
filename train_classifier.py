@@ -180,7 +180,8 @@ def main(arguments=None):
                         help="The epochs used for training neural networks."
                              "", type=int, default=10)
     parser.add_argument("-nnl", "--nnlayers",
-                        help="The file containing the Python code to instantiate neural network layers."
+                        help="The file containing the Python code to instantiate neural network layers.  "
+                             "The content should be a list containing a list of layers if you are grid searching."
                              "", type=str, default="")
     parser.add_argument("-gt", "--gridsearchtype",
                         help="The type of the base estimator for gridsearch."
@@ -228,7 +229,7 @@ def main(arguments=None):
     ovr_base_estimator = get_estimator_static(ovr_type)
     extra_estimator_params = json.loads(args.estimatorparams)
     if len(args.nnlayers.strip()) > 0:
-        nnlayers = open(args.nnlayers.strip(), 'r').read()
+        nnlayers = eval(open(args.nnlayers.strip(), 'r').read())
     else:
         nnlayers = None
 
@@ -259,7 +260,8 @@ def main(arguments=None):
     y = pd.DataFrame(all_data['classification']).values.copy()
 
     # Make the classifier
-    ml = ML(feature_type=feature_type, classifier_type=classifier_type, n_classes=n_categories, rwe_windowsize=windowsize, datapoints=datapoints)
+    ml = ML(feature_type=feature_type, classifier_type=classifier_type, n_classes=n_categories,
+            rwe_windowsize=windowsize, datapoints=datapoints, nnlayers=nnlayers)
     X, y = ml.preprocess_data(X, y)
 
     # Check for bad values...
@@ -426,9 +428,15 @@ def main(arguments=None):
         yt = y_train
 
         if gridsearch_type.lower() == 'ann':
-            classifier = get_estimator_static(gridsearch_type.lower(), Xt, yt)
+            if nnlayers:
+                classifier = get_estimator_static(gridsearch_type.lower(), Xt, yt, layers=nnlayers)
+            else:
+                classifier = get_estimator_static(gridsearch_type.lower(), Xt, yt)
         elif gridsearch_type.lower() == 'cnn':
-            classifier = get_estimator_static(gridsearch_type.lower(), Xt, yt)
+            if nnlayers:
+                classifier = get_estimator_static(gridsearch_type.lower(), Xt, yt)
+            else:
+                classifier = get_estimator_static(gridsearch_type.lower(), Xt, yt, layers=nnlayers)
         if gridsearch_type.lower() == 'adaboost':
             base_estimator = get_estimator_static(adaboost_type.lower())
             classifier = get_estimator_static(gridsearch_type.lower(), base_estimator=base_estimator)

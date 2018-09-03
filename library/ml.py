@@ -61,6 +61,7 @@ class ML(object):
         self.y_labelonehotencoder = None
         self.rwe_windowsize = kwargs.get('rwe_windowsize', None)
         self.datapoints = kwargs.get('datapoints', None)
+        self.nnlayers = kwargs.get('nnlayers', None)
         self.feature_type = feature_type
 
     def train(self, *args, **kwargs):
@@ -124,6 +125,7 @@ class ML(object):
             self.classifier.save_weights(os.path.join(directory, 'nn.h5'))
             self.classifier = None
             self.classifiers = None
+            self.nnlayers = None
         with open(os.path.join(directory, "ml.dill"), 'wb') as file:
             dill.dump(self, file)
 
@@ -791,9 +793,17 @@ class ML(object):
 
             def create_model():
                 if self.classifier_type == 'cnn':
-                    return ML.build_cnn_static(X_train_in, label_binarize(y_train, classes=range(self.n_classes)))
+                    if self.nnlayers:
+                        return ML.build_cnn_static(X_train_in, label_binarize(y_train, classes=range(self.n_classes)),
+                                                   layers=self.nnlayers)
+                    else:
+                        return ML.build_cnn_static(X_train_in, label_binarize(y_train, classes=range(self.n_classes)))
                 else:
-                    return ML.build_ann_static(X_train, label_binarize(y_train, classes=range(self.n_classes)))
+                    if self.nnlayers:
+                        return ML.build_ann_static(X_train, label_binarize(y_train, classes=range(self.n_classes)),
+                                                   layers=self.nnlayers)
+                    else:
+                        return ML.build_ann_static(X_train, label_binarize(y_train, classes=range(self.n_classes)))
             classifier = KerasClassifier(build_fn=create_model,
                                          batch_size=batch_size,
                                          epochs=epochs)
