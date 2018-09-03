@@ -761,8 +761,8 @@ class ML(object):
         :param epochs:  The number of epochs for Keras classifiers.
         :return:  A dictionary with the results.
         """
-        from keras.wrappers.scikit_learn import KerasClassifier
         if self.classifier_type in ['ann', 'cnn']:
+            from keras.wrappers.scikit_learn import KerasClassifier
             if self.classifier_type == 'cnn':
                 X_train_in = np.expand_dims(X_train, axis=2)
             else:
