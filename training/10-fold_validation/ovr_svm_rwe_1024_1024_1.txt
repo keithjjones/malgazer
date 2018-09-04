@@ -1,6 +1,6 @@
 ================================================================================
 Command Line:
-	train_classifier.py ovr rwe /mnt/data/RWE/ -rwew 1024 -rwed 1024 -ot svm -c 10 -cj 5 -e {"estimator__C": 100, "estimator__kernel": "rbf"}
+	train_classifier.py ovr rwe /mnt/data/RWE/ -rwew 1024 -rwed 1024 -ot svm -c 10 -cj 10 -e {"estimator__C": 100, "estimator__kernel": "rbf"}
 ================================================================================
 ================================================================================
 Loading data...
@@ -11,11 +11,9 @@ Feature Type: rwe
 	Data points: 1,024
 Number of features: 1,024
 ================================================================================
-/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:111: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
-  y = column_or_1d(y, warn=True)
-/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+/usr/local/lib/python3.5/dist-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
-/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+/usr/local/lib/python3.5/dist-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
 
 
@@ -29,21 +27,21 @@ OneVRest Type: Support Vector Machine (svm)
 ================================================================================
 Training Class Count:
 ================================================================================
-	Backdoor    10000
 	Worm        10000
+	Trojan      10000
 	Ransom      10000
 	Virus       10000
+	Backdoor    10000
 	PUA         10000
-	Trojan      10000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	Backdoor    10000
 	Worm        10000
+	Trojan      10000
 	Ransom      10000
 	Virus       10000
+	Backdoor    10000
 	PUA         10000
-	Trojan      10000
 ================================================================================
 
 
@@ -51,10 +49,10 @@ Testing Class Count:
 Begin training...
 ================================================================================
 ================================================================================
-Model hyperparameters: {'estimator': SVC(C=100, cache_size=200, class_weight=None, coef0=0.0,
+Model hyperparameters: {'ovr_type': 'svm', 'estimator': SVC(C=100, cache_size=200, class_weight=None, coef0=0.0,
   decision_function_shape='ovr', degree=3, gamma='auto', kernel='rbf',
   max_iter=-1, probability=False, random_state=None, shrinking=True,
-  tol=0.001, verbose=False), 'ovr_type': 'svm'}
+  tol=0.001, verbose=False)}
 ================================================================================
 Start Cross Fold Validation...
 	Calculating fold: 1
@@ -62,22 +60,25 @@ Start Cross Fold Validation...
 	Calculating fold: 3
 	Calculating fold: 4
 	Calculating fold: 5
-	Finished calculating fold: 4
 	Calculating fold: 6
-	Finished calculating fold: 5
 	Calculating fold: 7
-	Finished calculating fold: 2
 	Calculating fold: 8
-	Finished calculating fold: 1
 	Calculating fold: 9
-Traceback (most recent call last):
-  File "/usr/lib/python3.5/multiprocessing/queues.py", line 241, in _feed
-    obj = ForkingPickler.dumps(obj)
-  File "/usr/lib/python3.5/multiprocessing/reduction.py", line 50, in dumps
-    cls(buf, protocol).dump(obj)
-MemoryError
-	Finished calculating fold: 3
 	Calculating fold: 10
+	Finished calculating fold: 4
 	Finished calculating fold: 8
+	Finished calculating fold: 5
+	Finished calculating fold: 10
+	Finished calculating fold: 2
+	Finished calculating fold: 1
+	Finished calculating fold: 3
 	Finished calculating fold: 6
 	Finished calculating fold: 7
+	Finished calculating fold: 9
+Training time 16803.837998 seconds
+================================================================================
+CFV Mean: 0.9162833333333333
+CFV Var: 0.006725593736697966
+================================================================================
+
+
