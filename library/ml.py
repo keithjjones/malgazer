@@ -668,7 +668,7 @@ class ML(object):
         """
         if self.y_labelencoder is None:
             self.y_labelencoder = LabelEncoder()
-            Y = self.y_labelencoder.fit_transform(y)
+            Y = self.y_labelencoder.fit_transform(y[:, 0])
         else:
             Y = self.y_labelencoder.transform(y)
         # from keras.utils import to_categorical

@@ -11,6 +11,8 @@ Feature Type: rwe
 	Data points: 1,024
 Number of features: 1,024
 ================================================================================
+/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:111: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
+  y = column_or_1d(y, warn=True)
 /home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
 /home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
@@ -27,19 +29,19 @@ OneVRest Type: Support Vector Machine (svm)
 ================================================================================
 Training Class Count:
 ================================================================================
-	Virus       10000
+	Backdoor    10000
 	Worm        10000
 	Ransom      10000
-	Backdoor    10000
+	Virus       10000
 	PUA         10000
 	Trojan      10000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	Virus       10000
+	Backdoor    10000
 	Worm        10000
 	Ransom      10000
-	Backdoor    10000
+	Virus       10000
 	PUA         10000
 	Trojan      10000
 ================================================================================
@@ -60,3 +62,22 @@ Start Cross Fold Validation...
 	Calculating fold: 3
 	Calculating fold: 4
 	Calculating fold: 5
+	Finished calculating fold: 4
+	Calculating fold: 6
+	Finished calculating fold: 5
+	Calculating fold: 7
+	Finished calculating fold: 2
+	Calculating fold: 8
+	Finished calculating fold: 1
+	Calculating fold: 9
+Traceback (most recent call last):
+  File "/usr/lib/python3.5/multiprocessing/queues.py", line 241, in _feed
+    obj = ForkingPickler.dumps(obj)
+  File "/usr/lib/python3.5/multiprocessing/reduction.py", line 50, in dumps
+    cls(buf, protocol).dump(obj)
+MemoryError
+	Finished calculating fold: 3
+	Calculating fold: 10
+	Finished calculating fold: 8
+	Finished calculating fold: 6
+	Finished calculating fold: 7

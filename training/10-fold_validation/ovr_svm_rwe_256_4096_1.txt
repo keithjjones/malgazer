@@ -11,22 +11,50 @@ Feature Type: rwe
 	Data points: 4,096
 Number of features: 4,096
 ================================================================================
-Using TensorFlow backend.
-Traceback (most recent call last):
-  File "train_classifier.py", line 540, in <module>
-    main(args)
-  File "train_classifier.py", line 251, in main
-    X, y = ml.preprocess_data(X, y)
-  File "/Source/malgazer/library/ml.py", line 156, in preprocess_data
-    X_out, X_scaler = self.scale_features(X)
-  File "/Source/malgazer/library/ml.py", line 628, in scale_features
-    X_scaled = self.X_sc.fit_transform(X)
-  File "/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/base.py", line 517, in fit_transform
-    return self.fit(X, **fit_params).transform(X)
-  File "/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/data.py", line 590, in fit
-    return self.partial_fit(X, y)
-  File "/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/data.py", line 612, in partial_fit
-    warn_on_dtype=True, estimator=self, dtype=FLOAT_DTYPES)
-  File "/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/utils/validation.py", line 444, in check_array
-    array = np.array(array, dtype=dtype, order=order, copy=copy)
-MemoryError
+/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:111: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
+  y = column_or_1d(y, warn=True)
+/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+
+
+================================================================================
+Classifier Type: OneVRest (ovr)
+================================================================================
+Cross Fold Validation - 10 Fold(s) - Enabled!
+================================================================================
+OneVRest Enabled!
+OneVRest Type: Support Vector Machine (svm)
+================================================================================
+Training Class Count:
+================================================================================
+	Ransom      10000
+	Trojan      10000
+	Backdoor    10000
+	PUA         10000
+	Worm        10000
+	Virus       10000
+================================================================================
+Testing Class Count:
+================================================================================
+	Ransom      10000
+	Trojan      10000
+	Backdoor    10000
+	PUA         10000
+	Worm        10000
+	Virus       10000
+================================================================================
+
+
+================================================================================
+Begin training...
+================================================================================
+================================================================================
+Model hyperparameters: {'estimator': SVC(C=100, cache_size=200, class_weight=None, coef0=0.0,
+  decision_function_shape='ovr', degree=3, gamma='auto', kernel='rbf',
+  max_iter=-1, probability=False, random_state=None, shrinking=True,
+  tol=0.001, verbose=False), 'ovr_type': 'svm'}
+================================================================================
+Start Cross Fold Validation...
+	Calculating fold: 1
