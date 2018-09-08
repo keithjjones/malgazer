@@ -352,7 +352,7 @@ def main(arguments=None):
             print(DIVIDER)
 
             if generate_roc_curves:
-                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="cnn.png")
+                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="cnn_{0}.png".format(feature_type))
         else:
             # Cross Fold Validation
             start_time = time.time()
@@ -371,7 +371,8 @@ def main(arguments=None):
                     ml.set_classifier_by_fold(fold+1)
                     y_test = ml.classifiers[fold+1]['y_test']
                     y_pred = ml.classifiers[fold+1]['y_pred']
-                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1, filename="cnn-fold-{0}.png".format(fold+1))
+                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1, filename="cnn-fold-{0}_{1}.png".format(
+                        fold+1, feature_type))
 
     elif classifier_type.lower() == 'ann':
         if cross_fold_validation is False:
@@ -403,7 +404,7 @@ def main(arguments=None):
             print(DIVIDER)
 
             if generate_roc_curves:
-                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="ann.png")
+                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="ann_{0}.png".format(feature_type))
         else:
             # Cross Fold Validation
             start_time = time.time()
@@ -422,7 +423,8 @@ def main(arguments=None):
                     ml.set_classifier_by_fold(fold+1)
                     y_test = ml.classifiers[fold+1]['y_test']
                     y_pred = ml.classifiers[fold+1]['y_pred']
-                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1, filename="ann-fold-{0}.png".format(fold+1))
+                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1, filename="ann-fold-{0}_{1}.png".format(
+                        fold+1, feature_type))
     elif classifier_type.lower() == 'gridsearch':
         Xt = X_train
         yt = y_train
@@ -516,7 +518,8 @@ def main(arguments=None):
             print(DIVIDER)
 
             if generate_roc_curves:
-                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="{0}.png".format(classifier_short))
+                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="{0}_{1}.png".format(
+                    classifier_short, feature_type))
         else:
             # Cross Fold Validation
             mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
@@ -533,7 +536,7 @@ def main(arguments=None):
                     y_test = ml.classifiers[fold+1]['y_test']
                     y_pred = ml.classifiers[fold+1]['y_pred']
                     ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1,
-                                       filename="{0}-fold-{1}.png".format(classifier_short, fold+1))
+                                       filename="{0}-fold-{1}_{2}.png".format(classifier_short, fold+1, feature_type))
 
     # Save the classifier
     print("\n")
