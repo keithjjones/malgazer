@@ -352,7 +352,11 @@ def main(arguments=None):
             print(DIVIDER)
 
             if generate_roc_curves:
-                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="cnn_{0}.png".format(feature_type))
+                if feature_type == 'rwe':
+                    suffix = "rwe_{0}_{1}".format(windowsize, datapoints)
+                else:
+                    suffix = "gist"
+                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="cnn_{0}.png".format(suffix))
         else:
             # Cross Fold Validation
             start_time = time.time()
@@ -367,12 +371,16 @@ def main(arguments=None):
             print(DIVIDER)
 
             if generate_roc_curves:
+                if feature_type == 'rwe':
+                    suffix = "rwe_{0}_{1}".format(windowsize, datapoints)
+                else:
+                    suffix = "gist"
                 for fold in range(cfv_groups):
                     ml.set_classifier_by_fold(fold+1)
                     y_test = ml.classifiers[fold+1]['y_test']
                     y_pred = ml.classifiers[fold+1]['y_pred']
-                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1, filename="cnn-fold-{0}_{1}.png".format(
-                        fold+1, feature_type))
+                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1,
+                                       filename="cnn-fold-{0}_{1}.png".format(fold+1, suffix))
 
     elif classifier_type.lower() == 'ann':
         if cross_fold_validation is False:
@@ -404,7 +412,11 @@ def main(arguments=None):
             print(DIVIDER)
 
             if generate_roc_curves:
-                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="ann_{0}.png".format(feature_type))
+                if feature_type == 'rwe':
+                    suffix = "rwe_{0}_{1}".format(windowsize, datapoints)
+                else:
+                    suffix = "gist"
+                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="ann_{0}.png".format(suffix))
         else:
             # Cross Fold Validation
             start_time = time.time()
@@ -419,12 +431,16 @@ def main(arguments=None):
             print(DIVIDER)
 
             if generate_roc_curves:
+                if feature_type == 'rwe':
+                    suffix = "rwe_{0}_{1}".format(windowsize, datapoints)
+                else:
+                    suffix = "gist"
                 for fold in range(cfv_groups):
                     ml.set_classifier_by_fold(fold+1)
                     y_test = ml.classifiers[fold+1]['y_test']
                     y_pred = ml.classifiers[fold+1]['y_pred']
-                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1, filename="ann-fold-{0}_{1}.png".format(
-                        fold+1, feature_type))
+                    ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1,
+                                       filename="ann-fold-{0}_{1}.png".format(fold+1, suffix))
     elif classifier_type.lower() == 'gridsearch':
         Xt = X_train
         yt = y_train
@@ -518,8 +534,12 @@ def main(arguments=None):
             print(DIVIDER)
 
             if generate_roc_curves:
-                ml.plot_roc_curves(y_test, y_pred, n_categories, filename="{0}_{1}.png".format(
-                    classifier_short, feature_type))
+                if feature_type == 'rwe':
+                    suffix = "rwe_{0}_{1}".format(windowsize, datapoints)
+                else:
+                    suffix = "gist"
+                ml.plot_roc_curves(y_test, y_pred, n_categories,
+                                   filename="{0}_{1}.png".format(classifier_short, suffix))
         else:
             # Cross Fold Validation
             mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
@@ -531,12 +551,16 @@ def main(arguments=None):
             print(DIVIDER)
 
             if generate_roc_curves:
+                if feature_type == 'rwe':
+                    suffix = "rwe_{0}_{1}".format(windowsize, datapoints)
+                else:
+                    suffix = "gist"
                 for fold in range(cfv_groups):
                     ml.set_classifier_by_fold(fold+1)
                     y_test = ml.classifiers[fold+1]['y_test']
                     y_pred = ml.classifiers[fold+1]['y_pred']
                     ml.plot_roc_curves(y_test, y_pred, n_categories, fold+1,
-                                       filename="{0}-fold-{1}_{2}.png".format(classifier_short, fold+1, feature_type))
+                                       filename="{0}-fold-{1}_{2}.png".format(classifier_short, fold+1, suffix))
 
     # Save the classifier
     print("\n")
