@@ -937,4 +937,5 @@ class ML(object):
 
         # Save the figure...
         if filename:
+            print("Saving the figure as {0}...".format(filename))
             plt.savefig(filename)
