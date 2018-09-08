@@ -885,7 +885,7 @@ class ML(object):
         tpr = dict()
         thresholds = dict()
         roc_auc = dict()
-        for i in self.n_classes:
+        for i in range(self.n_classes):
             fpr[i], tpr[i], thresholds[i] = roc_curve(yt[:, i], yp[:, i])
             roc_auc[i] = auc(fpr[i], tpr[i])
 
