@@ -496,13 +496,13 @@ def main(arguments=None):
                                                                                          "base_estimator__")
             base_estimator = get_estimator_static(adaboost_type.lower(), **base_estimator_params)
             estimator_params = {'base_estimator': base_estimator, 'adaboost_type': adaboost_type}
-            classifier_short = "{0}-{1}".format(classifier_type.lower(), adaboost_type.lower())
+            classifier_short = "{0}_{1}".format(classifier_type.lower(), adaboost_type.lower())
         elif classifier_type.lower() == 'ovr':
             extra_estimator_params, base_estimator_params = create_base_estimator_params(extra_estimator_params,
                                                                                          "estimator__")
             base_estimator = get_estimator_static(ovr_type.lower(), **base_estimator_params)
             estimator_params = {'estimator': base_estimator, 'ovr_type': ovr_type}
-            classifier_short = "{0}-{1}".format(classifier_type.lower(), ovr_type.lower())
+            classifier_short = "{0}_{1}".format(classifier_type.lower(), ovr_type.lower())
         else:
             estimator_params = {}
             classifier_short = "{0}".format(classifier_type.lower())
