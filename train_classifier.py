@@ -148,7 +148,7 @@ def main(arguments=None):
                         help='The directory containing the feature files.')
     parser.add_argument("-t", "--test",
                         help="The percentage of samples used for testing (set to zero to use the whole data set).  "
-                             "This should be 0.1 for 10%, etc."
+                             "This should be 0.1 for 10\%%, etc."
                              "", type=float, default=0)
     parser.add_argument("-c", "--crossval",
                         help="The number of groups for cross validation.  Set to zero to disable cross validation.  "
