@@ -564,12 +564,18 @@ def main(arguments=None):
 
     # Save the classifier
     print("\n")
+    classifier_long = classifier_type.lower()
+    if classifier_type.lower() == 'adaboost':
+        classifier_long = "{0}_{1}".format(classifier_type.lower(), adaboost_type.lower())
+    elif classifier_type.lower() == 'ovr':
+        classifier_long = "{0}_{1}".format(classifier_type.lower(), ovr_type.lower())
+
     if feature_type == 'rwe':
         path = os.path.join(datadir, "classifiers",
                             "classifiers_rwe_{0}_window_{1}_datapoints".format(windowsize, datapoints),
-                            classifier_type.lower())
+                            classifier_long.lower())
     else:
-        path = os.path.join(datadir, "classifiers", "GIST", classifier_type.lower())
+        path = os.path.join(datadir, "classifiers", "GIST", classifier_long.lower())
 
     try:
         os.stat(path)
