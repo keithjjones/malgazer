@@ -867,8 +867,8 @@ class ML(object):
         :param y_test:  The y testing data.
         :param y_pred:  The y predicted data.
         :param fold:  An optional fold number to add to the title.
-        :param filename:  A PNG filename to save this to.  Set to None to not save to a file.
-        :return: Nothing.  This plots the curve.
+        :param filename:  A PNG filename to save this to.  Set to None to not save to a file and display the results instead.
+        :return: Nothing.  The plot object.
         """
         if isinstance(y_test, list):
             y_test = np.array(y_test)
@@ -929,13 +929,15 @@ class ML(object):
             plt.title('Receiver operating characteristic')
         plt.legend(loc="lower right")
 
-        try:
-            plt.show()
-        except Exception as exc:
-            print("UNHANDLED EXCEPTION - Trying to show Matplotlib plot: {0}".format(exc))
-            raise
-
         # Save the figure...
         if filename:
             print("Saving the figure as {0}...".format(filename))
             plt.savefig(filename)
+        else:
+            try:
+                print("Displaying the plot, close it to continue...")
+                plt.show()
+            except Exception as exc:
+                print("UNHANDLED EXCEPTION - Trying to show Matplotlib plot: {0}".format(exc))
+                raise
+        return plt
