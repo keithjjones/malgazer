@@ -2,7 +2,7 @@
   from pandas.core import datetools
 ================================================================================
 Command Line:
-	train_classifier.py adaboost rwe /Volumes/JONES/Focused Set May 2018/RWE/ -rwew 256 -rwed 1024 -t 0.1 -roc -at dt -e {"algorithm": "SAMME", "base_estimator__criterion": "entropy", "base_estimator__splitter": "random", "learning_rate": 1, "n_estimators": 50}
+	train_classifier.py adaboost rwe /Volumes/JONES/Focused Set May 2018/RWE/ -rwew 256 -rwed 1024 -t 0.1 -roc -at dt -e {"learning_rate": 0.9, "base_estimator__splitter": "best", "base_estimator__criterion": "entropy", "n_estimators": 50, "algorithm": "SAMME"}
 ================================================================================
 ================================================================================
 Loading data...
@@ -27,21 +27,21 @@ AdaBoost Type: Decision Tree (dt)
 ================================================================================
 Training Class Count:
 ================================================================================
+	Worm        9000
 	Ransom      9000
 	PUA         9000
-	Trojan      9000
-	Worm        9000
-	Backdoor    9000
 	Virus       9000
+	Trojan      9000
+	Backdoor    9000
 ================================================================================
 Testing Class Count:
 ================================================================================
 	Worm        1000
-	PUA         1000
-	Ransom      1000
-	Trojan      1000
-	Backdoor    1000
 	Virus       1000
+	Trojan      1000
+	Ransom      1000
+	Backdoor    1000
+	PUA         1000
 ================================================================================
 
 
@@ -49,28 +49,28 @@ Testing Class Count:
 Begin training...
 ================================================================================
 ================================================================================
-Model hyperparameters: {'n_estimators': 50, 'base_estimator': DecisionTreeClassifier(class_weight=None, criterion='entropy', max_depth=None,
+Model hyperparameters: {'n_estimators': 50, 'learning_rate': 0.9, 'base_estimator': DecisionTreeClassifier(class_weight=None, criterion='entropy', max_depth=None,
             max_features=None, max_leaf_nodes=None,
             min_impurity_decrease=0.0, min_impurity_split=None,
             min_samples_leaf=1, min_samples_split=2,
             min_weight_fraction_leaf=0.0, presort=False, random_state=None,
-            splitter='random'), 'adaboost_type': 'dt', 'learning_rate': 1, 'algorithm': 'SAMME'}
+            splitter='best'), 'algorithm': 'SAMME', 'adaboost_type': 'dt'}
 ================================================================================
-Training time 741.178183 seconds
+Training time 9059.342438 seconds
 ================================================================================
 
 
 ================================================================================
 Confusion Matrix:
-[[964   4   4  26   1   1]
- [  4 933   9  47   6   1]
- [  2  10 937  43   8   0]
- [  0  28  27 932  10   3]
- [  0   0   7  19 974   0]
- [  3   2   9  14   4 968]]
+[[962   8   4  24   0   2]
+ [  7 934  10  45   1   3]
+ [  2  11 943  38   4   2]
+ [  4  30  32 923   9   2]
+ [  0   6  11  12 969   2]
+ [  3   3   7  19   1 967]]
 ================================================================================
 	Accuracy:
-	0.9513333333333334
+	0.9496666666666667
 ================================================================================
 /Users/Keith/.virtualenvs/Python3/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
@@ -84,7 +84,7 @@ Confusion Matrix:
   if diff:
 /Users/Keith/.virtualenvs/Python3/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
-Saving the figure as adaboost-dt_rwe_256_1024.png...
+Saving the figure as adaboost_dt_rwe_256_1024.png...
 
 
 ================================================================================

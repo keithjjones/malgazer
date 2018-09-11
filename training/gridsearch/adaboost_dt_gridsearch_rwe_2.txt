@@ -1,0 +1,246 @@
+/Users/Keith/.virtualenvs/Python3/lib/python3.5/site-packages/statsmodels/compat/pandas.py:56: FutureWarning: The pandas.core.datetools module is deprecated and will be removed in a future version. Please use the pandas.tseries module instead.
+  from pandas.core import datetools
+================================================================================
+Command Line:
+	train_classifier.py gridsearch rwe /Volumes/JONES/Focused Set May 2018/RWE/ -gt adaboost -at dt -gc 2 -gj 5 -gp {"n_estimators":[10, 25, 50], "learning_rate":[1, 0.9, 0.5, 0.3, 0.1, 0.01, 0.001], "base_estimator__criterion":["gini", "entropy"], "base_estimator__splitter":["best"], "algorithm":["SAMME"]}
+================================================================================
+================================================================================
+Loading data...
+================================================================================
+================================================================================
+Feature Type: rwe
+	Window Size: 256
+	Data points: 1,024
+Number of features: 1,024
+================================================================================
+/Users/Keith/.virtualenvs/Python3/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/Users/Keith/.virtualenvs/Python3/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+
+
+================================================================================
+Classifier Type: Grid Search (gridsearch)
+================================================================================
+Grid Search Enabled!
+Grid Search Type: AdaBoost (adaboost)
+Grid Search Parameters: {'learning_rate': [1, 0.9, 0.5, 0.3, 0.1, 0.01, 0.001], 'algorithm': ['SAMME'], 'base_estimator__criterion': ['gini', 'entropy'], 'n_estimators': [10, 25, 50], 'base_estimator__splitter': ['best']}
+================================================================================
+AdaBoost Enabled!
+AdaBoost Type: Decision Tree (dt)
+================================================================================
+Training Class Count:
+================================================================================
+	Backdoor    10000
+	Trojan      10000
+	PUA         10000
+	Virus       10000
+	Ransom      10000
+	Worm        10000
+================================================================================
+Testing Class Count:
+================================================================================
+	Backdoor    10000
+	Trojan      10000
+	PUA         10000
+	Virus       10000
+	Ransom      10000
+	Worm        10000
+================================================================================
+
+
+================================================================================
+Begin training...
+================================================================================
+Training time 38720.812934 seconds
+================================================================================
+
+
+================================================================================
+Best Score: 0.9361
+================================================================================
+CV Results:
+{'split0_train_score': array([0.99793333, 0.99916667, 0.99793333, 0.99793333, 0.99916667,
+       0.99793333, 0.99916667, 0.99916667, 0.99916667, 0.99916667,
+       0.99913333, 0.99916667, 0.99916667, 0.99916667, 0.99916667,
+       0.99916667, 0.99916667, 0.99916667, 0.99916667, 0.99916667,
+       0.99916667, 0.99793333, 0.99916667, 0.99793333, 0.99793333,
+       0.99916667, 0.99793333, 0.99916667, 0.99916667, 0.99916667,
+       0.99916667, 0.99913333, 0.99916667, 0.99916667, 0.99916667,
+       0.99916667, 0.99916667, 0.99916667, 0.99916667, 0.99916667,
+       0.99916667, 0.99916667]), 'std_train_score': array([0.00000000e+00, 8.33333333e-05, 0.00000000e+00, 0.00000000e+00,
+       8.33333333e-05, 0.00000000e+00, 8.33333333e-05, 2.16666667e-04,
+       8.33333333e-05, 8.33333333e-05, 1.00000000e-04, 8.33333333e-05,
+       8.33333333e-05, 8.33333333e-05, 8.33333333e-05, 8.33333333e-05,
+       8.33333333e-05, 8.33333333e-05, 8.33333333e-05, 8.33333333e-05,
+       8.33333333e-05, 0.00000000e+00, 8.33333333e-05, 0.00000000e+00,
+       0.00000000e+00, 8.33333333e-05, 0.00000000e+00, 8.33333333e-05,
+       2.16666667e-04, 8.33333333e-05, 8.33333333e-05, 1.00000000e-04,
+       8.33333333e-05, 8.33333333e-05, 8.33333333e-05, 8.33333333e-05,
+       8.33333333e-05, 8.33333333e-05, 8.33333333e-05, 8.33333333e-05,
+       8.33333333e-05, 8.33333333e-05]), 'mean_fit_time': array([  386.7207644 ,   983.49235356,  2037.01849496,   384.94510055,
+         951.3785429 ,  1974.77281106,   433.62058294,   958.14228904,
+        1898.14194655,   403.26550293,   970.29419553,  1860.46541488,
+         422.12954044,  1065.03937411,  1978.03545189,   437.82704997,
+        1052.74100113,  2229.3789959 ,   467.07582307,  1128.42307353,
+        2371.38436711,   748.54107094,  1779.25586653, 13147.66783655,
+         661.31218052,  1708.49691153,  5926.45451438,   597.65911543,
+        1703.78350556,  3379.14775741,   597.90438187,  1498.52658415,
+        3011.41431451,   547.012532  ,  1359.63615835,  2714.9849931 ,
+         546.72938657,  1367.02498102,  2729.39075506,   548.31587744,
+        1400.46091008,  2408.16996753]), 'std_fit_time': array([1.08727205e+01, 7.38934215e+01, 1.94596085e+02, 1.98052785e+01,
+       1.25978420e+01, 1.01082362e+02, 6.20208108e+00, 2.70735449e+01,
+       3.31865394e+01, 4.83732104e+00, 8.73516047e+00, 2.24914190e+01,
+       2.98402953e+00, 7.43039703e+00, 2.28520010e+01, 9.78544950e-01,
+       2.81688094e+00, 2.69942260e+01, 8.42347908e+00, 1.43855424e+01,
+       3.04134220e+01, 9.77425694e+00, 6.30410743e+00, 7.81782209e+02,
+       3.53050756e+00, 3.57444525e-01, 5.08401949e+02, 4.43039358e+00,
+       9.47639254e+01, 3.19358615e+01, 5.53653705e+00, 7.09811926e-01,
+       2.91206095e+01, 9.99527407e+00, 1.75316755e+01, 3.23580440e+01,
+       8.98870850e+00, 2.35011489e+01, 3.91280401e+00, 9.14429140e+00,
+       1.42430689e+01, 3.72996265e+01]), 'mean_score_time': array([0.63076258, 1.87199044, 2.40495598, 0.94085658, 1.35926855,
+       2.33214045, 0.68024194, 1.2113086 , 2.69174898, 0.41496408,
+       1.05374599, 2.17954457, 0.46700203, 1.46906292, 2.43061447,
+       0.38244557, 1.02375746, 2.59835601, 0.43618894, 1.26980448,
+       2.28045607, 0.51014102, 1.87922287, 3.26712239, 0.69449043,
+       1.39689004, 2.83552504, 0.89471602, 1.63267255, 2.50425851,
+       0.71225011, 1.19934845, 2.20304954, 0.34566748, 1.31466305,
+       1.98958743, 0.58686447, 1.13292241, 1.94978392, 0.34558105,
+       1.29011595, 1.72857797]), 'split0_test_score': array([0.91906667, 0.9242    , 0.92763333, 0.91943333, 0.92246667,
+       0.9271    , 0.926     , 0.92983333, 0.92366667, 0.92026667,
+       0.92943333, 0.93093333, 0.9095    , 0.92053333, 0.92643333,
+       0.9032    , 0.904     , 0.90643333, 0.904     , 0.9043    ,
+       0.905     , 0.92583333, 0.93103333, 0.93346667, 0.92506667,
+       0.93133333, 0.93463333, 0.9252    , 0.93136667, 0.932     ,
+       0.92036667, 0.93026667, 0.93306667, 0.91283333, 0.92213333,
+       0.92753333, 0.9108    , 0.90906667, 0.91073333, 0.90943333,
+       0.91013333, 0.9101    ]), 'param_base_estimator__splitter': masked_array(data=['best', 'best', 'best', 'best', 'best', 'best', 'best',
+                   'best', 'best', 'best', 'best', 'best', 'best', 'best',
+                   'best', 'best', 'best', 'best', 'best', 'best', 'best',
+                   'best', 'best', 'best', 'best', 'best', 'best', 'best',
+                   'best', 'best', 'best', 'best', 'best', 'best', 'best',
+                   'best', 'best', 'best', 'best', 'best', 'best', 'best'],
+             mask=[False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False],
+       fill_value='?',
+            dtype=object), 'std_test_score': array([0.00476667, 0.00401667, 0.00303333, 0.00551667, 0.00433333,
+       0.00398333, 0.0031    , 0.00245   , 0.00338333, 0.00328333,
+       0.00306667, 0.00218333, 0.00476667, 0.00261667, 0.00181667,
+       0.00623333, 0.00655   , 0.00611667, 0.00581667, 0.00548333,
+       0.00546667, 0.00431667, 0.00408333, 0.00223333, 0.004     ,
+       0.00148333, 0.00146667, 0.00398333, 0.00261667, 0.00211667,
+       0.00498333, 0.00233333, 0.00241667, 0.00425   , 0.00358333,
+       0.00333333, 0.004     , 0.00546667, 0.00488333, 0.00463333,
+       0.0047    , 0.0045    ]), 'params': [{'learning_rate': 1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.5, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.5, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.5, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.3, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.3, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.3, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.01, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.01, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.01, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.001, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.001, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.001, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.5, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.5, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.5, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.3, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.3, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.3, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.01, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.01, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.01, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.001, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.001, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.001, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}], 'mean_test_score': array([0.92383333, 0.92821667, 0.93066667, 0.92495   , 0.9268    ,
+       0.93108333, 0.9291    , 0.93228333, 0.92705   , 0.92355   ,
+       0.9325    , 0.93311667, 0.91426667, 0.92315   , 0.92825   ,
+       0.90943333, 0.91055   , 0.91255   , 0.90981667, 0.90978333,
+       0.91046667, 0.93015   , 0.93511667, 0.9357    , 0.92906667,
+       0.93281667, 0.9361    , 0.92918333, 0.93398333, 0.92988333,
+       0.92535   , 0.9326    , 0.93548333, 0.91708333, 0.92571667,
+       0.93086667, 0.9148    , 0.91453333, 0.91561667, 0.91406667,
+       0.91483333, 0.9146    ]), 'split1_test_score': array([0.9286    , 0.93223333, 0.9337    , 0.93046667, 0.93113333,
+       0.93506667, 0.9322    , 0.93473333, 0.93043333, 0.92683333,
+       0.93556667, 0.9353    , 0.91903333, 0.92576667, 0.93006667,
+       0.91566667, 0.9171    , 0.91866667, 0.91563333, 0.91526667,
+       0.91593333, 0.93446667, 0.9392    , 0.93793333, 0.93306667,
+       0.9343    , 0.93756667, 0.93316667, 0.9366    , 0.92776667,
+       0.93033333, 0.93493333, 0.9379    , 0.92133333, 0.9293    ,
+       0.9342    , 0.9188    , 0.92      , 0.9205    , 0.9187    ,
+       0.91953333, 0.9191    ]), 'param_learning_rate': masked_array(data=[1, 1, 1, 0.9, 0.9, 0.9, 0.5, 0.5, 0.5, 0.3, 0.3, 0.3,
+                   0.1, 0.1, 0.1, 0.01, 0.01, 0.01, 0.001, 0.001, 0.001,
+                   1, 1, 1, 0.9, 0.9, 0.9, 0.5, 0.5, 0.5, 0.3, 0.3, 0.3,
+                   0.1, 0.1, 0.1, 0.01, 0.01, 0.01, 0.001, 0.001, 0.001],
+             mask=[False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False],
+       fill_value='?',
+            dtype=object), 'param_algorithm': masked_array(data=['SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME',
+                   'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME',
+                   'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME',
+                   'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME',
+                   'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME',
+                   'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME',
+                   'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME', 'SAMME'],
+             mask=[False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False],
+       fill_value='?',
+            dtype=object), 'std_score_time': array([0.00927258, 0.12270355, 0.07904804, 0.32659543, 0.01639044,
+       0.06811547, 0.0996629 , 0.15829957, 0.55925906, 0.00074899,
+       0.05905294, 0.08200037, 0.10935509, 0.17753804, 0.17051148,
+       0.0031805 , 0.00502753, 0.3880291 , 0.0014689 , 0.22359037,
+       0.13862801, 0.10503018, 0.02419996, 0.50586045, 0.0332706 ,
+       0.33767593, 0.04089808, 0.30470991, 0.17476058, 0.16302454,
+       0.33547199, 0.17786551, 0.15932453, 0.00153458, 0.01314294,
+       0.0711745 , 0.02234554, 0.19193649, 0.20387495, 0.02229905,
+       0.0732919 , 0.6573211 ]), 'mean_train_score': array([0.99793333, 0.99908333, 0.99793333, 0.99793333, 0.99908333,
+       0.99793333, 0.99908333, 0.99895   , 0.99908333, 0.99908333,
+       0.99903333, 0.99908333, 0.99908333, 0.99908333, 0.99908333,
+       0.99908333, 0.99908333, 0.99908333, 0.99908333, 0.99908333,
+       0.99908333, 0.99793333, 0.99908333, 0.99793333, 0.99793333,
+       0.99908333, 0.99793333, 0.99908333, 0.99895   , 0.99908333,
+       0.99908333, 0.99903333, 0.99908333, 0.99908333, 0.99908333,
+       0.99908333, 0.99908333, 0.99908333, 0.99908333, 0.99908333,
+       0.99908333, 0.99908333]), 'split1_train_score': array([0.99793333, 0.999     , 0.99793333, 0.99793333, 0.999     ,
+       0.99793333, 0.999     , 0.99873333, 0.999     , 0.999     ,
+       0.99893333, 0.999     , 0.999     , 0.999     , 0.999     ,
+       0.999     , 0.999     , 0.999     , 0.999     , 0.999     ,
+       0.999     , 0.99793333, 0.999     , 0.99793333, 0.99793333,
+       0.999     , 0.99793333, 0.999     , 0.99873333, 0.999     ,
+       0.999     , 0.99893333, 0.999     , 0.999     , 0.999     ,
+       0.999     , 0.999     , 0.999     , 0.999     , 0.999     ,
+       0.999     , 0.999     ]), 'rank_test_score': array([26, 20, 13, 25, 22, 11, 17, 10, 21, 27,  9,  6, 35, 28, 19, 42, 38,
+       37, 40, 41, 39, 14,  4,  2, 18,  7,  1, 16,  5, 15, 24,  8,  3, 29,
+       23, 12, 32, 34, 30, 36, 31, 33], dtype=int32), 'param_n_estimators': masked_array(data=[10, 25, 50, 10, 25, 50, 10, 25, 50, 10, 25, 50, 10, 25,
+                   50, 10, 25, 50, 10, 25, 50, 10, 25, 50, 10, 25, 50, 10,
+                   25, 50, 10, 25, 50, 10, 25, 50, 10, 25, 50, 10, 25, 50],
+             mask=[False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False],
+       fill_value='?',
+            dtype=object), 'param_base_estimator__criterion': masked_array(data=['gini', 'gini', 'gini', 'gini', 'gini', 'gini', 'gini',
+                   'gini', 'gini', 'gini', 'gini', 'gini', 'gini', 'gini',
+                   'gini', 'gini', 'gini', 'gini', 'gini', 'gini', 'gini',
+                   'entropy', 'entropy', 'entropy', 'entropy', 'entropy',
+                   'entropy', 'entropy', 'entropy', 'entropy', 'entropy',
+                   'entropy', 'entropy', 'entropy', 'entropy', 'entropy',
+                   'entropy', 'entropy', 'entropy', 'entropy', 'entropy',
+                   'entropy'],
+             mask=[False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False, False, False, False, False, False, False,
+                   False, False],
+       fill_value='?',
+            dtype=object)}
+================================================================================
+Params:
+[{'learning_rate': 1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.5, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.5, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.5, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.3, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.3, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.3, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.01, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.01, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.01, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.001, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.001, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.001, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'gini', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.5, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.5, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.5, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.3, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.3, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.3, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.1, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.01, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.01, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.01, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}, {'learning_rate': 0.001, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 10, 'algorithm': 'SAMME'}, {'learning_rate': 0.001, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 25, 'algorithm': 'SAMME'}, {'learning_rate': 0.001, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}]
+================================================================================
+Mean Test Score: [0.92383333 0.92821667 0.93066667 0.92495    0.9268     0.93108333
+ 0.9291     0.93228333 0.92705    0.92355    0.9325     0.93311667
+ 0.91426667 0.92315    0.92825    0.90943333 0.91055    0.91255
+ 0.90981667 0.90978333 0.91046667 0.93015    0.93511667 0.9357
+ 0.92906667 0.93281667 0.9361     0.92918333 0.93398333 0.92988333
+ 0.92535    0.9326     0.93548333 0.91708333 0.92571667 0.93086667
+ 0.9148     0.91453333 0.91561667 0.91406667 0.91483333 0.9146    ]
+================================================================================
+Best Params: {'learning_rate': 0.9, 'base_estimator__splitter': 'best', 'base_estimator__criterion': 'entropy', 'n_estimators': 50, 'algorithm': 'SAMME'}
+================================================================================
+
+
