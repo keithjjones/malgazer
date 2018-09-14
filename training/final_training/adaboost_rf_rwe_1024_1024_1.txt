@@ -2,7 +2,7 @@
   from pandas.core import datetools
 ================================================================================
 Command Line:
-	train_classifier.py adaboost rwe /Volumes/JONES/Focused Set May 2018/RWE/ -rwew 1024 -rwed 1024 -t 0.1 -roc -at rf -e {"base_estimator__criterion": "gini", "base_estimator__n_estimators": 100, "learning_rate": 2, "n_estimators": 2}
+	train_classifier.py adaboost rwe /Volumes/JONES/Focused Set May 2018/RWE/ -rwew 1024 -rwed 1024 -t 0.1 -roc -at rf -e {"base_estimator__n_estimators": 100, "base_estimator__criterion": "gini", "learning_rate": 0.01, "n_estimators": 50}
 ================================================================================
 ================================================================================
 Loading data...
@@ -27,21 +27,21 @@ AdaBoost Type: Random Forest (rf)
 ================================================================================
 Training Class Count:
 ================================================================================
+	Worm        9000
+	Trojan      9000
 	PUA         9000
 	Backdoor    9000
 	Ransom      9000
-	Trojan      9000
 	Virus       9000
-	Worm        9000
 ================================================================================
 Testing Class Count:
 ================================================================================
+	Trojan      1000
+	Backdoor    1000
+	Worm        1000
+	Ransom      1000
 	Virus       1000
 	PUA         1000
-	Backdoor    1000
-	Ransom      1000
-	Trojan      1000
-	Worm        1000
 ================================================================================
 
 
@@ -55,23 +55,23 @@ Model hyperparameters: {'base_estimator': RandomForestClassifier(bootstrap=True,
             min_samples_leaf=1, min_samples_split=2,
             min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=1,
             oob_score=False, random_state=None, verbose=0,
-            warm_start=False), 'adaboost_type': 'rf', 'learning_rate': 2, 'n_estimators': 2}
+            warm_start=False), 'n_estimators': 50, 'learning_rate': 0.01, 'adaboost_type': 'rf'}
 ================================================================================
-Training time 287.496908 seconds
+Training time 7032.448218 seconds
 ================================================================================
 
 
 ================================================================================
 Confusion Matrix:
-[[965  11   5  17   2   0]
- [  4 961   3  26   6   0]
- [  2  20 928  42   6   2]
- [  5  38  22 914  16   5]
- [  0   2   3  16 979   0]
- [  0   3   5  23   9 960]]
+[[967   6   6  19   2   0]
+ [  9 951   5  28   7   0]
+ [  3  19 935  35   7   1]
+ [ 11  38  28 899  19   5]
+ [  1   1   2  13 983   0]
+ [  2   0   7  19  13 959]]
 ================================================================================
 	Accuracy:
-	0.9511666666666667
+	0.949
 ================================================================================
 /Users/Keith/.virtualenvs/Python3/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:

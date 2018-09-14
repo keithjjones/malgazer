@@ -2,7 +2,7 @@
   from pandas.core import datetools
 ================================================================================
 Command Line:
-	train_classifier.py adaboost rwe /Volumes/JONES/Focused Set May 2018/RWE/ -rwew 256 -rwed 4096 -t 0.1 -roc -at rf -e {"base_estimator__criterion": "gini", "base_estimator__n_estimators": 100, "learning_rate": 2, "n_estimators": 2}
+	train_classifier.py adaboost rwe /Volumes/JONES/Focused Set May 2018/RWE/ -rwew 256 -rwed 4096 -t 0.1 -roc -at rf -e {"base_estimator__n_estimators": 100, "base_estimator__criterion": "gini", "learning_rate": 0.01, "n_estimators": 50}
 ================================================================================
 ================================================================================
 Loading data...
@@ -27,21 +27,21 @@ AdaBoost Type: Random Forest (rf)
 ================================================================================
 Training Class Count:
 ================================================================================
-	Ransom      9000
-	Backdoor    9000
 	Worm        9000
-	Trojan      9000
-	PUA         9000
 	Virus       9000
+	Ransom      9000
+	PUA         9000
+	Trojan      9000
+	Backdoor    9000
 ================================================================================
 Testing Class Count:
 ================================================================================
+	Trojan      1000
+	Worm        1000
+	Virus       1000
 	Ransom      1000
 	Backdoor    1000
-	Virus       1000
 	PUA         1000
-	Worm        1000
-	Trojan      1000
 ================================================================================
 
 
@@ -49,29 +49,29 @@ Testing Class Count:
 Begin training...
 ================================================================================
 ================================================================================
-Model hyperparameters: {'learning_rate': 2, 'n_estimators': 2, 'adaboost_type': 'rf', 'base_estimator': RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+Model hyperparameters: {'learning_rate': 0.01, 'base_estimator': RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
             max_depth=None, max_features='auto', max_leaf_nodes=None,
             min_impurity_decrease=0.0, min_impurity_split=None,
             min_samples_leaf=1, min_samples_split=2,
             min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=1,
             oob_score=False, random_state=None, verbose=0,
-            warm_start=False)}
+            warm_start=False), 'adaboost_type': 'rf', 'n_estimators': 50}
 ================================================================================
-Training time 590.741522 seconds
+Training time 14669.558019 seconds
 ================================================================================
 
 
 ================================================================================
 Confusion Matrix:
-[[960   8   3  23   6   0]
- [  3 942   3  42   9   1]
- [  1  20 933  37   8   1]
- [  2  35  16 927  18   2]
- [  0   5   6  16 972   1]
- [  3   4   2  24   8 959]]
+[[964   2   5  26   3   0]
+ [  9 938   5  41   6   1]
+ [  5  11 948  25   9   2]
+ [  3  24  20 929  21   3]
+ [  0   1   6  11 981   1]
+ [  4   1   6  20   9 960]]
 ================================================================================
 	Accuracy:
-	0.9488333333333333
+	0.9533333333333334
 ================================================================================
 /Users/Keith/.virtualenvs/Python3/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
