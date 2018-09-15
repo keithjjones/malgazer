@@ -528,7 +528,7 @@ class ML(object):
 
     def train_nn(self, X_train, y_train,
                  batch_size=50, epochs=100,
-                 tensorboard=False, verbose=0):
+                 tensorboard=False, verbose=2):
         """
         Trains a given neural network with X_train and y_train.
 
