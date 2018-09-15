@@ -762,7 +762,7 @@ class ML(object):
         variance = accuracies.std()
         return mean, variance, classifiers
 
-    def _cfv_runner(self, X_train, y_train, X_test, y_test, batch_size=None, epochs=None, **kwargs):
+    def _cfv_runner(self, X_train, y_train, X_test, y_test, batch_size=None, epochs=None, verbose=0, **kwargs):
         """
         Internal method for multi-processing to calculate the CFV of a model.
 
@@ -772,6 +772,7 @@ class ML(object):
         :param y_test:  The X testing set.
         :param batch_size:  The batch size for Keras classifiers.
         :param epochs:  The number of epochs for Keras classifiers.
+        :param verbose:  Integer. 0, 1, or 2. Verbosity mode. 0 = silent, 1 = progress bar, 2 = one line per epoch.
         :return:  A dictionary with the results.
         """
         if self.classifier_type in ['ann', 'cnn']:
@@ -797,7 +798,8 @@ class ML(object):
             classifier = KerasClassifier(build_fn=create_model,
                                          batch_size=batch_size,
                                          epochs=epochs)
-            classifier.fit(X_train_in, label_binarize(y_train, classes=range(self.n_classes)), batch_size=batch_size, epochs=epochs, **kwargs)
+            classifier.fit(X_train_in, label_binarize(y_train, classes=range(self.n_classes)),
+                           batch_size=batch_size, epochs=epochs, verbose=verbose, **kwargs)
         else:
             classifier = self.classifier
             if self.classifier_type in ['svm', 'nb', 'nc', 'adaboost']:
