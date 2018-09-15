@@ -180,8 +180,7 @@ def main(arguments=None):
                         help="The epochs used for training neural networks."
                              "", type=int, default=10)
     parser.add_argument("-nnl", "--nnlayers",
-                        help="The file containing the Python code to instantiate neural network layers.  "
-                             "The content should be a list containing a list of layers if you are grid searching."
+                        help="The file containing the Python code to instantiate neural network layers."
                              "", type=str, default="")
     parser.add_argument("-gt", "--gridsearchtype",
                         help="The type of the base estimator for gridsearch."
@@ -226,7 +225,6 @@ def main(arguments=None):
     gridsearch_cv = args.gridsearchcv
     adaboost_type = args.adaboosttype
     ovr_type = args.ovrtype.lower()
-    ovr_base_estimator = get_estimator_static(ovr_type)
     extra_estimator_params = json.loads(args.estimatorparams)
     if len(args.nnlayers.strip()) > 0:
         nnlayers = eval(open(args.nnlayers.strip(), 'r').read())
@@ -325,10 +323,7 @@ def main(arguments=None):
     if classifier_type.lower() == 'cnn':
         if cross_fold_validation is False:
             # Create the CNN
-            if nnlayers:
-                classifier = ml.build_cnn(X_train, y_train, layers=nnlayers)
-            else:
-                classifier = ml.build_cnn(X_train, y_train)
+            classifier = ml.build_cnn(X_train, y_train)
 
             # Train the CNN
             start_time = time.time()
@@ -385,10 +380,7 @@ def main(arguments=None):
     elif classifier_type.lower() == 'ann':
         if cross_fold_validation is False:
             # Create the ANN
-            if nnlayers:
-                classifier = ml.build_ann(X_train, y_train, layers=nnlayers)
-            else:
-                classifier = ml.build_ann(X_train, y_train)
+            classifier = ml.build_ann(X_train, y_train)
 
             # Train the NN
             start_time = time.time()
