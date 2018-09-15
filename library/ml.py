@@ -428,23 +428,16 @@ class ML(object):
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_ann(self, X, y, layers=[
-        Keras_Dense_Parameters(value="1/2", kernel_initializer='uniform', activation='relu'),
-        Keras_Dense_Parameters(value=100, kernel_initializer='uniform', activation='relu')
-    ]):
+    def build_ann(self, X, y):
         """
         Create a generic ANN.
 
         :param X:  The input to the ANN, used to find input shape.
         :param y:  The output to the ANN, used to find the output shape.
-        :param layers:  A list of layer descriptions, where each item is a named tuple defined at the top of this
-        file... where if the value is an int, the value will be used for the number of units for that layer, or
-        if the value is a float or string it will be multiplied to the number of input data points.  kernel_initializer
-        and activation are passed to the Dense object as such.
         :return:  The classifier.
         """
         self.classifier_type = 'ann'
-        self.classifier = ML.build_ann_static(X, y, layers=layers)
+        self.classifier = ML.build_ann_static(X, y, layers=self.layers)
         self.classifier.summary()
         return self.classifier
 
@@ -516,25 +509,12 @@ class ML(object):
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
-    def build_cnn(self, X, y, layers=[
-        Keras_Conv1D_Parameters(filters=10, kernel_size="1/4", activation="relu", pool_size=10),
-        Keras_Conv1D_Parameters(filters=10, kernel_size="1/30", activation="relu", pool_size=2),
-        Keras_Conv1D_Parameters(filters=10, kernel_size=2, activation='relu', pool_size=2),
-        Keras_Flatten_Parameters(),
-        Keras_Dense_Parameters(value="1/4", kernel_initializer='uniform', activation='relu'),
-        Keras_Dense_Parameters(value="1/8", kernel_initializer='uniform', activation='relu'),
-        Keras_Dense_Parameters(value="1/16", kernel_initializer='uniform', activation='relu')
-    ]):
+    def build_cnn(self, X, y):
         """
         Create a generic CNN.
 
         :param X:  The input to the CNN, used to find input shape.
         :param y:  The output to the CNN, used to find the output shape.
-        :param layers:  A list of layer descriptions for the CNN, where each item is a namedtuple from the top of
-        this file... where if the value, filters, kernel_size, pool_size is an int, the corresponding value will be used, or
-        if they are a a float or string they will be multiplied to the number of input data points.  kernel_initializer
-        and activation are passed to the Dense and/or CNN object as such.  It makes more sense if you look at the short
-        code below.
         :return:  The classifier.
         """
         if len(X.shape) != 3:
@@ -542,13 +522,13 @@ class ML(object):
         else:
             X = X
         self.classifier_type = 'cnn'
-        self.classifier = ML.build_cnn_static(X, y, layers=layers)
+        self.classifier = ML.build_cnn_static(X, y, layers=self.layers)
         self.classifier.summary()
         return self.classifier
 
     def train_nn(self, X_train, y_train,
                  batch_size=50, epochs=100,
-                 tensorboard=False):
+                 tensorboard=False, verbose=0):
         """
         Trains a given neural network with X_train and y_train.
 
@@ -559,6 +539,7 @@ class ML(object):
         :param epochs:  The number of epochs.
         :param tensorboard:  Set to True to include tensorboard
         data in the local directory under ./Graph
+        :param verbose:  Integer. 0, 1, or 2. Verbosity mode. 0 = silent, 1 = progress bar, 2 = one line per epoch.
         :return: The classifier after training.
         """
         import keras.callbacks
@@ -575,11 +556,13 @@ class ML(object):
             self.classifier.fit(X_in, y_train,
                                 batch_size=batch_size,
                                 epochs=epochs,
-                                callbacks=[tb])
+                                callbacks=[tb],
+                                verbose=verbose)
         else:
             self.classifier.fit(X_in, y_train,
                                 batch_size=batch_size,
-                                epochs=epochs)
+                                epochs=epochs,
+                                verbose=verbose)
         return self.classifier
 
     def predict_nn(self, X_test):
