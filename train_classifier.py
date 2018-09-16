@@ -156,7 +156,7 @@ def main(arguments=None):
                              "Cross validation will use all the samples if enabled.  "
                              "Not available for gridsearch.", type=int, default=0)
     parser.add_argument("-cj", "--crossvaljobs",
-                        help="The number jobs for cross validation."
+                        help="The number jobs for cross validation.  Does not apply to neural networks."
                              "", type=int, default=10)
     parser.add_argument("-n", "--numclasses",
                         help="The number of classes in the training data."
@@ -212,7 +212,10 @@ def main(arguments=None):
     classifier_type = args.ClassifierType.lower()
     cross_fold_validation = args.crossval > 0
     cfv_groups = args.crossval
-    cfv_jobs = args.crossvaljobs
+    if classifier_type == "ann" or classifier_type == "cnn":
+        cfv_jobs = 1
+    else:
+        cfv_jobs = args.crossvaljobs
     generate_roc_curves = args.roccurves
     test_percent = args.test
     windowsize = args.rwewindowsize
