@@ -7,7 +7,8 @@ import numpy as np
 import json
 from library.utils import Utils
 from library.ml import ML, Keras_Dense_Parameters, Keras_Conv1D_Parameters, \
-    Keras_Flatten_Parameters, Keras_Dropout_Parameters
+    Keras_Flatten_Parameters, Keras_Dropout_Parameters, Keras_Output_Dense_Parameters, Keras_Input_Dense_Parameters, \
+    Keras_InputLayer_Parameters
 
 
 pd.set_option('max_colwidth', 64)

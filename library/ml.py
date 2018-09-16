@@ -34,6 +34,9 @@ from fractions import Fraction
 from collections import namedtuple
 
 
+Keras_Input_Dense_Parameters = namedtuple('Keras_Input_Dense_Parameters', ['kernel_initializer', 'activation'])
+Keras_InputLayer_Parameters = namedtuple('Keras_InputLayer_Parameters', ['notused'])
+Keras_Output_Dense_Parameters = namedtuple('Keras_Output_Dense_Parameters', ['kernel_initializer', 'activation'])
 Keras_Dense_Parameters = namedtuple('Keras_Dense_Parameters', ['value', 'kernel_initializer', 'activation'])
 Keras_Dropout_Parameters = namedtuple('Keras_Dropout_Parameters', 'rate')
 Keras_Flatten_Parameters = namedtuple('Keras_Flatten_Parameters', [])
@@ -382,8 +385,10 @@ class ML(object):
 
     @staticmethod
     def build_ann_static(X, y, layers=[
+        Keras_Input_Dense_Parameters(kernel_initializer='uniform', activation='relu'),
         Keras_Dense_Parameters(value="1/2", kernel_initializer='uniform', activation='relu'),
-        Keras_Dense_Parameters(value=100, kernel_initializer='uniform', activation='relu')
+        Keras_Dense_Parameters(value=100, kernel_initializer='uniform', activation='relu'),
+        Keras_Output_Dense_Parameters(kernel_initializer='uniform', activation='softmax')
     ]):
         """
         Create a generic ANN.
@@ -401,8 +406,6 @@ class ML(object):
         datapoints = X.shape[1]
         output_shape = y.shape[1]
         classifier = Sequential()
-        classifier.add(Dense(units=datapoints, kernel_initializer='uniform',
-                             activation='relu', input_dim=datapoints))
 
         for layer in layers:
             if isinstance(layer, Keras_Dense_Parameters):
@@ -417,12 +420,19 @@ class ML(object):
             elif isinstance(layer, Keras_Dropout_Parameters):
                 rate = layer.rate
                 classifier.add(Dropout(rate))
+            elif isinstance(layer, Keras_Input_Dense_Parameters):
+                kernel_initializer, activation = layer.kernel_initializer, layer.activation
+                classifier.add(Dense(units=datapoints, input_dim=datapoints,
+                                     kernel_initializer=kernel_initializer,
+                                     activation=activation))
+            elif isinstance(layer, Keras_Output_Dense_Parameters):
+                kernel_initializer, activation = layer.kernel_initializer, layer.activation
+                classifier.add(Dense(units=output_shape,
+                                     kernel_initializer=kernel_initializer,
+                                     activation=activation))
             else:
                 raise ValueError('Invalid layer type!')
 
-        classifier.add(Dense(units=output_shape,
-                             kernel_initializer='uniform',
-                             activation='softmax'))
         classifier.compile(optimizer='adam',
                            loss='categorical_crossentropy',
                            metrics=['categorical_accuracy', 'accuracy'])
@@ -443,13 +453,15 @@ class ML(object):
 
     @staticmethod
     def build_cnn_static(X, y, layers=[
+        Keras_InputLayer_Parameters(notused=None),
         Keras_Conv1D_Parameters(filters=10, kernel_size="1/4", activation="relu", pool_size=10),
         Keras_Conv1D_Parameters(filters=10, kernel_size="1/30", activation="relu", pool_size=2),
         Keras_Conv1D_Parameters(filters=10, kernel_size=2, activation='relu', pool_size=2),
         Keras_Flatten_Parameters(),
         Keras_Dense_Parameters(value="1/4", kernel_initializer='uniform', activation='relu'),
         Keras_Dense_Parameters(value="1/8", kernel_initializer='uniform', activation='relu'),
-        Keras_Dense_Parameters(value="1/16", kernel_initializer='uniform', activation='relu')
+        Keras_Dense_Parameters(value="1/16", kernel_initializer='uniform', activation='relu'),
+        Keras_Output_Dense_Parameters(kernel_initializer='uniform', activation='softmax')
     ]):
         """
         Create a generic CNN.
@@ -469,7 +481,6 @@ class ML(object):
         input_dim = datapoints[0]
         output_shape = y.shape[1]
         classifier = Sequential()
-        classifier.add(InputLayer(input_shape=datapoints))
 
         print("input_dim: {0} datapoints {1}".format(input_dim, datapoints))
 
@@ -501,10 +512,16 @@ class ML(object):
             elif isinstance(layer, Keras_Dropout_Parameters):
                 rate = layer.rate
                 classifier.add(Dropout(rate))
+            elif isinstance(layer, Keras_InputLayer_Parameters):
+                classifier.add(InputLayer(input_shape=datapoints))
+            elif isinstance(layer, Keras_Output_Dense_Parameters):
+                kernel_initializer, activation = layer.kernel_initializer, layer.activation
+                classifier.add(Dense(units=output_shape,
+                                     kernel_initializer=kernel_initializer,
+                                     activation=activation))
             else:
                 raise ValueError('Invalid layer type!')
 
-        classifier.add(Dense(units=output_shape, activation='softmax'))
         classifier.compile(optimizer='adam', loss='categorical_crossentropy',
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
@@ -540,6 +557,7 @@ class ML(object):
         :param tensorboard:  Set to True to include tensorboard
         data in the local directory under ./Graph
         :param verbose:  Integer. 0, 1, or 2. Verbosity mode. 0 = silent, 1 = progress bar, 2 = one line per epoch.
+        This is for neural networks only.
         :return: The classifier after training.
         """
         import keras.callbacks
@@ -730,9 +748,9 @@ class ML(object):
             print("\tCalculating fold: {0}".format(fold))
             if executor:
                 future = executor.submit(self._cfv_runner,
-                                     X_train, y_train,
-                                     X_test, y_test,
-                                     batch_size=batch_size, epochs=epochs)
+                                         X_train, y_train,
+                                         X_test, y_test,
+                                         batch_size=batch_size, epochs=epochs, verbose=2)
                 saved_futures[future] = fold
                 if len(saved_futures) >= n_jobs:
                     keystodel = []
@@ -745,7 +763,8 @@ class ML(object):
                     for key in keystodel:
                         del saved_futures[key]
             else:
-                result_dict = self._cfv_runner(X_train, y_train, X_test, y_test, batch_size=batch_size, epochs=epochs)
+                result_dict = self._cfv_runner(X_train, y_train, X_test, y_test, batch_size=batch_size,
+                                               epochs=epochs, verbose=2)
                 print("\tFinished calculating fold: {0}".format(fold))
                 classifiers[fold] = result_dict
 
@@ -773,6 +792,7 @@ class ML(object):
         :param batch_size:  The batch size for Keras classifiers.
         :param epochs:  The number of epochs for Keras classifiers.
         :param verbose:  Integer. 0, 1, or 2. Verbosity mode. 0 = silent, 1 = progress bar, 2 = one line per epoch.
+        This is for neural networks only.
         :return:  A dictionary with the results.
         """
         if self.classifier_type in ['ann', 'cnn']:
