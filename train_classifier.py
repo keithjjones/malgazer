@@ -183,6 +183,9 @@ def main(arguments=None):
     parser.add_argument("-nnl", "--nnlayers",
                         help="The file containing the Python code to instantiate neural network layers."
                              "", type=str, default="")
+    parser.add_argument("-nno", "--nnoptimizer",
+                        help="The optimizer used for training neural networks."
+                             "", type=str, default="adam")
     parser.add_argument("-gt", "--gridsearchtype",
                         help="The type of the base estimator for gridsearch."
                              "", type=str, default='dt')
@@ -234,6 +237,7 @@ def main(arguments=None):
         nnlayers = eval(open(args.nnlayers.strip(), 'r').read())
     else:
         nnlayers = None
+    nnoptimizer = args.nnoptimizer
 
     if test_percent < 0 or test_percent > 1:
         raise ValueError("Test percent should be between 0 and 1!")
@@ -263,7 +267,7 @@ def main(arguments=None):
 
     # Make the classifier
     ml = ML(feature_type=feature_type, classifier_type=classifier_type, n_classes=n_categories,
-            rwe_windowsize=windowsize, datapoints=datapoints, nnlayers=nnlayers)
+            rwe_windowsize=windowsize, datapoints=datapoints, nnlayers=nnlayers, nnoptimizer=nnoptimizer)
     X, y = ml.preprocess_data(X, y)
 
     # Check for bad values...

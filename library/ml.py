@@ -45,7 +45,7 @@ Keras_Conv1D_Parameters = namedtuple('Keras_Conv1D_Parameters', ['filters', 'ker
 
 class ML(object):
     def __init__(self, feature_type='rwe', classifier_type='dt', n_classes=6, rwe_windowsize=None, datapoints=None,
-                 nnlayers=None, *args, **kwargs):
+                 nnlayers=None, nnoptimizer="adam", *args, **kwargs):
         """
         A machine learning class to hold information about classifiers.
 
@@ -55,6 +55,7 @@ class ML(object):
         :param rwe_windowsize:  The RWE window size.
         :param datapoints:  The datapoints for RWE.
         :param nnlayers:  The neural network layers.
+        :param nnoptimizer:  The optimizer for neural networks.
         """
         super(ML, self).__init__()
         self.classifer = None
@@ -71,6 +72,7 @@ class ML(object):
         self.rwe_windowsize = rwe_windowsize
         self.datapoints = datapoints
         self.nnlayers = nnlayers
+        self.nnoptimizer = nnoptimizer
         self.feature_type = feature_type
 
     def train(self, *args, **kwargs):
@@ -389,7 +391,7 @@ class ML(object):
         Keras_Dense_Parameters(value="1/2", kernel_initializer='uniform', activation='relu'),
         Keras_Dense_Parameters(value=100, kernel_initializer='uniform', activation='relu'),
         Keras_Output_Dense_Parameters(kernel_initializer='uniform', activation='softmax')
-    ]):
+    ], optimizer='adam'):
         """
         Create a generic ANN.
 
@@ -399,10 +401,12 @@ class ML(object):
         file... where if the value is an int, the value will be used for the number of units for that layer, or
         if the value is a float or string it will be multiplied to the number of input data points.  kernel_initializer
         and activation are passed to the Dense object as such.
+        :param optimizer:  The optimizer to use.
         :return:  The classifier.
         """
         from keras.models import Sequential
         from keras.layers import Dense, Dropout
+        from keras import optimizers
         datapoints = X.shape[1]
         output_shape = y.shape[1]
         classifier = Sequential()
@@ -433,7 +437,7 @@ class ML(object):
             else:
                 raise ValueError('Invalid layer type!')
 
-        classifier.compile(optimizer='adam',
+        classifier.compile(optimizer=optimizer,
                            loss='categorical_crossentropy',
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
@@ -462,7 +466,7 @@ class ML(object):
         Keras_Dense_Parameters(value="1/8", kernel_initializer='uniform', activation='relu'),
         Keras_Dense_Parameters(value="1/16", kernel_initializer='uniform', activation='relu'),
         Keras_Output_Dense_Parameters(kernel_initializer='uniform', activation='softmax')
-    ]):
+    ], optimizer='adam'):
         """
         Create a generic CNN.
 
@@ -473,16 +477,16 @@ class ML(object):
         if they are a a float or string they will be multiplied to the number of input data points.  kernel_initializer
         and activation are passed to the Dense and/or CNN object as such.  It makes more sense if you look at the short
         code below.
+        :param optimizer:  The optimizer to use.
         :return:  The classifier.
         """
         from keras.models import Sequential
         from keras.layers import Dense, Dropout, Flatten, MaxPooling1D, Conv1D, InputLayer
+        from keras import optimizers
         datapoints = X.shape[1:]
         input_dim = datapoints[0]
         output_shape = y.shape[1]
         classifier = Sequential()
-
-        print("input_dim: {0} datapoints {1}".format(input_dim, datapoints))
 
         for layer in layers:
             if isinstance(layer, Keras_Flatten_Parameters):
@@ -522,7 +526,7 @@ class ML(object):
             else:
                 raise ValueError('Invalid layer type!')
 
-        classifier.compile(optimizer='adam', loss='categorical_crossentropy',
+        classifier.compile(optimizer=optimizer, loss='categorical_crossentropy',
                            metrics=['categorical_accuracy', 'accuracy'])
         return classifier
 
@@ -806,15 +810,17 @@ class ML(object):
                 if self.classifier_type == 'cnn':
                     if self.nnlayers:
                         return ML.build_cnn_static(X_train_in, label_binarize(y_train, classes=range(self.n_classes)),
-                                                   layers=self.nnlayers)
+                                                   layers=self.nnlayers, optmizer=self.nnoptimizer)
                     else:
-                        return ML.build_cnn_static(X_train_in, label_binarize(y_train, classes=range(self.n_classes)))
+                        return ML.build_cnn_static(X_train_in, label_binarize(y_train, classes=range(self.n_classes)),
+                                                   optimizer=self.nnoptimizer)
                 else:
                     if self.nnlayers:
                         return ML.build_ann_static(X_train, label_binarize(y_train, classes=range(self.n_classes)),
-                                                   layers=self.nnlayers)
+                                                   layers=self.nnlayers, optimizer=self.nnoptimizer)
                     else:
-                        return ML.build_ann_static(X_train, label_binarize(y_train, classes=range(self.n_classes)))
+                        return ML.build_ann_static(X_train, label_binarize(y_train, classes=range(self.n_classes)),
+                                                   optimizer=self.nnoptimizer)
             classifier = KerasClassifier(build_fn=create_model,
                                          batch_size=batch_size,
                                          epochs=epochs)
