@@ -363,14 +363,15 @@ def main(arguments=None):
         else:
             # Cross Fold Validation
             start_time = time.time()
-            mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
-                                                                   batch_size=batch_size,
-                                                                   epochs=epochs,
-                                                                   cv=cfv_groups, n_jobs=cfv_jobs)
+            mean, variance, classifiers, accuracies = ml.cross_fold_validation(X_train, y_train,
+                                                                               batch_size=batch_size,
+                                                                               epochs=epochs,
+                                                                               cv=cfv_groups, n_jobs=cfv_jobs)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print(DIVIDER)
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
+            print("CFV Accuracies: {0}".format(accuracies))
             print(DIVIDER)
 
             if generate_roc_curves:
@@ -420,14 +421,15 @@ def main(arguments=None):
         else:
             # Cross Fold Validation
             start_time = time.time()
-            mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
-                                                                   batch_size=batch_size,
-                                                                   epochs=epochs,
-                                                                   cv=cfv_groups, n_jobs=cfv_jobs)
+            mean, variance, classifiers, accuracies = ml.cross_fold_validation(X_train, y_train,
+                                                                               batch_size=batch_size,
+                                                                               epochs=epochs,
+                                                                               cv=cfv_groups, n_jobs=cfv_jobs)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print(DIVIDER)
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
+            print("CFV Accuracies: {0}".format(accuracies))
             print(DIVIDER)
 
             if generate_roc_curves:
@@ -542,12 +544,13 @@ def main(arguments=None):
                                    filename="{0}_{1}.png".format(classifier_short, suffix))
         else:
             # Cross Fold Validation
-            mean, variance, classifiers = ml.cross_fold_validation(X_train, y_train,
-                                                                   cv=cfv_groups, n_jobs=cfv_jobs)
+            mean, variance, classifiers, accuracies = ml.cross_fold_validation(X_train, y_train,
+                                                                               cv=cfv_groups, n_jobs=cfv_jobs)
             print("Training time {0:.6f} seconds".format(round(time.time() - start_time, 6)))
             print(DIVIDER)
             print("CFV Mean: {0}".format(mean))
             print("CFV Var: {0}".format(variance))
+            print("CFV Accuracies: {0}".format(accuracies))
             print(DIVIDER)
 
             if generate_roc_curves:

@@ -727,7 +727,7 @@ class ML(object):
         :param n_jobs:  The number of jobs to run at once.
         :param batch_size:  The batch size for Keras classifiers.
         :param epochs:  The number of epochs for Keras classifiers.
-        :return:  A tuple of mean, variance, classifiers (dict).
+        :return:  A tuple of mean, variance, classifiers (dict), and a list of accuracies.
         """
         cvkfold = StratifiedKFold(n_splits=cv)
 
@@ -762,6 +762,7 @@ class ML(object):
                     for future in futures.done:
                         print("\tFinished calculating fold: {0}".format(saved_futures[future]))
                         result_dict = future.result()
+                        print("\tAccuracy {0} for fold {1}".format(result_dict['accuracy'], saved_futures[future]))
                         classifiers[saved_futures[future]] = result_dict
                         keystodel.append(future)
                     for key in keystodel:
@@ -770,12 +771,14 @@ class ML(object):
                 result_dict = self._cfv_runner(X_train, y_train, X_test, y_test, batch_size=batch_size,
                                                epochs=epochs, verbose=2)
                 print("\tFinished calculating fold: {0}".format(fold))
+                print("\tAccuracy {0} for fold {1}".format(result_dict['accuracy'], fold))
                 classifiers[fold] = result_dict
 
         if executor:
             for future in as_completed(saved_futures):
                 print("\tFinished calculating fold: {0}".format(saved_futures[future]))
                 result_dict = future.result()
+                print("\tAccuracy {0} for fold {1}".format(result_dict['accuracy'], saved_futures[future]))
                 classifiers[saved_futures[future]] = result_dict
             executor.shutdown(wait=True)
 
@@ -783,7 +786,7 @@ class ML(object):
         accuracies = np.array([classifiers[f]['accuracy'] for f in classifiers])
         mean = accuracies.mean()
         variance = accuracies.std()
-        return mean, variance, classifiers
+        return mean, variance, classifiers, accuracies
 
     def _cfv_runner(self, X_train, y_train, X_test, y_test, batch_size=None, epochs=None, verbose=0, **kwargs):
         """
