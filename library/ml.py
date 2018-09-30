@@ -451,7 +451,7 @@ class ML(object):
         :return:  The classifier.
         """
         self.classifier_type = 'ann'
-        self.classifier = ML.build_ann_static(X, y, layers=self.layers)
+        self.classifier = ML.build_ann_static(X, y, layers=self.nnlayers, optimizer=self.nnoptimizer)
         self.classifier.summary()
         return self.classifier
 
@@ -543,7 +543,7 @@ class ML(object):
         else:
             X = X
         self.classifier_type = 'cnn'
-        self.classifier = ML.build_cnn_static(X, y, layers=self.layers)
+        self.classifier = ML.build_cnn_static(X, y, layers=self.nnlayers, optimizer=self.nnoptimizer)
         self.classifier.summary()
         return self.classifier
 
