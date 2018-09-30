@@ -813,7 +813,7 @@ class ML(object):
                 if self.classifier_type == 'cnn':
                     if self.nnlayers:
                         return ML.build_cnn_static(X_train_in, label_binarize(y_train, classes=range(self.n_classes)),
-                                                   layers=self.nnlayers, optmizer=self.nnoptimizer)
+                                                   layers=self.nnlayers, optimizer=self.nnoptimizer)
                     else:
                         return ML.build_cnn_static(X_train_in, label_binarize(y_train, classes=range(self.n_classes)),
                                                    optimizer=self.nnoptimizer)
