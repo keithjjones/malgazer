@@ -1,0 +1,174 @@
+================================================================================
+Command Line:
+	train_classifier.py ann rwe /mnt/data/RWE/ -rwew 256 -rwed 4096 -c 10 -cj 1 -nno nadam -nnb 5000 -nne 200 -nnl training/nnlayers/ann1.txt
+================================================================================
+================================================================================
+Loading data...
+================================================================================
+================================================================================
+Feature Type: rwe
+	Window Size: 256
+	Data points: 4,096
+Number of features: 4,096
+================================================================================
+/usr/local/lib/python3.5/dist-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/usr/local/lib/python3.5/dist-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+
+
+================================================================================
+Classifier Type: Artificial Neural Network (ann)
+================================================================================
+Cross Fold Validation - 10 Fold(s) - Enabled!
+================================================================================
+Training Class Count:
+================================================================================
+	Virus       10000
+	Ransom      10000
+	Backdoor    10000
+	Trojan      10000
+	PUA         10000
+	Worm        10000
+================================================================================
+Testing Class Count:
+================================================================================
+	Virus       10000
+	Ransom      10000
+	Backdoor    10000
+	Trojan      10000
+	PUA         10000
+	Worm        10000
+================================================================================
+
+
+================================================================================
+Begin training...
+================================================================================
+Start Cross Fold Validation...
+	Calculating fold: 1
+Using TensorFlow backend.
+Epoch 1/200
+2018-10-05 14:07:43.239616: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2018-10-05 14:07:46.416590: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:897] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2018-10-05 14:07:46.417015: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1405] Found device 0 with properties: 
+name: Tesla K80 major: 3 minor: 7 memoryClockRate(GHz): 0.8235
+pciBusID: 0000:00:1e.0
+totalMemory: 11.17GiB freeMemory: 11.10GiB
+2018-10-05 14:07:46.417043: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1484] Adding visible gpu devices: 0
+2018-10-05 14:07:46.719868: I tensorflow/core/common_runtime/gpu/gpu_device.cc:965] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-05 14:07:46.719917: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971]      0 
+2018-10-05 14:07:46.719925: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] 0:   N 
+2018-10-05 14:07:46.720220: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1097] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 10759 MB memory) -> physical GPU (device: 0, name: Tesla K80, pci bus id: 0000:00:1e.0, compute capability: 3.7)
+ - 9s - loss: 11.1582 - categorical_accuracy: 0.2096 - acc: 0.2096
+Epoch 2/200
+ - 4s - loss: 5.3158 - categorical_accuracy: 0.3009 - acc: 0.3009
+Epoch 3/200
+ - 4s - loss: 1.4342 - categorical_accuracy: 0.4965 - acc: 0.4965
+Epoch 4/200
+ - 4s - loss: 0.9217 - categorical_accuracy: 0.6506 - acc: 0.6506
+Epoch 5/200
+ - 4s - loss: 0.8238 - categorical_accuracy: 0.6898 - acc: 0.6898
+Epoch 6/200
+ - 4s - loss: 0.7025 - categorical_accuracy: 0.7408 - acc: 0.7408
+Epoch 7/200
+ - 4s - loss: 0.6479 - categorical_accuracy: 0.7627 - acc: 0.7627
+Epoch 8/200
+ - 4s - loss: 0.5834 - categorical_accuracy: 0.7898 - acc: 0.7898
+Epoch 9/200
+ - 4s - loss: 0.6067 - categorical_accuracy: 0.7828 - acc: 0.7828
+Epoch 10/200
+ - 4s - loss: 0.9585 - categorical_accuracy: 0.7040 - acc: 0.7040
+Epoch 11/200
+ - 4s - loss: 1.6297 - categorical_accuracy: 0.5127 - acc: 0.5127
+Epoch 12/200
+ - 4s - loss: 1.0210 - categorical_accuracy: 0.6302 - acc: 0.6302
+Epoch 13/200
+ - 4s - loss: 0.6549 - categorical_accuracy: 0.7594 - acc: 0.7594
+Epoch 14/200
+ - 4s - loss: 0.5522 - categorical_accuracy: 0.7954 - acc: 0.7954
+Epoch 15/200
+ - 4s - loss: 0.4936 - categorical_accuracy: 0.8182 - acc: 0.8182
+Epoch 16/200
+ - 4s - loss: 0.4655 - categorical_accuracy: 0.8268 - acc: 0.8268
+Epoch 17/200
+ - 4s - loss: 0.5486 - categorical_accuracy: 0.8106 - acc: 0.8106
+Epoch 18/200
+ - 4s - loss: 0.6044 - categorical_accuracy: 0.7520 - acc: 0.7520
+Epoch 19/200
+ - 4s - loss: 0.5180 - categorical_accuracy: 0.8007 - acc: 0.8007
+Epoch 20/200
+ - 4s - loss: 0.4504 - categorical_accuracy: 0.8244 - acc: 0.8244
+Epoch 21/200
+ - 4s - loss: 0.4055 - categorical_accuracy: 0.8416 - acc: 0.8416
+Epoch 22/200
+ - 4s - loss: 0.3547 - categorical_accuracy: 0.8683 - acc: 0.8683
+Epoch 23/200
+ - 4s - loss: 0.3467 - categorical_accuracy: 0.8706 - acc: 0.8706
+Epoch 24/200
+ - 4s - loss: 0.3049 - categorical_accuracy: 0.8896 - acc: 0.8896
+Epoch 25/200
+ - 4s - loss: 0.2911 - categorical_accuracy: 0.8950 - acc: 0.8950
+Epoch 26/200
+ - 4s - loss: 0.2640 - categorical_accuracy: 0.9061 - acc: 0.9061
+Epoch 27/200
+ - 4s - loss: 0.4826 - categorical_accuracy: 0.8188 - acc: 0.8188
+Epoch 28/200
+ - 4s - loss: 0.3196 - categorical_accuracy: 0.8828 - acc: 0.8828
+Epoch 29/200
+ - 4s - loss: 0.2770 - categorical_accuracy: 0.9013 - acc: 0.9013
+Epoch 30/200
+ - 4s - loss: 0.2497 - categorical_accuracy: 0.9106 - acc: 0.9106
+Epoch 31/200
+ - 4s - loss: 4.0223 - categorical_accuracy: 0.5074 - acc: 0.5074
+Epoch 32/200
+ - 4s - loss: 1.4835 - categorical_accuracy: 0.3480 - acc: 0.3480
+Epoch 33/200
+ - 4s - loss: 1.4566 - categorical_accuracy: 0.3589 - acc: 0.3589
+Epoch 34/200
+ - 4s - loss: 1.5429 - categorical_accuracy: 0.3801 - acc: 0.3801
+Epoch 35/200
+ - 4s - loss: 1.3796 - categorical_accuracy: 0.3980 - acc: 0.3980
+Epoch 36/200
+ - 4s - loss: 1.5095 - categorical_accuracy: 0.3467 - acc: 0.3467
+Epoch 37/200
+ - 4s - loss: 1.3908 - categorical_accuracy: 0.3848 - acc: 0.3848
+Epoch 38/200
+ - 4s - loss: 1.3580 - categorical_accuracy: 0.4011 - acc: 0.4011
+Epoch 39/200
+ - 4s - loss: 1.3494 - categorical_accuracy: 0.4050 - acc: 0.4050
+Epoch 40/200
+ - 4s - loss: 1.3395 - categorical_accuracy: 0.4098 - acc: 0.4098
+Epoch 41/200
+ - 4s - loss: 1.3122 - categorical_accuracy: 0.4246 - acc: 0.4246
+Epoch 42/200
+ - 4s - loss: 1.2999 - categorical_accuracy: 0.4283 - acc: 0.4283
+Epoch 43/200
+ - 4s - loss: 1.2948 - categorical_accuracy: 0.4286 - acc: 0.4286
+Epoch 44/200
+ - 4s - loss: 1.2986 - categorical_accuracy: 0.4315 - acc: 0.4315
+Epoch 45/200
+ - 4s - loss: 1.2889 - categorical_accuracy: 0.4283 - acc: 0.4283
+Epoch 46/200
+ - 4s - loss: 1.2850 - categorical_accuracy: 0.4284 - acc: 0.4284
+Epoch 47/200
+ - 4s - loss: 1.2824 - categorical_accuracy: 0.4293 - acc: 0.4293
+Epoch 48/200
+ - 4s - loss: 1.2773 - categorical_accuracy: 0.4322 - acc: 0.4322
+Epoch 49/200
+ - 4s - loss: 1.2702 - categorical_accuracy: 0.4343 - acc: 0.4343
+Epoch 50/200
+ - 4s - loss: 1.2643 - categorical_accuracy: 0.4383 - acc: 0.4383
+Epoch 51/200
+ - 4s - loss: 1.3195 - categorical_accuracy: 0.4174 - acc: 0.4174
+Epoch 52/200
+ - 4s - loss: 1.2794 - categorical_accuracy: 0.4313 - acc: 0.4313
+Epoch 53/200
+ - 4s - loss: 1.2722 - categorical_accuracy: 0.4345 - acc: 0.4345
+Epoch 54/200
+ - 4s - loss: 1.2710 - categorical_accuracy: 0.4347 - acc: 0.4347
+Epoch 55/200
+ - 4s - loss: 1.2625 - categorical_accuracy: 0.4388 - acc: 0.4388
+Epoch 56/200
+ - 4s - loss: 1.2555 - categorical_accuracy: 0.4439 - acc: 0.4439
+Epoch 57/200
