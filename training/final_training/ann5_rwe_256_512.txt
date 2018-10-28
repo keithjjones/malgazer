@@ -1,0 +1,531 @@
+================================================================================
+Command Line:
+	train_classifier.py ann rwe /mnt/data/RWE -rwew 256 -rwed 512 -t 0.1 -roc -nno adadelta -nnb 1000 -nne 200 -nnl training/nnlayers/ann5.txt
+================================================================================
+================================================================================
+Loading data...
+================================================================================
+================================================================================
+Feature Type: rwe
+	Window Size: 256
+	Data points: 512
+Number of features: 512
+================================================================================
+/usr/local/lib/python3.5/dist-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/usr/local/lib/python3.5/dist-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+
+
+================================================================================
+Classifier Type: Artificial Neural Network (ann)
+================================================================================
+Training Class Count:
+================================================================================
+	Virus       9000
+	Trojan      9000
+	Worm        9000
+	Backdoor    9000
+	Ransom      9000
+	PUA         9000
+================================================================================
+Testing Class Count:
+================================================================================
+	Trojan      1000
+	Ransom      1000
+	PUA         1000
+	Worm        1000
+	Virus       1000
+	Backdoor    1000
+================================================================================
+
+
+================================================================================
+Begin training...
+================================================================================
+Using TensorFlow backend.
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+dense_1 (Dense)              (None, 512)               262656    
+_________________________________________________________________
+dense_2 (Dense)              (None, 1024)              525312    
+_________________________________________________________________
+dense_3 (Dense)              (None, 1024)              1049600   
+_________________________________________________________________
+dense_4 (Dense)              (None, 1024)              1049600   
+_________________________________________________________________
+dense_5 (Dense)              (None, 1024)              1049600   
+_________________________________________________________________
+dense_6 (Dense)              (None, 1024)              1049600   
+_________________________________________________________________
+dense_7 (Dense)              (None, 1024)              1049600   
+_________________________________________________________________
+dense_8 (Dense)              (None, 1024)              1049600   
+_________________________________________________________________
+dense_9 (Dense)              (None, 1024)              1049600   
+_________________________________________________________________
+dense_10 (Dense)             (None, 1024)              1049600   
+_________________________________________________________________
+dense_11 (Dense)             (None, 1024)              1049600   
+_________________________________________________________________
+dense_12 (Dense)             (None, 256)               262400    
+_________________________________________________________________
+dense_13 (Dense)             (None, 6)                 1542      
+=================================================================
+Total params: 10,498,310
+Trainable params: 10,498,310
+Non-trainable params: 0
+_________________________________________________________________
+Epoch 1/200
+2018-10-28 21:59:20.852905: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2018-10-28 21:59:23.031533: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:897] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2018-10-28 21:59:23.032033: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1405] Found device 0 with properties: 
+name: Tesla K80 major: 3 minor: 7 memoryClockRate(GHz): 0.8235
+pciBusID: 0000:00:1e.0
+totalMemory: 11.17GiB freeMemory: 11.10GiB
+2018-10-28 21:59:23.032061: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1484] Adding visible gpu devices: 0
+2018-10-28 21:59:23.328984: I tensorflow/core/common_runtime/gpu/gpu_device.cc:965] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-10-28 21:59:23.329032: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971]      0 
+2018-10-28 21:59:23.329049: I tensorflow/core/common_runtime/gpu/gpu_device.cc:984] 0:   N 
+2018-10-28 21:59:23.329408: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1097] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 10759 MB memory) -> physical GPU (device: 0, name: Tesla K80, pci bus id: 0000:00:1e.0, compute capability: 3.7)
+ - 7s - loss: 1.7205 - categorical_accuracy: 0.3017 - acc: 0.3017
+Epoch 2/200
+ - 3s - loss: 1.2234 - categorical_accuracy: 0.4622 - acc: 0.4622
+Epoch 3/200
+ - 3s - loss: 0.9503 - categorical_accuracy: 0.6230 - acc: 0.6230
+Epoch 4/200
+ - 3s - loss: 0.7882 - categorical_accuracy: 0.7103 - acc: 0.7103
+Epoch 5/200
+ - 3s - loss: 0.6484 - categorical_accuracy: 0.7803 - acc: 0.7803
+Epoch 6/200
+ - 3s - loss: 0.5079 - categorical_accuracy: 0.8274 - acc: 0.8274
+Epoch 7/200
+ - 3s - loss: 0.4465 - categorical_accuracy: 0.8439 - acc: 0.8439
+Epoch 8/200
+ - 3s - loss: 0.3649 - categorical_accuracy: 0.8733 - acc: 0.8733
+Epoch 9/200
+ - 3s - loss: 0.3451 - categorical_accuracy: 0.8796 - acc: 0.8796
+Epoch 10/200
+ - 3s - loss: 0.3146 - categorical_accuracy: 0.8911 - acc: 0.8911
+Epoch 11/200
+ - 3s - loss: 0.2894 - categorical_accuracy: 0.9015 - acc: 0.9015
+Epoch 12/200
+ - 3s - loss: 0.3259 - categorical_accuracy: 0.8897 - acc: 0.8897
+Epoch 13/200
+ - 3s - loss: 0.2105 - categorical_accuracy: 0.9290 - acc: 0.9290
+Epoch 14/200
+ - 3s - loss: 0.2365 - categorical_accuracy: 0.9227 - acc: 0.9227
+Epoch 15/200
+ - 3s - loss: 0.2011 - categorical_accuracy: 0.9324 - acc: 0.9324
+Epoch 16/200
+ - 3s - loss: 0.2081 - categorical_accuracy: 0.9306 - acc: 0.9306
+Epoch 17/200
+ - 3s - loss: 0.1722 - categorical_accuracy: 0.9432 - acc: 0.9432
+Epoch 18/200
+ - 3s - loss: 0.1588 - categorical_accuracy: 0.9472 - acc: 0.9472
+Epoch 19/200
+ - 3s - loss: 0.2107 - categorical_accuracy: 0.9318 - acc: 0.9318
+Epoch 20/200
+ - 3s - loss: 0.1483 - categorical_accuracy: 0.9505 - acc: 0.9505
+Epoch 21/200
+ - 3s - loss: 0.1386 - categorical_accuracy: 0.9539 - acc: 0.9539
+Epoch 22/200
+ - 3s - loss: 0.1323 - categorical_accuracy: 0.9567 - acc: 0.9567
+Epoch 23/200
+ - 3s - loss: 0.1309 - categorical_accuracy: 0.9573 - acc: 0.9573
+Epoch 24/200
+ - 3s - loss: 0.1250 - categorical_accuracy: 0.9591 - acc: 0.9591
+Epoch 25/200
+ - 3s - loss: 0.1003 - categorical_accuracy: 0.9672 - acc: 0.9672
+Epoch 26/200
+ - 3s - loss: 0.2068 - categorical_accuracy: 0.9385 - acc: 0.9385
+Epoch 27/200
+ - 3s - loss: 0.0948 - categorical_accuracy: 0.9695 - acc: 0.9695
+Epoch 28/200
+ - 3s - loss: 0.0932 - categorical_accuracy: 0.9696 - acc: 0.9696
+Epoch 29/200
+ - 3s - loss: 0.1244 - categorical_accuracy: 0.9611 - acc: 0.9611
+Epoch 30/200
+ - 3s - loss: 0.0822 - categorical_accuracy: 0.9734 - acc: 0.9734
+Epoch 31/200
+ - 3s - loss: 0.0886 - categorical_accuracy: 0.9708 - acc: 0.9708
+Epoch 32/200
+ - 3s - loss: 0.0952 - categorical_accuracy: 0.9694 - acc: 0.9694
+Epoch 33/200
+ - 3s - loss: 0.0728 - categorical_accuracy: 0.9764 - acc: 0.9764
+Epoch 34/200
+ - 3s - loss: 0.0749 - categorical_accuracy: 0.9755 - acc: 0.9755
+Epoch 35/200
+ - 3s - loss: 0.1080 - categorical_accuracy: 0.9658 - acc: 0.9658
+Epoch 36/200
+ - 3s - loss: 0.0673 - categorical_accuracy: 0.9781 - acc: 0.9781
+Epoch 37/200
+ - 3s - loss: 0.0737 - categorical_accuracy: 0.9769 - acc: 0.9769
+Epoch 38/200
+ - 3s - loss: 0.0602 - categorical_accuracy: 0.9800 - acc: 0.9800
+Epoch 39/200
+ - 3s - loss: 0.0635 - categorical_accuracy: 0.9798 - acc: 0.9798
+Epoch 40/200
+ - 3s - loss: 0.0671 - categorical_accuracy: 0.9785 - acc: 0.9785
+Epoch 41/200
+ - 3s - loss: 0.0740 - categorical_accuracy: 0.9768 - acc: 0.9768
+Epoch 42/200
+ - 3s - loss: 0.0525 - categorical_accuracy: 0.9829 - acc: 0.9829
+Epoch 43/200
+ - 3s - loss: 0.0583 - categorical_accuracy: 0.9816 - acc: 0.9816
+Epoch 44/200
+ - 3s - loss: 0.0628 - categorical_accuracy: 0.9797 - acc: 0.9797
+Epoch 45/200
+ - 3s - loss: 0.0509 - categorical_accuracy: 0.9835 - acc: 0.9835
+Epoch 46/200
+ - 3s - loss: 0.0467 - categorical_accuracy: 0.9845 - acc: 0.9845
+Epoch 47/200
+ - 3s - loss: 0.0478 - categorical_accuracy: 0.9844 - acc: 0.9844
+Epoch 48/200
+ - 3s - loss: 0.0481 - categorical_accuracy: 0.9842 - acc: 0.9842
+Epoch 49/200
+ - 3s - loss: 0.0441 - categorical_accuracy: 0.9858 - acc: 0.9858
+Epoch 50/200
+ - 3s - loss: 0.0497 - categorical_accuracy: 0.9841 - acc: 0.9841
+Epoch 51/200
+ - 3s - loss: 0.0400 - categorical_accuracy: 0.9864 - acc: 0.9864
+Epoch 52/200
+ - 3s - loss: 0.0395 - categorical_accuracy: 0.9867 - acc: 0.9867
+Epoch 53/200
+ - 3s - loss: 0.0460 - categorical_accuracy: 0.9852 - acc: 0.9852
+Epoch 54/200
+ - 3s - loss: 0.0355 - categorical_accuracy: 0.9882 - acc: 0.9882
+Epoch 55/200
+ - 3s - loss: 0.0420 - categorical_accuracy: 0.9866 - acc: 0.9866
+Epoch 56/200
+ - 3s - loss: 0.0369 - categorical_accuracy: 0.9876 - acc: 0.9876
+Epoch 57/200
+ - 3s - loss: 0.0340 - categorical_accuracy: 0.9887 - acc: 0.9887
+Epoch 58/200
+ - 3s - loss: 0.0416 - categorical_accuracy: 0.9866 - acc: 0.9866
+Epoch 59/200
+ - 3s - loss: 0.0319 - categorical_accuracy: 0.9895 - acc: 0.9895
+Epoch 60/200
+ - 3s - loss: 0.0497 - categorical_accuracy: 0.9849 - acc: 0.9849
+Epoch 61/200
+ - 3s - loss: 0.0293 - categorical_accuracy: 0.9902 - acc: 0.9902
+Epoch 62/200
+ - 3s - loss: 0.0294 - categorical_accuracy: 0.9901 - acc: 0.9901
+Epoch 63/200
+ - 3s - loss: 0.0302 - categorical_accuracy: 0.9902 - acc: 0.9902
+Epoch 64/200
+ - 3s - loss: 0.0339 - categorical_accuracy: 0.9884 - acc: 0.9884
+Epoch 65/200
+ - 3s - loss: 0.0290 - categorical_accuracy: 0.9904 - acc: 0.9904
+Epoch 66/200
+ - 3s - loss: 0.0286 - categorical_accuracy: 0.9904 - acc: 0.9904
+Epoch 67/200
+ - 3s - loss: 0.0285 - categorical_accuracy: 0.9908 - acc: 0.9908
+Epoch 68/200
+ - 3s - loss: 0.0271 - categorical_accuracy: 0.9910 - acc: 0.9910
+Epoch 69/200
+ - 3s - loss: 0.0255 - categorical_accuracy: 0.9915 - acc: 0.9915
+Epoch 70/200
+ - 3s - loss: 0.0239 - categorical_accuracy: 0.9921 - acc: 0.9921
+Epoch 71/200
+ - 3s - loss: 0.0335 - categorical_accuracy: 0.9895 - acc: 0.9895
+Epoch 72/200
+ - 3s - loss: 0.0244 - categorical_accuracy: 0.9921 - acc: 0.9921
+Epoch 73/200
+ - 3s - loss: 0.0254 - categorical_accuracy: 0.9914 - acc: 0.9914
+Epoch 74/200
+ - 3s - loss: 0.0285 - categorical_accuracy: 0.9911 - acc: 0.9911
+Epoch 75/200
+ - 3s - loss: 0.0241 - categorical_accuracy: 0.9921 - acc: 0.9921
+Epoch 76/200
+ - 3s - loss: 0.0249 - categorical_accuracy: 0.9916 - acc: 0.9916
+Epoch 77/200
+ - 3s - loss: 0.0252 - categorical_accuracy: 0.9916 - acc: 0.9916
+Epoch 78/200
+ - 3s - loss: 0.0201 - categorical_accuracy: 0.9934 - acc: 0.9934
+Epoch 79/200
+ - 3s - loss: 0.0207 - categorical_accuracy: 0.9933 - acc: 0.9933
+Epoch 80/200
+ - 3s - loss: 0.0235 - categorical_accuracy: 0.9925 - acc: 0.9925
+Epoch 81/200
+ - 3s - loss: 0.0201 - categorical_accuracy: 0.9934 - acc: 0.9934
+Epoch 82/200
+ - 3s - loss: 0.0239 - categorical_accuracy: 0.9921 - acc: 0.9921
+Epoch 83/200
+ - 3s - loss: 0.0189 - categorical_accuracy: 0.9938 - acc: 0.9938
+Epoch 84/200
+ - 3s - loss: 0.0212 - categorical_accuracy: 0.9927 - acc: 0.9927
+Epoch 85/200
+ - 3s - loss: 0.0224 - categorical_accuracy: 0.9926 - acc: 0.9926
+Epoch 86/200
+ - 3s - loss: 0.0222 - categorical_accuracy: 0.9930 - acc: 0.9930
+Epoch 87/200
+ - 3s - loss: 0.0203 - categorical_accuracy: 0.9934 - acc: 0.9934
+Epoch 88/200
+ - 3s - loss: 0.0199 - categorical_accuracy: 0.9931 - acc: 0.9931
+Epoch 89/200
+ - 3s - loss: 0.0222 - categorical_accuracy: 0.9928 - acc: 0.9928
+Epoch 90/200
+ - 3s - loss: 0.0190 - categorical_accuracy: 0.9937 - acc: 0.9937
+Epoch 91/200
+ - 3s - loss: 0.0174 - categorical_accuracy: 0.9940 - acc: 0.9940
+Epoch 92/200
+ - 3s - loss: 0.0193 - categorical_accuracy: 0.9934 - acc: 0.9934
+Epoch 93/200
+ - 3s - loss: 0.0185 - categorical_accuracy: 0.9941 - acc: 0.9941
+Epoch 94/200
+ - 3s - loss: 0.0583 - categorical_accuracy: 0.9859 - acc: 0.9859
+Epoch 95/200
+ - 3s - loss: 0.0172 - categorical_accuracy: 0.9944 - acc: 0.9944
+Epoch 96/200
+ - 3s - loss: 0.0193 - categorical_accuracy: 0.9938 - acc: 0.9938
+Epoch 97/200
+ - 3s - loss: 0.0253 - categorical_accuracy: 0.9920 - acc: 0.9920
+Epoch 98/200
+ - 3s - loss: 0.0185 - categorical_accuracy: 0.9937 - acc: 0.9937
+Epoch 99/200
+ - 3s - loss: 0.0168 - categorical_accuracy: 0.9945 - acc: 0.9945
+Epoch 100/200
+ - 3s - loss: 0.0206 - categorical_accuracy: 0.9936 - acc: 0.9936
+Epoch 101/200
+ - 3s - loss: 0.0169 - categorical_accuracy: 0.9946 - acc: 0.9946
+Epoch 102/200
+ - 3s - loss: 0.0178 - categorical_accuracy: 0.9939 - acc: 0.9939
+Epoch 103/200
+ - 3s - loss: 0.0177 - categorical_accuracy: 0.9943 - acc: 0.9943
+Epoch 104/200
+ - 3s - loss: 0.0237 - categorical_accuracy: 0.9926 - acc: 0.9926
+Epoch 105/200
+ - 3s - loss: 0.0177 - categorical_accuracy: 0.9944 - acc: 0.9944
+Epoch 106/200
+ - 3s - loss: 0.0182 - categorical_accuracy: 0.9941 - acc: 0.9941
+Epoch 107/200
+ - 3s - loss: 0.0186 - categorical_accuracy: 0.9940 - acc: 0.9940
+Epoch 108/200
+ - 3s - loss: 0.0172 - categorical_accuracy: 0.9943 - acc: 0.9943
+Epoch 109/200
+ - 3s - loss: 0.0159 - categorical_accuracy: 0.9949 - acc: 0.9949
+Epoch 110/200
+ - 3s - loss: 0.0191 - categorical_accuracy: 0.9939 - acc: 0.9939
+Epoch 111/200
+ - 3s - loss: 0.0160 - categorical_accuracy: 0.9947 - acc: 0.9947
+Epoch 112/200
+ - 3s - loss: 0.0161 - categorical_accuracy: 0.9946 - acc: 0.9946
+Epoch 113/200
+ - 3s - loss: 0.0181 - categorical_accuracy: 0.9942 - acc: 0.9942
+Epoch 114/200
+ - 3s - loss: 0.0204 - categorical_accuracy: 0.9937 - acc: 0.9937
+Epoch 115/200
+ - 3s - loss: 0.0165 - categorical_accuracy: 0.9944 - acc: 0.9944
+Epoch 116/200
+ - 3s - loss: 0.0160 - categorical_accuracy: 0.9947 - acc: 0.9947
+Epoch 117/200
+ - 3s - loss: 0.0145 - categorical_accuracy: 0.9953 - acc: 0.9953
+Epoch 118/200
+ - 3s - loss: 0.0355 - categorical_accuracy: 0.9909 - acc: 0.9909
+Epoch 119/200
+ - 3s - loss: 0.0161 - categorical_accuracy: 0.9947 - acc: 0.9947
+Epoch 120/200
+ - 3s - loss: 0.0137 - categorical_accuracy: 0.9956 - acc: 0.9956
+Epoch 121/200
+ - 3s - loss: 0.0159 - categorical_accuracy: 0.9949 - acc: 0.9949
+Epoch 122/200
+ - 3s - loss: 0.0147 - categorical_accuracy: 0.9949 - acc: 0.9949
+Epoch 123/200
+ - 3s - loss: 0.0147 - categorical_accuracy: 0.9952 - acc: 0.9952
+Epoch 124/200
+ - 3s - loss: 0.0148 - categorical_accuracy: 0.9949 - acc: 0.9949
+Epoch 125/200
+ - 3s - loss: 0.0148 - categorical_accuracy: 0.9950 - acc: 0.9950
+Epoch 126/200
+ - 3s - loss: 0.0196 - categorical_accuracy: 0.9934 - acc: 0.9934
+Epoch 127/200
+ - 3s - loss: 0.0159 - categorical_accuracy: 0.9950 - acc: 0.9950
+Epoch 128/200
+ - 3s - loss: 0.0147 - categorical_accuracy: 0.9952 - acc: 0.9952
+Epoch 129/200
+ - 3s - loss: 0.0160 - categorical_accuracy: 0.9949 - acc: 0.9949
+Epoch 130/200
+ - 3s - loss: 0.0143 - categorical_accuracy: 0.9951 - acc: 0.9951
+Epoch 131/200
+ - 3s - loss: 0.0128 - categorical_accuracy: 0.9957 - acc: 0.9957
+Epoch 132/200
+ - 3s - loss: 0.0125 - categorical_accuracy: 0.9957 - acc: 0.9957
+Epoch 133/200
+ - 3s - loss: 0.0173 - categorical_accuracy: 0.9943 - acc: 0.9943
+Epoch 134/200
+ - 3s - loss: 0.0139 - categorical_accuracy: 0.9952 - acc: 0.9952
+Epoch 135/200
+ - 3s - loss: 0.0117 - categorical_accuracy: 0.9959 - acc: 0.9959
+Epoch 136/200
+ - 3s - loss: 0.0156 - categorical_accuracy: 0.9948 - acc: 0.9948
+Epoch 137/200
+ - 3s - loss: 0.0161 - categorical_accuracy: 0.9948 - acc: 0.9948
+Epoch 138/200
+ - 3s - loss: 0.0140 - categorical_accuracy: 0.9953 - acc: 0.9953
+Epoch 139/200
+ - 3s - loss: 0.0135 - categorical_accuracy: 0.9954 - acc: 0.9954
+Epoch 140/200
+ - 3s - loss: 0.0145 - categorical_accuracy: 0.9951 - acc: 0.9951
+Epoch 141/200
+ - 3s - loss: 0.0194 - categorical_accuracy: 0.9944 - acc: 0.9944
+Epoch 142/200
+ - 3s - loss: 0.0166 - categorical_accuracy: 0.9949 - acc: 0.9949
+Epoch 143/200
+ - 3s - loss: 0.0122 - categorical_accuracy: 0.9959 - acc: 0.9959
+Epoch 144/200
+ - 3s - loss: 0.0137 - categorical_accuracy: 0.9956 - acc: 0.9956
+Epoch 145/200
+ - 3s - loss: 0.0127 - categorical_accuracy: 0.9957 - acc: 0.9957
+Epoch 146/200
+ - 3s - loss: 0.0172 - categorical_accuracy: 0.9941 - acc: 0.9941
+Epoch 147/200
+ - 3s - loss: 0.0120 - categorical_accuracy: 0.9960 - acc: 0.9960
+Epoch 148/200
+ - 3s - loss: 0.0145 - categorical_accuracy: 0.9952 - acc: 0.9952
+Epoch 149/200
+ - 3s - loss: 0.0121 - categorical_accuracy: 0.9961 - acc: 0.9961
+Epoch 150/200
+ - 3s - loss: 0.0116 - categorical_accuracy: 0.9961 - acc: 0.9961
+Epoch 151/200
+ - 3s - loss: 0.0148 - categorical_accuracy: 0.9951 - acc: 0.9951
+Epoch 152/200
+ - 3s - loss: 0.0165 - categorical_accuracy: 0.9947 - acc: 0.9947
+Epoch 153/200
+ - 3s - loss: 0.0114 - categorical_accuracy: 0.9961 - acc: 0.9961
+Epoch 154/200
+ - 3s - loss: 0.0124 - categorical_accuracy: 0.9956 - acc: 0.9956
+Epoch 155/200
+ - 3s - loss: 0.0145 - categorical_accuracy: 0.9952 - acc: 0.9952
+Epoch 156/200
+ - 3s - loss: 0.0127 - categorical_accuracy: 0.9958 - acc: 0.9958
+Epoch 157/200
+ - 3s - loss: 0.0114 - categorical_accuracy: 0.9961 - acc: 0.9961
+Epoch 158/200
+ - 3s - loss: 0.0118 - categorical_accuracy: 0.9960 - acc: 0.9960
+Epoch 159/200
+ - 3s - loss: 0.0147 - categorical_accuracy: 0.9952 - acc: 0.9952
+Epoch 160/200
+ - 3s - loss: 0.0120 - categorical_accuracy: 0.9960 - acc: 0.9960
+Epoch 161/200
+ - 3s - loss: 0.0119 - categorical_accuracy: 0.9961 - acc: 0.9961
+Epoch 162/200
+ - 3s - loss: 0.0118 - categorical_accuracy: 0.9960 - acc: 0.9960
+Epoch 163/200
+ - 3s - loss: 0.0153 - categorical_accuracy: 0.9951 - acc: 0.9951
+Epoch 164/200
+ - 3s - loss: 0.0156 - categorical_accuracy: 0.9952 - acc: 0.9952
+Epoch 165/200
+ - 3s - loss: 0.0129 - categorical_accuracy: 0.9957 - acc: 0.9957
+Epoch 166/200
+ - 3s - loss: 0.0125 - categorical_accuracy: 0.9958 - acc: 0.9958
+Epoch 167/200
+ - 3s - loss: 0.0142 - categorical_accuracy: 0.9954 - acc: 0.9954
+Epoch 168/200
+ - 3s - loss: 0.0127 - categorical_accuracy: 0.9959 - acc: 0.9959
+Epoch 169/200
+ - 3s - loss: 0.0119 - categorical_accuracy: 0.9958 - acc: 0.9958
+Epoch 170/200
+ - 3s - loss: 0.0120 - categorical_accuracy: 0.9960 - acc: 0.9960
+Epoch 171/200
+ - 3s - loss: 0.0114 - categorical_accuracy: 0.9960 - acc: 0.9960
+Epoch 172/200
+ - 3s - loss: 0.0125 - categorical_accuracy: 0.9959 - acc: 0.9959
+Epoch 173/200
+ - 3s - loss: 0.0110 - categorical_accuracy: 0.9961 - acc: 0.9961
+Epoch 174/200
+ - 3s - loss: 0.0143 - categorical_accuracy: 0.9954 - acc: 0.9954
+Epoch 175/200
+ - 3s - loss: 0.0125 - categorical_accuracy: 0.9959 - acc: 0.9959
+Epoch 176/200
+ - 3s - loss: 0.0135 - categorical_accuracy: 0.9958 - acc: 0.9958
+Epoch 177/200
+ - 3s - loss: 0.0109 - categorical_accuracy: 0.9962 - acc: 0.9962
+Epoch 178/200
+ - 3s - loss: 0.0107 - categorical_accuracy: 0.9963 - acc: 0.9963
+Epoch 179/200
+ - 3s - loss: 0.0130 - categorical_accuracy: 0.9956 - acc: 0.9956
+Epoch 180/200
+ - 3s - loss: 0.0110 - categorical_accuracy: 0.9964 - acc: 0.9964
+Epoch 181/200
+ - 3s - loss: 0.0149 - categorical_accuracy: 0.9954 - acc: 0.9954
+Epoch 182/200
+ - 3s - loss: 0.0119 - categorical_accuracy: 0.9960 - acc: 0.9960
+Epoch 183/200
+ - 3s - loss: 0.0116 - categorical_accuracy: 0.9961 - acc: 0.9961
+Epoch 184/200
+ - 3s - loss: 0.0134 - categorical_accuracy: 0.9958 - acc: 0.9958
+Epoch 185/200
+ - 3s - loss: 0.0115 - categorical_accuracy: 0.9961 - acc: 0.9961
+Epoch 186/200
+ - 3s - loss: 0.0133 - categorical_accuracy: 0.9955 - acc: 0.9955
+Epoch 187/200
+ - 3s - loss: 0.0130 - categorical_accuracy: 0.9955 - acc: 0.9955
+Epoch 188/200
+ - 3s - loss: 0.0113 - categorical_accuracy: 0.9962 - acc: 0.9962
+Epoch 189/200
+ - 3s - loss: 0.0114 - categorical_accuracy: 0.9961 - acc: 0.9961
+Epoch 190/200
+ - 3s - loss: 0.0117 - categorical_accuracy: 0.9959 - acc: 0.9959
+Epoch 191/200
+ - 3s - loss: 0.0107 - categorical_accuracy: 0.9964 - acc: 0.9964
+Epoch 192/200
+ - 3s - loss: 0.0106 - categorical_accuracy: 0.9964 - acc: 0.9964
+Epoch 193/200
+ - 3s - loss: 0.0122 - categorical_accuracy: 0.9959 - acc: 0.9959
+Epoch 194/200
+ - 3s - loss: 0.0112 - categorical_accuracy: 0.9964 - acc: 0.9964
+Epoch 195/200
+ - 3s - loss: 0.0110 - categorical_accuracy: 0.9962 - acc: 0.9962
+Epoch 196/200
+ - 3s - loss: 0.0101 - categorical_accuracy: 0.9966 - acc: 0.9966
+Epoch 197/200
+ - 3s - loss: 0.0118 - categorical_accuracy: 0.9960 - acc: 0.9960
+Epoch 198/200
+ - 3s - loss: 0.0113 - categorical_accuracy: 0.9964 - acc: 0.9964
+Epoch 199/200
+ - 3s - loss: 0.0106 - categorical_accuracy: 0.9963 - acc: 0.9963
+Epoch 200/200
+ - 3s - loss: 0.0110 - categorical_accuracy: 0.9964 - acc: 0.9964
+Training time 589.338378 seconds
+================================================================================
+
+
+================================================================================
+Confusion Matrix:
+[[958  13   6  18   2   3]
+ [  6 943   9  33   7   2]
+ [  4  13 945  21  12   5]
+ [  4  44  32 903  10   7]
+ [  1   5   9  14 968   3]
+ [  3   8   7  14   4 964]]
+================================================================================
+	Accuracy:
+	0.9468333333333333
+================================================================================
+/usr/local/lib/python3.5/dist-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/usr/local/lib/python3.5/dist-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/usr/local/lib/python3.5/dist-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/usr/local/lib/python3.5/dist-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/usr/local/lib/python3.5/dist-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+/usr/local/lib/python3.5/dist-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+  if diff:
+Saving the figure as ann_rwe_256_512.png...
+
+
+================================================================================
+Saving the classifier...
+Classifier saved to: /mnt/data/RWE/classifiers/classifiers_rwe_256_window_512_datapoints/ann
+================================================================================
+
+
+Exception ignored in: <bound method BaseSession.__del__ of <tensorflow.python.client.session.Session object at 0x7efc827dcc18>>
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.5/dist-packages/tensorflow/python/client/session.py", line 686, in __del__
+TypeError: 'NoneType' object is not callable
