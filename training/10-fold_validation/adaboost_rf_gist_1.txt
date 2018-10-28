@@ -1,7 +1,6 @@
-Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py adaboost gist /mnt/data/GIST/ -at rf -c 10 -cj 1 -e {"base_estimator__criterion": "gini", "base_estimator__n_estimators": 100, "learning_rate": 5, "n_estimators": 50}
+	train_classifier.py adaboost gist /mnt/data/GIST/ -at rf -c 10 -cj 1 -e {"base_estimator__criterion": "entropy", "base_estimator__n_estimators": 100, "n_estimators": 50, "learning_rate": 0.5}
 ================================================================================
 ================================================================================
 Loading data...
@@ -26,21 +25,21 @@ AdaBoost Type: Random Forest (rf)
 ================================================================================
 Training Class Count:
 ================================================================================
+	Virus       10000
 	Worm        10000
-	Trojan      10000
 	PUA         10000
 	Backdoor    10000
+	Trojan      10000
 	Ransom      10000
-	Virus       10000
 ================================================================================
 Testing Class Count:
 ================================================================================
+	Virus       10000
 	Worm        10000
-	Trojan      10000
 	PUA         10000
 	Backdoor    10000
+	Trojan      10000
 	Ransom      10000
-	Virus       10000
 ================================================================================
 
 
@@ -48,39 +47,51 @@ Testing Class Count:
 Begin training...
 ================================================================================
 ================================================================================
-Model hyperparameters: {'base_estimator': RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+Model hyperparameters: {'base_estimator': RandomForestClassifier(bootstrap=True, class_weight=None, criterion='entropy',
             max_depth=None, max_features='auto', max_leaf_nodes=None,
             min_impurity_decrease=0.0, min_impurity_split=None,
             min_samples_leaf=1, min_samples_split=2,
             min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=1,
             oob_score=False, random_state=None, verbose=0,
-            warm_start=False), 'adaboost_type': 'rf', 'learning_rate': 5, 'n_estimators': 50}
+            warm_start=False), 'adaboost_type': 'rf', 'n_estimators': 50, 'learning_rate': 0.5}
 ================================================================================
 Start Cross Fold Validation...
 	Calculating fold: 1
 	Finished calculating fold: 1
+	Accuracy 0.9361666666666667 for fold 1
 	Calculating fold: 2
 	Finished calculating fold: 2
+	Accuracy 0.9388333333333333 for fold 2
 	Calculating fold: 3
 	Finished calculating fold: 3
+	Accuracy 0.9398333333333333 for fold 3
 	Calculating fold: 4
 	Finished calculating fold: 4
+	Accuracy 0.9353333333333333 for fold 4
 	Calculating fold: 5
 	Finished calculating fold: 5
+	Accuracy 0.9405 for fold 5
 	Calculating fold: 6
 	Finished calculating fold: 6
+	Accuracy 0.9463333333333334 for fold 6
 	Calculating fold: 7
 	Finished calculating fold: 7
+	Accuracy 0.9433333333333334 for fold 7
 	Calculating fold: 8
 	Finished calculating fold: 8
+	Accuracy 0.9278333333333333 for fold 8
 	Calculating fold: 9
 	Finished calculating fold: 9
+	Accuracy 0.945 for fold 9
 	Calculating fold: 10
 	Finished calculating fold: 10
-Training time 11743.366792 seconds
+	Accuracy 0.9396666666666667 for fold 10
+Training time 112270.887136 seconds
 ================================================================================
-CFV Mean: 0.61595
-CFV Var: 0.11710071757062618
+CFV Mean: 0.9392833333333332
+CFV Var: 0.005072830680311652
+CFV Accuracies: [0.93616667 0.93883333 0.93983333 0.93533333 0.9405     0.94633333
+ 0.94333333 0.92783333 0.945      0.93966667]
 ================================================================================
 
 

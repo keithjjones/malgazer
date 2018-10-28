@@ -1,7 +1,6 @@
-Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py adaboost rwe /mnt/data/RWE/ -rwew 1024 -rwed 1024 -at dt -c 10 -cj 10 -e {"algorithm": "SAMME", "base_estimator__criterion": "entropy", "base_estimator__splitter": "random", "learning_rate": 1, "n_estimators": 50}
+	train_classifier.py adaboost rwe /mnt/data/RWE -rwew 1024 -rwed 1024 -at dt -c 10 -cj 10 -e {"learning_rate": 0.9, "base_estimator__splitter": "best", "base_estimator__criterion": "entropy", "n_estimators": 50, "algorithm": "SAMME"}
 ================================================================================
 ================================================================================
 Loading data...
@@ -29,20 +28,20 @@ AdaBoost Type: Decision Tree (dt)
 Training Class Count:
 ================================================================================
 	Ransom      10000
+	Trojan      10000
+	PUA         10000
+	Worm        10000
 	Backdoor    10000
 	Virus       10000
-	Worm        10000
-	PUA         10000
-	Trojan      10000
 ================================================================================
 Testing Class Count:
 ================================================================================
 	Ransom      10000
+	Trojan      10000
+	PUA         10000
+	Worm        10000
 	Backdoor    10000
 	Virus       10000
-	Worm        10000
-	PUA         10000
-	Trojan      10000
 ================================================================================
 
 
@@ -55,7 +54,7 @@ Model hyperparameters: {'base_estimator': DecisionTreeClassifier(class_weight=No
             min_impurity_decrease=0.0, min_impurity_split=None,
             min_samples_leaf=1, min_samples_split=2,
             min_weight_fraction_leaf=0.0, presort=False, random_state=None,
-            splitter='random'), 'adaboost_type': 'dt', 'algorithm': 'SAMME', 'learning_rate': 1, 'n_estimators': 50}
+            splitter='best'), 'adaboost_type': 'dt', 'learning_rate': 0.9, 'n_estimators': 50, 'algorithm': 'SAMME'}
 ================================================================================
 Start Cross Fold Validation...
 	Calculating fold: 1
@@ -68,20 +67,32 @@ Start Cross Fold Validation...
 	Calculating fold: 8
 	Calculating fold: 9
 	Calculating fold: 10
-	Finished calculating fold: 3
 	Finished calculating fold: 2
-	Finished calculating fold: 4
-	Finished calculating fold: 6
+	Accuracy 0.9465 for fold 2
 	Finished calculating fold: 1
-	Finished calculating fold: 7
-	Finished calculating fold: 10
-	Finished calculating fold: 5
-	Finished calculating fold: 8
+	Accuracy 0.9406666666666667 for fold 1
 	Finished calculating fold: 9
-Training time 872.259162 seconds
+	Accuracy 0.9565 for fold 9
+	Finished calculating fold: 6
+	Accuracy 0.9556666666666667 for fold 6
+	Finished calculating fold: 5
+	Accuracy 0.9498333333333333 for fold 5
+	Finished calculating fold: 4
+	Accuracy 0.9493333333333334 for fold 4
+	Finished calculating fold: 7
+	Accuracy 0.9526666666666667 for fold 7
+	Finished calculating fold: 8
+	Accuracy 0.9433333333333334 for fold 8
+	Finished calculating fold: 10
+	Accuracy 0.9508333333333333 for fold 10
+	Finished calculating fold: 3
+	Accuracy 0.9501666666666667 for fold 3
+Training time 32932.574039 seconds
 ================================================================================
-CFV Mean: 0.9518000000000001
-CFV Var: 0.0036838989007722724
+CFV Mean: 0.94955
+CFV Var: 0.004737586117657623
+CFV Accuracies: [0.9465     0.94066667 0.9565     0.95566667 0.94983333 0.94933333
+ 0.95266667 0.94333333 0.95083333 0.95016667]
 ================================================================================
 
 

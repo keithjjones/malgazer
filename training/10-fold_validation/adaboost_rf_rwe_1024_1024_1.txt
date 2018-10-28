@@ -1,7 +1,6 @@
-Using TensorFlow backend.
 ================================================================================
 Command Line:
-	train_classifier.py adaboost rwe /mnt/data/RWE/ -rwew 1024 -rwed 1024 -at rf -c 10 -cj 5 -e {"base_estimator__criterion": "gini", "base_estimator__n_estimators": 100, "learning_rate": 2, "n_estimators": 2}
+	train_classifier.py adaboost rwe /mnt/data/RWE/ -rwew 1024 -rwed 1024 -at rf -c 10 -cj 1 -e {"base_estimator__n_estimators": 100, "base_estimator__criterion": "gini", "learning_rate": 0.01, "n_estimators": 50}
 ================================================================================
 ================================================================================
 Loading data...
@@ -12,9 +11,9 @@ Feature Type: rwe
 	Data points: 1,024
 Number of features: 1,024
 ================================================================================
-/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
-/home/ubuntu/.local/lib/python3.5/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
+/home/kjones/.local/lib/python3.6/site-packages/sklearn/preprocessing/label.py:151: DeprecationWarning: The truth value of an empty array is ambiguous. Returning False, but in future this will result in an error. Use `array.size > 0` to check that an array is not empty.
   if diff:
 
 
@@ -28,19 +27,19 @@ AdaBoost Type: Random Forest (rf)
 ================================================================================
 Training Class Count:
 ================================================================================
-	Virus       10000
 	Ransom      10000
-	Trojan      10000
 	Worm        10000
+	Trojan      10000
+	Virus       10000
 	PUA         10000
 	Backdoor    10000
 ================================================================================
 Testing Class Count:
 ================================================================================
-	Virus       10000
 	Ransom      10000
-	Trojan      10000
 	Worm        10000
+	Trojan      10000
+	Virus       10000
 	PUA         10000
 	Backdoor    10000
 ================================================================================
@@ -56,33 +55,45 @@ Model hyperparameters: {'base_estimator': RandomForestClassifier(bootstrap=True,
             min_samples_leaf=1, min_samples_split=2,
             min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=1,
             oob_score=False, random_state=None, verbose=0,
-            warm_start=False), 'adaboost_type': 'rf', 'learning_rate': 2, 'n_estimators': 2}
+            warm_start=False), 'adaboost_type': 'rf', 'learning_rate': 0.01, 'n_estimators': 50}
 ================================================================================
 Start Cross Fold Validation...
 	Calculating fold: 1
-	Calculating fold: 2
-	Calculating fold: 3
-	Calculating fold: 4
-	Calculating fold: 5
 	Finished calculating fold: 1
-	Finished calculating fold: 3
-	Finished calculating fold: 5
-	Finished calculating fold: 4
+	Accuracy 0.9455 for fold 1
+	Calculating fold: 2
 	Finished calculating fold: 2
+	Accuracy 0.9503333333333334 for fold 2
+	Calculating fold: 3
+	Finished calculating fold: 3
+	Accuracy 0.9516666666666667 for fold 3
+	Calculating fold: 4
+	Finished calculating fold: 4
+	Accuracy 0.9433333333333334 for fold 4
+	Calculating fold: 5
+	Finished calculating fold: 5
+	Accuracy 0.9495 for fold 5
 	Calculating fold: 6
-	Calculating fold: 7
-	Calculating fold: 8
-	Calculating fold: 9
-	Calculating fold: 10
-	Finished calculating fold: 7
-	Finished calculating fold: 9
-	Finished calculating fold: 8
-	Finished calculating fold: 10
 	Finished calculating fold: 6
-Training time 1166.652650 seconds
+	Accuracy 0.9573333333333334 for fold 6
+	Calculating fold: 7
+	Finished calculating fold: 7
+	Accuracy 0.9515 for fold 7
+	Calculating fold: 8
+	Finished calculating fold: 8
+	Accuracy 0.9431666666666667 for fold 8
+	Calculating fold: 9
+	Finished calculating fold: 9
+	Accuracy 0.9556666666666667 for fold 9
+	Calculating fold: 10
+	Finished calculating fold: 10
+	Accuracy 0.9518333333333333 for fold 10
+Training time 53298.270880 seconds
 ================================================================================
-CFV Mean: 0.9493666666666666
-CFV Var: 0.004558752265941017
+CFV Mean: 0.9499833333333333
+CFV Var: 0.004538997686714541
+CFV Accuracies: [0.9455     0.95033333 0.95166667 0.94333333 0.9495     0.95733333
+ 0.9515     0.94316667 0.95566667 0.95183333]
 ================================================================================
 
 
