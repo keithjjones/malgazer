@@ -24,6 +24,8 @@ from sklearn.metrics import roc_curve, auc
 from sklearn.preprocessing import label_binarize
 from sklearn.model_selection import StratifiedKFold
 from scipy import interp
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed, wait, FIRST_COMPLETED
 import os
