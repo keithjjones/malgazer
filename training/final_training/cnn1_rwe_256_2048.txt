@@ -1,0 +1,19 @@
+================================================================================
+Command Line:
+	train_classifier.py cnn rwe /mnt/data/RWE -rwew 256 -rwed 2048 -t 0.1 -roc -nno adadelta -nnb 1000 -nne 200 -nnl training/nnlayers/cnn1.txt
+================================================================================
+================================================================================
+Loading data...
+================================================================================
+Traceback (most recent call last):
+  File "train_classifier.py", line 602, in <module>
+    main(args)
+  File "train_classifier.py", line 254, in main
+    windowsize=windowsize, datapoints=datapoints)
+  File "/Source/malgazer/library/utils.py", line 771, in load_features
+    raw_data, classification_data = Utils.load_rwe_features(datadir, kwargs.get('windowsize', 256), kwargs.get('datapoints', 1024))
+  File "/Source/malgazer/library/utils.py", line 793, in load_rwe_features
+    df = pd.read_hdf(os.path.join(datadir, 'rwe_window_{0}_datapoints_{1}.hdf'.format(windowsize, datapoints)), 'rwe')
+  File "/usr/local/lib/python3.5/dist-packages/pandas/io/pytables.py", line 371, in read_hdf
+    'File %s does not exist' % path_or_buf)
+FileNotFoundError: File /mnt/data/RWE/rwe_window_256_datapoints_2048.hdf does not exist
