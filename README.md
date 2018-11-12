@@ -48,6 +48,12 @@ docker-compose build --no-cache
 
 This was developed using Docker on a Mac.  Other operating systems have not been tested (yet).
 
+You can start a local registry with:
+
+```
+docker run -d -p 5000:5000 --restart=always --name registry registry:2
+```
+
 ## Web
 
 After bringing it up in Docker, you can access the web portion of this project at https://localhost.

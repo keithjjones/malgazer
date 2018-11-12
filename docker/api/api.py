@@ -8,11 +8,12 @@ from werkzeug.utils import secure_filename
 import datetime
 import sqlalchemy
 import glob
-import multiprocessing
+# import multiprocessing
 import threading
 import sys
 import logging
 import logging.handlers
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 # sys.path.append('..')
 # sys.path.append(os.path.join('..', '..'))
 from ...library.files import Sample
@@ -41,6 +42,9 @@ applogger.addHandler(file_handler)
 SAMPLES_DIRECTORY = "/samples"
 MULTIUSER = bool(int(os.environ.get('MALGAZER_MULTIUSER', 0)))
 ALLOW_RESET = bool(int(os.environ.get('MALGAZER_ALLOW_RESET', 0)))
+NUM_JOBS = int(os.environ.get("NUM_JOBS", 100))
+
+EXECUTOR = ProcessPoolExecutor(max_workers=NUM_JOBS)
 
 
 def get_request_ip():
@@ -128,7 +132,11 @@ def process_sample(submission_id):
     :return: Nothing.
     """
     sys.modules['library'] = library
-    submission = Submission.query.filter_by(id=submission_id).first()
+    try:
+        submission = Submission.query.filter_by(id=submission_id).first()
+    except Exception as exc:
+        app.logger.exception("Exception while looking up submission: {0}".format(exc))
+        return
     try:
         # ml = dill.load(open(os.path.join('..', '..', 'classifier', 'ml.dill'), 'rb'))
         ml = ML.load_classifier(os.path.join('..', '..', 'classifier'))
@@ -188,12 +196,13 @@ def submit():
     db.session.add(submission)
     db.session.commit()
     app.logger.info('Submitted sample: {0} from IP: {1} from User ID: {2}'.format(s.sha256, ip_addr, user_id))
-    proc = multiprocessing.Process(target=process_sample, args=(submission.id,))
-    proc.start()
+    # proc = multiprocessing.Process(target=process_sample, args=(submission.id,))
+    # proc.start()
     # thread = threading.Thread(target=process_sample, args=(submission.id,))
     # thread.daemon = True
     # thread.start()
     # process_sample(submission.id)
+    future = EXECUTOR.submit(process_sample, submission.id)
     return json.dumps(return_data), 200
 
 
