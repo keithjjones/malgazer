@@ -11,6 +11,12 @@ For now, this page is all of the documentation for this project.
 
 You can find logs from different training session in the [training folder](training). 
 
+# Training Data
+
+You can access all the training data I used at:
+
+https://keithjjones-my.sharepoint.com/:f:/p/keith/EqyQqJCh0o9BuKnI2RuVIhYBp-njSmQCT86Wuf9WRhTm4w?e=g4WCnT
+
 # Bugs and Issues
 
 Please file any bugs or issues using the GitHub issues facility above.
