@@ -9,7 +9,7 @@ For now, this page is all of the documentation for this project.
 
 ## Training Logs
 
-You can find logs from different training session in the [training folder](training). 
+You can find logs from different training sessions in the [training folder](training). 
 
 # Training Data
 
