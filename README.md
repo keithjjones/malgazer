@@ -4,8 +4,16 @@ A Python malware analysis library.  Mostly for machine learning purposes.
 
 # Documentation
 
-More info coming soon, along with my dissertation, which will go much deeper into what this is.
-For now, this page is all of the documentation for this project.
+You can download the PDF of my dissertation at:
+
+https://scholar.dsu.edu/theses/326/
+
+Recommended citation (this helps me see if my work is used in other places):
+
+```
+Jones, Keith, "Malgazer: An Automated Malware Classifier With Running Window Entropy and Machine Learning" (2019). Masters Theses & Doctoral Dissertations. 326. 
+https://scholar.dsu.edu/theses/326
+```
 
 ## Training Logs
 
