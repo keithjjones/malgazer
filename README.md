@@ -93,6 +93,14 @@ To use this module outside Docker, you will need the requirement.  The following
 pip install -r requirements.txt
 ```
 
+If you have trouble with the FFTW library on a Mac, install it via HomeBrew and pass the directory into pyleargist:
+
+```
+# brew install fftw
+...
+# export LIBRARY_PATH=/usr/local/Cellar/fftw/3.3.8/lib/
+```
+
 ## python-magic
 
 If you are running Windows or macOS, please make sure the dependencies for 
