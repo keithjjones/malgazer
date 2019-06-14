@@ -15,6 +15,10 @@ Jones, Keith, "Malgazer: An Automated Malware Classifier With Running Window Ent
 https://scholar.dsu.edu/theses/326
 ```
 
+The slides for the dissertation can be viewed at:
+
+https://www.slideshare.net/KeithJones36/keith-j-jones-phd-malgazer-an-automated-malware-classifier-with-running-window-entropy-and-machine-learning
+
 ## Training Logs
 
 You can find logs from different training sessions in the [training folder](training). 
