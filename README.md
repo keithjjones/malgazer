@@ -27,7 +27,7 @@ You can find logs from different training sessions in the [training folder](trai
 
 You can access all the training data I used at:
 
-https://dakotastateuniversity-my.sharepoint.com/:f:/g/personal/keith_jones_trojans_dsu_edu/Ei6XxhQ7Dv9MpPZ1BHOmgP4BDi0asZJqo0q-ymscmcXS5g?e=GNQBJu
+https://keithjjones-my.sharepoint.com/:f:/p/keith/EqyQqJCh0o9BuKnI2RuVIhYBp-njSmQCT86Wuf9WRhTm4w?e=g4WCnT
 
 # Bugs and Issues
 
